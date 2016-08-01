@@ -1,0 +1,281 @@
+---
+title: "Practice sequence Persistance and Learning Engagement"
+author: "Junchen Feng"
+date: "April 21st 2016"
+header-includes:
+   - \usepackage{setspace}
+   - \doublespacing
+
+output: pdf_document
+---
+
+# I. Introduction
+There is a class of learning task where practice makes perfect. Hereby refers to as the PMP task. In K-12 context, Examples of such task include memorizing vocabuary and internalizing single digit multiplication (In China it is called "9 by 9 Multiplication Table). Repeated practice has been one of the key doctrines of Chinese education philosophy. Recently pmp task has also gained momentum in the States(Lemov et al 2012). 
+
+PMP task is a good candidate for online learning: High frequency, efficient in scattered time, effective even without human instruction. Therefore, Duolingo illustrates how beginner language learning can be formated into a series of PMP task. Khan Academy, to a less extent, demonstrates how repeated exercises help users master elementary math skills.
+
+The achilles' hill of "Practice Makes Perfect"(PMP) task is user engagement. PMP task is boring, except for when it is hard then it is frustrating.Evidence for such claim is hard to come by because good quality user retention rate data are considered as commercial secret. In 2012, Duolingo has a retention rate around 20%(Luis von Ahn,2012), since then the retention rate should have gone up. That said, Duolingo is the best in the industry, thus the monthly retention rate of most online PMP learning service is probably at teens.
+
+Such is the dilemma of online PMP task: Perfect only comes from practice, but users are not practicing. Thus for PMP task, persistence of practices is key to learning outcome. 
+
+# II. Literature Review
+There is a string of literature on engagement under the umbrella of "cognitive affect state" (Baker et al, 2010). The BROMP protocol(Ocumpaugh et al, 2012) uses on-stie logs to analyze user's mental engagement in classroom activity. It has been deployed in field study (Ocumpaugh et al,2013) to evaluate online learning service. However, to my best knowledge, there is no literature on practice streaks or engagement in online learning service.
+
+There is a large literature on learning curve that is closely related to the PMP task. The goal of the bayesian knowledge tracing model(Corbett & Anderson, 1994) is to estimate the latent mastery of the knowledge point (the degree of perfect). The key assumption is that the error rate and the practice number follows a downward exponetial curve. The latent mastery thus can be identified by the number of the practice opportunity once the curve parameter is estimated. The mixture learning curve (Streeter,2015) relax the parametric assumption of the learning curve and claims to have higher predictive power. This literature assumes that the users will not stop practicing until they master. The persistent user assumption is likey to hold in mandatory homework setting, but not in a self-regulated learning environment. The longer users stay in the practice, the grittier they are. If grit is correlated with cognitive learning skill, then the estimated learning curve suffers from dynamic selection bias(Cameron and Heckman, 1988; Ham and LaLonde, 1997). 
+
+To extend the practice sequence, one must understand the dynamics of practice sequence. Therefore, this paper attempts to build a statistical model that describes the practice sequence persistence. The item hazard rate describes how likely user stops the practice streak after encountering the item. Using randomized control trial, the paper also provides some empirical evidence that user persistence, measured by continued practice streak and user retention rate, can be altered by engineering composition of item hazard rates.
+
+
+
+# III. Facts about User Persistence
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE,error=FALSE}
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(caret)
+library(pROC)
+```
+
+## (1) Wrong Response Hurts
+A wrong answer is (unconditionally) 2 times more likely leading to a stop. About 14% spell ends after the first error. It speaks volume to the lack of user persistence. 
+
+Moreover, it matters what item the student trips over. Otherwise, the conditional stop rate for right/wrong answer should be identical across items (here defined as the knowledge point tested by the quiz). Figure 1 shows that is not the case. There is a wide dispersion of the conditional rate for wrong answer, and less so for the right answer. Therefore the item characteristics need to be modeled.
+
+It is not clear why failure tastes different across items. The educated guess is careless V.S. powerless. The student slips even if he has already mastered the knowledge point. In the Bayesian Knowledge Tracing literature, the average slip rate is about 10%, which fits the current data set. If the student knows the error is a slippage and thus is likely to get the next item right, he is more likely to persist. Instead, if the student makes an error because he cannot solve it, the prospect of future success also dims, consequently he quits. Therefore, some failures are careless while others are powerless, homogeneous within knowledge points, heterogeneous across knowledge points.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+proj_dir = 'C:/Users/junchen/Documents/Github/pmpEngagement/data/'
+#proj_dir = '/Users/17zuoye/Desktop/16366/'
+load(paste0(proj_dir,'spell_data.RData'))
+
+# compute the end idx
+spell_data = spell_data %>% arrange(uid, spell_id, desc(rank))
+spell_data = spell_data %>% transform(idx=as.integer((rank-lag(rank,1))>0))
+spell_data$idx[1] = 1
+spell_data = spell_data %>% arrange(spell_id,rank)
+spell_data = spell_data %>% select(kpid, atag, timelen, appid, spell_id, rank, idx)
+
+wrong_stop_by_item_stat = spell_data %>% group_by(atag,kpid) %>% summarize(pct=mean(as.integer(idx)),n=n())
+qplot(data=wrong_stop_by_item_stat %>% filter(n>100), x=pct, col=factor(atag),geom='density')
+```
+
+## (2) Duration dependence
+The data exihibt duration dependence. Figure 2 describes the probability of termination at each period. There is a significant difference for the level of hazard rate, but less so for the shape. The zigzag shape of the hazard rate curve for the wrong response may be a result of insufficient wrong data at each period.  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+wrong_stop_by_rank_stat = spell_data %>% group_by(atag,rank) %>% summarize(pct=mean(as.integer(idx)),n=n())
+qplot(data=wrong_stop_by_rank_stat%>% filter(rank<=20 & rank>1) %>% rename(hazard_rate=pct, period=rank), x=period, y=hazard_rate, col=factor(atag),geom='line') 
+```
+
+For right answer, the hazard rate peaks at period #3 and trends down afterwards. Such shape results from the product design. Presented as a role playing game, the student clears a level to claim virtual reward. If the student answers a quiz right, the "monster" takes a hit; while if the student gives a wrong answer, the avartar takes a hit. On average, both the monster and the avartar can take 3 hits before yields. The student usually does not give up until they clear the level. The gentle decline of hazard rate after period 3 may reflect the dynamical selection process: There are more gritty students in the latter periods than in the earlier periods.
+
+## (3) Hot Streak
+If the user is on a winning streak, they are less likely to stop. Consequently the each response is not independent and cannot directly apply the product rule. 
+
+The "streak" (or sequence) dependence a testable hypothesis. Under the assumption of indepedent response sequence, the probability of termination is only a function of item characteristics. The probability distribution of termination shall be identical, conditioning on the preceding answer sequence, a direct application of the definition of statistical independence.
+
+Figure 3 shows the (2nd) easiest case of sequence dependence. Conditioning on the answer sequence of last 2 items (2-item sequence), whether the user gets it right or worng influences the termination of a spell. The left panel shows the pdf of termination probability for the wrong answer while the right panel that of the right answer. Four numbers differentiate the previous answer patterns: 0 stands for two wrong, 1 for first wrong and second right, 10 for first right and second wrong, 11 for both right.
+
+There are two interesting observations from this figure:
+    
+(1) If the current answer is wrong, the data generating process is close to sequence independence, with two winning streak slightly increases the chance of keep practicing.
+
+(2) If the current answer is right, the data generating process is sequence dependent, especially for 3 win in a row, with the rest scenario close to sequence independent.
+
+Similar pattern can be found for 3-item sequence or 4 item sequence.
+
+```{r, echo=FALSE, warning=FALSE}
+lag_spell_data = read.csv(paste0(proj_dir,'spell_data_lag_3.csv'),sep=',', col.names=c('atag','end_idx','spell_id','rank','seq_id','streak_id'))
+
+# group by identical item id
+cell_summary = lag_spell_data %>% group_by(seq_id) %>% summarize(n=n()) %>%
+    ungroup()%>% arrange(desc(n)) %>% filter(n>=400)
+
+# label the streak data
+test_stat = lag_spell_data %>% filter(seq_id %in% cell_summary$seq_id) %>% group_by(seq_id, streak_id, atag) %>% summarize(pct=mean(end_idx))  
+test_sum_stat = test_stat %>% group_by(seq_id) %>% summarize(n=n()) %>% filter(n==8)
+
+qplot(data=test_stat %>% filter(seq_id %in% test_sum_stat$seq_id), x=pct, col=factor(streak_id),geom='density', facets=.~atag)
+```
+
+The caveat of such exploratory analysis is a selection process. Group the data by the triplet of items, retain the group that has more than 400 data points. Then group those retain triplets by combination of the current and previous responses, retain those triplets that have data in all 8 possible combinations. After the two step filtering, only 215 item triplets remains, accounting for around 60% of the total response data.
+
+
+# IV. Predict User Engagement
+
+##(1) Survival Model
+The following assumptions are needed to formulate a survial analysis model:
+    
+(1) Dropping out at each item is a independent event, conditioning on the variables. There are no "n-gram" effect where n items arranged in a particular order have different hazard rates from shown to students one by one. In another words, the model rules out "scaffolding" where preceding easy items prepare students for the hard climax.
+
+(2) The item hazard rate is not a function of exposure. Item shown twice have identical hazard rate.
+
+(3) The probability of training sequence is not a function of user characteristics.
+
+(4) The duration dependences are identical for all items
+
+(5) Conditional on winning streak, each response is i.i.d.
+
+The hazard rate of period $t$ for spell $i$ is modeled as 
+
+$$
+h_{i,t} = h_{t} \times (\beta_{1}Streak_{i,t} + \beta_{2}Y_{i,t} + \beta_{3}Streak_{i,t} \times Y_{i,t}  + \beta_{5}Item_{i,t})
+$$
+
+where $h_{t}$ is the baseline hazard rate, $Y_{i,t}$ the boolean value of whether the response is right, $Streak_{i,t}$ is the boolean value of whether the student is on a winning spell until $t-1$, and $Item_{i,t}$ the item id encountered in spell i and period t.
+
+The likelihood function for spell $i$ is thus
+
+$$
+P(S_{i,1},\dots,S_{i,T}) = \prod_{t=1,\dots,T} h_{i,t}^{S_{i,t}}*(1-h_{i,t})^{1-S_{i,t}}
+$$
+where $S_{i,t}$ is the boolean value of whether the spell terminates for spell i at period t.
+
+Unfortunately, I did not have time to finish the EM routine for this hazard model, which is something I will focus on after the proposal.
+
+
+##(2) OLS model as proxy model
+To illustrate, the current draft adopts the machine learning routine and try to predict the termination of a spell.
+
+To establish a baseline, fit the following OSL model. Fit a (unconstrained) logit model has essentially the same parameter estimation, and almost identical area under curve (auc) statistics.
+
+$$
+    S_{i,t} = \beta_{1}Streak_{i,t} + \beta_{2}Y_{i,t} + \beta_{3}Streak_{i,t}*Y_{i,t}  + \beta_{4}t + \beta_{5}Item_{i,t} + \epsilon_{i,t}
+$$
+
+To fit the data one must define spell. As a practical (temporary) solution. This paper follow a "30 minute" rule that if two practices are done 30 minutes apart, they are separated into two spells.
+```{r, echo=FALSE, warning=FALSE}
+select_data = spell_data %>% group_by(spell_id) %>% mutate(cumatag=cumsum(atag)) %>%
+    transform(streak=as.integer(cumatag==rank)) %>%
+    transform(streak_last = lag(streak,1)) %>%
+    filter(rank!=1)
+
+# sample 20% of the data
+max_response_num = 20
+select_data = select_data %>% filter(rank<=max_response_num)
+
+# do a 10% sample on the spell
+spell_ids = unique(select_data$spell_id)
+selected_spell_ids = spell_ids[runif(length(spell_ids))<0.1]
+train_data = select_data %>% filter(spell_id %in% selected_spell_ids)
+
+# OLS is similar to logit
+ols_model = lm(data=train_data, idx~atag*streak_last+factor(rank)+factor(kpid)+timelen)
+
+
+# predict
+#train_data$ols_prob = predict(ols_model)
+#auc(roc(train_data$idx, train_data$ols_prob))
+
+item_hrate = data.frame(itemid=as.character(), hrate=as.numeric())
+for (i in seq(length(variable.names(ols_model)))){
+    if (substr(variable.names(ols_model)[i],8,11) == 'kpid'){
+        var_data = data.frame(itemid=substr(variable.names(ols_model)[i],13,99), hrate=ols_model$coefficients[[i]])
+        item_hrate = rbind(item_hrate, var_data)
+    }
+}
+
+period_hrate = data.frame(rank=as.character(), hrate=as.numeric())
+for (i in seq(length(variable.names(ols_model)))){
+    if (substr(variable.names(ols_model)[i],8,11) == 'rank'){
+        var_data = data.frame(itemid=substr(variable.names(ols_model)[i],13,99), hrate=ols_model$coefficients[[i]])
+        period_rate = rbind(period_hrate, var_data)
+    }
+}
+
+```
+
+
+## Characteritics of the item hazard rate
+
+The paper estimated the hazard rate of the knowledge points, rather than the quiz items, because items are quite homogeneous within knowledge point and because computational power only allows for the former. 
+
+Figure 4 shows the histogram and density of the item hazard rate. There is one outlier that is excluded: long division. Students have to type in multiple numbers to complete the long division formula, instead of one number or a comparative sign in the rest of the items. The poorly designed user interface results in user confusion and frustration, and subsequently, user attrition. The long division items account for only less than 0.1% response data, thus dropped for simplicity.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+item_hrate =  item_hrate %>% filter(hrate<0.2) %>% arrange(hrate)
+ggplot(data=item_hrate, aes(hrate)) +
+    geom_histogram(aes(y = ..density..)) +
+    stat_function(fun = dnorm, 
+                  args = list(mean = mean(item_hrate$hrate), sd = sd(item_hrate$hrate)), 
+                  col = 'red')
+```
+
+The variation of the item hazard rate is meaningful, compared to that of the duration dependence. The 75%-25% difference of item hazard rate is 2.3% while that of the duration dependence is 1.7%.  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+item_feature = spell_data %>% filter(appid==1) %>% group_by(kpid) %>% summarize(pct=mean(atag), timelen=mean(timelen)) %>% 
+    rename(itemid=kpid)
+
+item_feature = merge(item_feature, item_hrate)
+m1=qplot(data=item_feature, x=pct, y=hrate, xlab='item success rate', ylab='item hazard rate')+geom_smooth()
+m2=qplot(data=item_feature, x=timelen, y=hrate, xlab='item average time spent (sec)', ylab='item hazard rate')+geom_smooth()
+
+grid.arrange(m1,m2, ncol=2)
+```
+
+The item hazard rate variation is strongly associated with item difficulty, measured as success rate and average time required. It is positively correlated with average time spent and negative correlated with success rate. 
+
+In this dataset, all items are explict mental calculation questions (such as "0.5 $\times$ 0.75 = ?"), therefore difficulty reflects the calculation complexity ( "0.5 $\times$ 85 = ?" V.s "0.5 $\times$ 8 = ?"), rather than the level of abstract thinking ("0.5 $\times$ 8 = ?" V.s. "8 Dollars spent on apples and bananas equally. How much are the apples?"). In this case, success rate and time spent are strongly correlated, although there is a decent varation except for the easy ones.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+qplot(data=item_feature, y=timelen, x=pct, xlab='item success rate',  ylab='item average time spent (sec)')
+```
+
+## Learning Curve and Item Hazard Rate
+For the class of PMP problem, high value item has a steep learning curve where each practice opportunity offers non-trivial improvement, at least for the early period. To offer a succinct summary of the learning curve value, define the learning potential as the population success rate at 10th attempt minus that of the 1st attempt. The learning potential is mechanically linked to the initial success rate (and to an extent the average success rate). If the knowledge point starts with a success rate of 98%, there is little room for upside.
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+load(paste0(proj_dir,'lc_stat.RData'))
+lc_hr_stat = merge(lc_stat %>% rename(itemid=item_id), item_hrate)
+qplot(data=lc_hr_stat, x=kpdelta, y=hrate, xlab='item learning potential', ylab='item hazard rate') + geom_smooth()
+
+```
+
+The scatter plot of learning potential and item hazard rate shows a negative correlation: Items with low learning potential (high initial success rate) have low hazard rate, while items with high learning potential have high hazard rate. *It points to dilemma of PMP task: Feed students with real learning chanllenge, they drop out. Engage students with easy routine, they do not learn.* 
+
+Or alternatively, it demonstrates the importance of non-cognitive skill. Grit is a critical pre-requisite for effective self-learning service. 
+
+
+
+# V.Micro-tweak with Macro-impact
+From Decemeber 2015 to March 2016, the study carries out two experiments that (de facto) uses the distribution of item hazard rate as a policy instrument. The first experiment overweighs the hard items that student makes good progress as number of practice opportunities increases. The second experiment underweighs the hard items that has low first attemp success rate. In both experiments, the control group has an equal weight on all items. Users are randomly assigned into two groups with 50% probability. The actual assignment is based on the last digit of user id.
+
+Due to an elaborate rule based recommendation system, the details of which is spared in the current draft. The realized change in the hazard rate distribution is quite small in both cases, about 5% of the recommended items are influenced by the weighting scheme. However, such small tuning has a detectable, though small, impact on daily user retention rate, defined as the number of users active today and yesterday as a percentage of users active yesterday. Since user retention rate is considered as commercial secret here I only report the relative change in daily user retention rate. Easy items brings a significant upshot in daily retention rate, although hard items had a much tamed response. 
+
+```{r, echo=FALSE, warning=FALSE}
+
+exp_res = read.csv(paste0(proj_dir,'exp_summary.csv'),sep=',',header=T)
+qplot(data=exp_res,x=days,y=pct,col=factor(exp_id),geom='line')+geom_hline(yintercept = 1)
+
+```
+
+Similar pattern can be found for average number of quiz items.
+
+# VI. Future Research
+It is not a productive strategy to use easy items as a bait for student to stay engaged. We would like student to engage when hard items are present.
+
+In addition, it seems to be a logical next step to loose the assumption that engagement data generating process is independent of user characteristics.
+
+
+# Literture
+[1]Lemov, Doug, Erica Woolway, and Katie Yezzi. Practice perfect: 42 rules for getting better at getting better. John Wiley & Sons, 2012.
+
+[2]Luis von Ahn, http://youtu.be/e7aTabdzr5Q?t=24m, 2012
+
+[3]Baker, Ryan SJd, et al. "Better to be frustrated than bored: The incidence, persistence, and impact of learners’ cognitive–affective states during interactions with three different computer-based learning environments." International Journal of Human-Computer Studies 68.4 (2010): 223-241.
+
+[4]Ocumpaugh, J. "Baker-Rodrigo observation method protocol (BROMP) 1.0." Training Manual (2012).
+
+[5]Ocumpaugh, Jaclyn, et al. "Field observations of engagement in reasoning mind." Artificial intelligence in education. Springer Berlin Heidelberg, 2013.
+
+[6] Corbett, Albert T., and John R. Anderson. "Knowledge tracing: Modeling the acquisition of procedural knowledge." User modeling and user-adapted interaction 4.4 (1994): 253-278.
+
+[7] Matthew Streeter, Mixture modeling of individual learning curves, EDM, 2015
+
+[8] Cameron S V, Heckman J J. Life cycle schooling and dynamic selection bias: Models and evidence for five cohorts[R]. National Bureau of Economic Research, 1998.
+
+[9] Eberwein C, Ham J C, LaLonde R J. The impact of being offered and receiving classroom training on the employment histories of disadvantaged women: Evidence from experimental data[J]. The Review of Economic Studies, 1997, 64(4): 655-682.
+
