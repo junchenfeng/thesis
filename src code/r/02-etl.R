@@ -94,7 +94,7 @@ train_time = meta_24921_1st_attempt %>% filter(eid %in% c('Q_10201056655901','Q_
 
 workdata = meta_24921_1st_attempt %>%
   filter(uid %in% valid_user_sum$uid[valid_user_sum$k==4]) %>%
-  select(uid,gid,eid,atag_pct,giveup) %>% rename(y=atag_pct)
+  select(uid,gid,eid,atag_pct,giveup,cmt_time) %>% rename(y=atag_pct)
 
 workdata = merge(placebo_status, workdata, by='uid')
 workdata = merge(train_time, workdata, by='uid')
