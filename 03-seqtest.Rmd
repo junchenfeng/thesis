@@ -11,27 +11,29 @@ load(output_file_path)
 
 ## Motivation
 
-Randomized control trials (RCT) has long been held as the golden standard of program evaluation[@lalonde1986evaluating;@imbens2009recent]. Since the call for "Scientifically Based Research" as a part of the No Child Left Behind initiative, RCT has gained dominance among researchers and practioners in education evaluation, as symbolized by the establishment of *What Works Clearninghouse*[@slavin2002evidence]. 
+Randomized control trials (RCT) has long been held as the golden standard of program evaluation[@lalonde1986evaluating;@imbens2009recent]. Since the call for "Scientifically Based Research" as a part of the No Child Left Behind initiative, RCT has gained dominance among researchers and practitioners in education evaluation, as symbolized by the establishment of *What Works Clearninghouse*[@slavin2002evidence]. 
 
-However, fixed sample RCT with frequentist hypothesis test may not be the optimal tool for continuous improvement of the education programs, rather than the evaluation of it. Especially for digtial learning service, there are two major disagreement between the t-test driven RCT and the production iteration:
+However, fixed sample RCT with frequentist hypothesis test may not be the optimal tool for continuous improvement of the education programs, rather than the evaluation of it. Especially for digital learning service, there are two major disagreements between the t-test driven RCT and the production iteration:
 
-(1) The observation arrives sequentially. The dynamic assignment of the observations gives lattitude to imbalance sample and early termination of the experiments. The imbalance sample limits damage by the inferior in medical research[@mukhopadhyay_sequential_2009] and increase return by the superior in commerical adverstisement[@scott_multi_2015]. A similar argument can be made in education production that larger exposurer of the more effective pedagogy is ethically preferable. In addition, sequential test harbors the possbility of early termination and speeds up the product iteration process. This shortened experiment duration is practically import in the competition.
+(1) The observation arrives sequentially. The dynamic assignment of the observations gives latitude to imbalance sample and early termination of the experiments. The imbalance sample limits damage by the inferior in medical research[@mukhopadhyay_sequential_2009] and increase return by the superior in commercial adverstisement[@scott_multi_2015]. A similar argument can be made in education production that larger exposure of more effective pedagogy is ethically preferable. In addition, sequential test harbors the possibility of early termination and speeds up the product iteration process. 
 
-(2) Type II error is more costly than type I error under Null Hypothesis of Null effect. Because product iterations usually aims at incremental changes, missing a true improvement (Type II error) is worse than prefering one of two equivalent alternatives (Type I error). One can argue that this is the result of "bad" hypothesis: type I error will obviously matter if the hypothesis is formulated as an inequality. However, there are many scenarios in product iterations where any of the alternatives are acceptable. There is a famous ancedote that Marrisa Mayer "commissioned" a A/B to pick the optimal color for Google button from more than 40 shades of blue. This is very different from the casual inference encountered in the evaluation of education programs. 
+(2) Type II error is more costly than type I error under Null Hypothesis of Null effect. Because product iterations usually aim at incremental changes, missing a true improvement (Type II error) is worse than preferring one of two equivalent alternatives (Type I error). One can argue that this is the result of "bad" hypothesis: type I error will obviously matter if the hypothesis is formulated as an inequality. However, there are many scenarios in product iterations where any of the alternatives are acceptable. There is a famous anecdote that Marrisa Mayer "commissioned" an A/B test to pick the optimal color for Google button from more than 40 shades of blue. This is very different from the casual inference encountered in the evaluation of education programs. 
 
 
-Therefore, this chapter focuses on sequential test as a tool for continuous improvement, which has been successful in the online service sector. Thanks to the ubiquitous data collection drived by the wide adoption of smart devices and high speed internet, there are going to be more opportunities in the education sector. 
+Therefore, this chapter focuses on the sequential test as a tool for continuous improvement, which has been successful in the online service sector. Thanks to the ubiquitous data collection driven by the wide adoption of smart devices and high-speed internet, there are going to be more opportunities in the education sector. 
+
+
 
 
 ## Literature Review
-Experiments are no stranger to education literature. **Add a review of experiments in education**. Yet very few publication has used experiments as a tool of improvement. **Need a more through search**
+Experiments are no stranger to education literature. **Add a review of experiments in education**. Yet very few publication has used experiments as a tool for improvement. **Need a more thorough search**
 
 
-Various algorithms of the Multi-armed bandit problem [@white_bandit_2012;@scott_modern_2010] have been used for website optimization, but Thompson sampling is the popular candidate. It is a bayesian algorithm that balances the trade off of exploration and exploitation. It has stong heuristics[@scott_modern_2010], good emprirical performance[@chapelle_empirical_2011] and a regret bound for finite time sequences[@kaufmann_thompson_2012]. The bound guarantees that the optimal arm is chosen exponetially more times than inferior alternatives as the experiment continues. 
+Various algorithms for the Multi-armed bandit problem [@white_bandit_2012;@scott_modern_2010] have been used for website optimization, but Thompson sampling is the popular candidate. It is a bayesian algorithm that balances the tradeoff of exploration and exploitation. It has strong heuristics[@scott_modern_2010], good empirical performance[@chapelle_empirical_2011] and a regret bound for finite time sequences[@kaufmann_thompson_2012]. The bound guarantees that the optimal arm is chosen exponentially more times than inferior alternatives as the experiment continues. 
 
-Desipte its popularity as A/B test methodology, the property of Thompson sample as a test has not been well documented. 
+Despite its popularity as A/B test methodology, the property of Thompson sample as a test has not been well documented. 
 
-This chapter contributes by provide empirical test property comparison of t-test, sequential test and thompson sampling in the binary outcome test scenario with simulation method. In addition, this chapter shows how thompson sampling can reduce the cost of experiments compared to t-test in practice.
+This chapter contributes by providing empirical test property comparison of t-test, sequential test and Thompson sampling in the binary outcome test scenario with simulation method. In addition, this chapter shows how Thompson sampling can reduce the cost of experiments compared to t-test in practice.
 
 
 ## Thompson Sampling with Potential Value Remaining Stop Condition
@@ -39,26 +41,26 @@ This chapter contributes by provide empirical test property comparison of t-test
 ### Multi-armed Bandit Algorithm
 There are $n$ experimental options (arm), each with a unknown return parameter $\mu_i$. The researcher designs a sequence of experiments (pulls) that samples one option at a time. The goal is to design an allocation policy that achieves the highest return. The name "multi-armed bandit" comes from the analogy to the slot machine. 
 
-Denote the best arm has a expected return $\mu^*$, regret for each pull is defined as the difference between $\mu^*$ and the expected return of the chosen arm $\mu_t$. The dual problem of maximizing the return is to minize the regret during the tenure of the policy.
+Denote the best arm has an expected return $\mu^*$, regret for each pull is defined as the difference between $\mu^*$ and the expected return of the chosen arm $\mu_t$. The dual problem of maximizing the return is to minimize the regret during the tenure of the policy.
 
 ### Optimal Policy and Thompson Sampling
-The multi-armed bandit algorithm is notoriously hard to solve. Although the problem was raised during World War II, the first theoretical optimal solution did not surface until Gittins[@gittins_bandit_1979] proposed the index policy. Although it provides optimal solution for certain special cases, the exact policy is hard to compute. The family of Upper Confidence Bound(UCB) alogrithms [@lai_adaptive_1987;@lai_asymptotically_1985] describes a series of algorithm based on the mean return of each arm. The UCB algorithm has a weaker but more general guarantee than the Gittins index policy. It ensures that optimal arm is played exponentially more often than any of the suboptimal arm. Although the original UCB policy is hard to compute as well, later algorithm improves substantially [@scott_modern_2010]. The UCB policy family is hard to extend to dependent return between arms, such as the contextual test design.
+The multi-armed bandit algorithm is notoriously hard to solve. Although the problem was raised during World War II, the first theoretical optimal solution did not surface until Gittins[@gittins_bandit_1979] proposed the index policy. Although it provides an optimal solution for certain special cases, the exact policy is hard to compute. The family of Upper Confidence Bound(UCB) algorithms [@lai_adaptive_1987;@lai_asymptotically_1985] describes a series of algorithms based on the mean return of each arm. The UCB algorithm has a weaker but more general guarantee than the Gittins index policy. It ensures that optimal arm is played exponentially more often than any of the suboptimal arm. Although the original UCB policy is hard to compute as well, later algorithm improves substantially [@scott_modern_2010]. The UCB policy family is hard to extend to dependent return between arms, such as the contextual test design.
 
-In addition to the theorem derived optimal policy, there is an array of heursitic driven policies. The key trade-off heuristics are exploration versus exploitation. Exploitation refers to the heuristic that player the winner more often, while exploration emphasizes on giving loser a second chance because of the uncertainty around the parameter estimation, especially in small sample. $\epsilon$-decreasing strategy [@auer_finite_2002] is a hybrid of exploitation and exploration. At each pull, with probability $1-\epsilon$ play the estimated best arm, with probability $\epsilon$ choose a random arm. $\epsilon$ decreases as the time goes by, because the uncertainty decreases over time.
+In addition to the theorem derived optimal policy, there is an array of heuristic driven policies. The key trade-off heuristics are exploration versus exploitation. Exploitation refers to the heuristic that player the winner more often, while exploration emphasizes on giving the loser a second chance because of the uncertainty around the parameter estimation, especially in the small sample. $\epsilon$-decreasing strategy [@auer_finite_2002] is a hybrid of exploitation and exploration. At each pull, with probability $1-\epsilon$ play the estimated best arm, with probability $\epsilon$ choose a random arm. $\epsilon$ decreases as the time goes by because the uncertainty decreases over time.
 
-Random probability matching(RPM), also known as Thompson sampling, is mostly a heuristic strategy, although Kaufmann et al[@kaufmann_thompson_2012] provides a UCB like bound on the regret. The key improvement over the $\epsilon$-decreasing strategy is a stratified sampling strategy that weighs the different options proportionally to the respective estimated returns instead of equal weights. The additional practical benefit is no tuning parameter such as $\epsilon$ and its decay rate. At time $t$, RPM allocates the sample according to a weight matrix ${w_{1t},\dots,w_{nt}}$ where $y_t$ is the observed return sequence to time $t$ and 
+Random probability matching(RPM), also known as Thompson sampling, is mostly a heuristic strategy, although Kaufmann et al[@kaufmann_thompson_2012] provide a UCB like bound on the regret. The key improvement over the $\epsilon$-decreasing strategy is a stratified sampling strategy that weighs the different options proportionally to the respective estimated returns instead of equal weights. The additional practical benefit is no tuning parameter such as $\epsilon$ and its decay rate. At time $t$, RPM allocates the sample according to a weight matrix ${w_{1t},\dots,w_{nt}}$ where $y_t$ is the observed return sequence to time $t$ and 
 
 $$
 w_{at} = Pr(\mu_a = max\{\mu_1, \dots, \mu_n\}|y_t)
 $$
 
-There are also engineering advantages for choosing Thompson sampling. Because the reward is not updated instaneously but rather in batches, a policy with random allocation rather than deterministic allocation can reduce the regret due to over exploiting the inferior arm in batch assignments. In addition, Thompson sampling can easily accomendate prior information, heterogeous reward distribution and contextual test design by modifying the prior and the posterior update procedure.
+There are also engineering advantages for choosing Thompson sampling. Because the reward is not updated instantaneously but rather in batches, a policy with random allocation rather than deterministic allocation can reduce the regret due to over-exploiting the inferior arm in batch assignments. In addition, Thompson sampling can easily accommodate prior information, heterogeneous reward distribution, and contextual test design by modifying the prior and the posterior update procedure.
 
-In short, Thompson sampling provides a good balanance in the trade off between exploration and exploitation, a flexible statistical framework and good empirical perforamce, thus ideal for field deployment.
+In short, Thompson sampling provides a good balance in the trade-off between exploration and exploitation, a flexible statistical framework and good empirical performance, thus ideal for field deployment.
 
 ### Potential Value Remaining Stop Condition
 
-Bandit algorithm is not a statistical test per se because it is designed to minimize regret over an time horizon rather than  reach a decision on whether to reject the null hypothesis. To analyze the "power" of Thompson sampling, one must first supply the stop condition and the null hypothesis. The stop condition analyzed here is the "potential value remaining" (PVR) stop condition used by Google Analytics. It is a practical choice of convenience.
+Bandit algorithm is not a statistical test per se because it is designed to minimize regret over a time horizon rather than  reach a decision on whether to reject the null hypothesis. To analyze the "power" of Thompson sampling, one must first supply the stop condition and the null hypothesis. The stop condition analyzed here is the "potential value remaining" (PVR) stop condition used by Google Analytics. It is a practical choice for convenience.
 
 "Value remaining" measures the regret of the chosen arm. Given the posterior distribution of return as  $\theta_i|Y$, draw $M$ samples from the posterior distribution. For each sample, denote the max return as $\theta^*(m)$. The same sample also yields the returns of the chosen optimal arm $i^*$ for each sample, denoting as $\theta_{i^*}(m)$. The value remaining distribution is estimated by the following formula 
 
@@ -66,16 +68,16 @@ $$
 VR = \frac{\theta^*(m)-\theta_{i^*}(m)}{\theta_{i^*}(m)} = \frac{\theta^*(m)}{\theta_{i^*}(m)} - 1 
 $$
 
-Potential value remaining stop condition has two parameters ($\epsilon$,$\delta$), the ratio threshold $\epsilon$ and the cumulative probabily threshold $\delta$. Mathematically, the experiments stops when the following inequality holds
+Potential value remaining stop condition has two parameters ($\epsilon$,$\delta$), the ratio threshold $\epsilon$ and the cumulative probability threshold $\delta$. Mathematically, the experiments stop when the following inequality holds
 
 $$
 \Pr(VR > 1+\epsilon) < \delta
 $$
 
-PVR stop condition can be interpreted as a PAC bound that $\Pr(\theta^*-\theta>\epsilon*\theta) < \delta$. The difference threshold varies according to the base rate. Alternatively, the PVR stop conditions can be morphed into a narrative of p-value: There is less than $\delta$ probability to observe the the alternative arm outperforms the chosen arm by $\epsilon$ percent given that the posterior belief is true. 
+PVR stop condition can be interpreted as a PAC bound that $\Pr(\theta^*-\theta>\epsilon*\theta) < \delta$. The difference threshold varies according to the base rate. Alternatively, the PVR stop conditions can be morphed into a narrative of p-value: There is less than $\delta$ probability to observe the alternative arm outperforms the chosen arm by $\epsilon$ percent given that the posterior belief is true. 
 
 
-## Simulation Desgin
+## Simulation Design
 ### Simulated Data with Known Parameters
 This paper considers three types of base rate ($p_0$)
 
@@ -87,7 +89,7 @@ high| 0.4, 0.5
 
 To reduce the number simulation combinations, the effect size ($\triangle$) is measured by percentage (relative) rather than percentage points(absolute). The effect sizes are 10%, 20%, 50%, 100%, representing small to huge effect size. 
 
-For a fair comparison, the maximum sample size($T$) for sequential test is the same as the sample size required for a 5% significance and 95% power of one sided welch-t test, which can be calculated precisely. 
+For a fair comparison, the maximum sample size($T$) for the sequential test is the same as the sample size required for a 5% significance and 95% power of one-sided Welch t-test, which can be calculated precisely. 
 
 For each pair of base rate and effect size, 100 datasets are simulated.
 
@@ -99,7 +101,7 @@ Simulate the experiment with valid data from the last chapter. To make it simple
 
 ## Power Analysis 
 
-It is, in general, difficult to articulate null hypothesis for multi-arm bandit algorithm because not being maxium is hard to express, especially when the number of arms grow. Only in the special case of binary choice does a clean null hypothesis exists. The statement that "new option is better" can be stated as the following null hypothesis and alternative hypothesis.
+It is, in general, difficult to articulate null hypothesis for multi-arm bandit algorithm because not being maximum is hard to express, especially when the number of arms grows. Only in the special case of binary choice does a clean null hypothesis exists. The statement that "new option is better" can be stated as the following null hypothesis and alternative hypothesis.
 
 $$
 \begin{aligned}
@@ -110,7 +112,7 @@ $$
 
 ### Simulated Data
 
-There is a family of sequential analysis whose test property is well understood: Sequential Probability Ratio Test(SPRT). SPRT build test procedure to exploit the dynamic sample assignment while provides sound theoratical gurantee on test significance and power. However, SPRT requries model parameter that is difficult to calbirate and permits a limited scope of null hypothesis to be tested. Here SPRT serves as a comparison on the power of sequential analysis where the significance is also controlled.
+There is a family of sequential analysis whose test property is well understood: Sequential Probability Ratio Test(SPRT). SPRT build test procedure to exploit the dynamic sample assignment while provides a sound theoretical guarantee on test significance and power. However, SPRT requires model parameters that are difficult to calibrate and permits a limited scope of the null hypothesis to be tested. Here SPRT serves as a comparison to the power of sequential analysis where the significance is also controlled.
 
 #### Sequential Probablity Ratio Test Procedure
 
@@ -124,7 +126,7 @@ $$
 Define Wald statistic as  
 $W(n) = nH(\frac{\sum_{n=1}^NY_n}{N})$ where $H(x) = xlogx+(1-x)log(1-x)+log2$.
 
-Define the reject time as 
+Define the rejected time as 
 
 $$
 T = \inf\{n:n \geq m_0, W(t)\geq \alpha\}
@@ -133,16 +135,16 @@ where $m_0$ is the minimum time of rejection.
 
 The sampling stops at $min(T,m)$ and reject the null hypothesis if the sample stops before $m$. However, such configuration has low power given significance level. The sequential test can be modified to have a second test at time $m$ and a higher value of $d$ to compensate the false positive in the second test. Therefore, the modified rejection is $T \leq m$ or $T>m, mH(\frac{\sum_{j}Y_j}{m}) \geq d$.
 
-The modified SPRT needs to be fed parameter of $(\alpha, d, m, m_0)$. The calibration of the parameters are detailed in Appendix II.
+The modified SPRT needs to be fed parameter of $(\alpha, d, m, m_0)$. The calibration of the parameters is detailed in Appendix II.
 
 #### Bandit Test Procedure
 
-The Thompson sampling with value remaining stop condition (hence refered to as bandit test) rejects the Null hypothesis if the stop condition is met within sample limitation and the chosen arm generates $X_1$.
+The Thompson sampling with value remaining stop condition (hence referred to as bandit test) rejects the Null hypothesis if the stop condition is met within sample limitation and the chosen arm generates $X_1$.
 
-The bandit test requires two tuning parameter. The first is prior distribution and the second is inspection interval, i.e. how often the stop condition is checked. The prior distribution for each arm is Beta(2,5), which incorporates some information about the distribution of the base rates. The inpsection interval matters because it controls the "repeated significance test" problem, otherwise known as early peeking. The inspection interval is set at such value that there are 25 inspections before the sample run out. The choice is made to facilitate visualization, rather than to optimize the test performance.
+The bandit test requires two tuning parameter. The first is prior distribution and the second is inspection interval, i.e. how often the stop condition is checked. The prior distribution for each arm is Beta(2,5), which incorporates some information about the distribution of the base rates. The inspection interval matters because it controls the "repeated significance test" problem, otherwise known as early peeking. The inspection interval is set at such value that there are 25 inspections before the sample runs out. The choice is made to facilitate visualization, rather than to optimize the test performance.
 
 #### Results
-Figure 1 is an illustration of the power comparison. The colums are effect size ratios and the rows are base rate. In each sub-graph, x axis represents progression of time and Y axis is the power.
+Figure 1 is an illustration of the power comparison. The columns are effect size ratios and the rows are base rate. In each sub-graph, the x-axis represents the progression of time and Y axis is the power.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 power_result = read.table(paste0(proj_dir,'/_data/03/power_result.txt'), sep=',', col.names = c('p','ratio','method','i','power'))
@@ -158,14 +160,14 @@ qplot(data=power_result,x=i,y=power,col=method,geom='line', facets = p~ratio)
 ```
 
 
-Overall, the bandit has superior performance on power over SPRT and t-test. Compared to the t-test, the bandit test achieves similar power in large sample but the concave shape of the power curve means it attains high enough power with relative small sample size. Compared to the sequential test, the bandit test has larger power for given sample size, except for cases where effect size is large and the base rate is low (upper right corner). Even in the weak region, bandit test is almost as good as the sequential test. The result is more remarkable considering the sequential test is optimally calibrated to each simulation environment while the bandit test relies on a global configuration. In practical scenario where true paramter is unknown, the bandit test can perform even better.
+Overall, the bandit has superior performance on power over SPRT and t-test. Compared to the t-test, the bandit test achieves similar power in a large sample but the concave shape of the power curve means it attains high enough power with relatively small sample size. Compared to the sequential test, the bandit test has larger power for given sample size, except for cases where effect size is large and the base rate is low (upper right corner). Even in the weak region, bandit test is almost as good as the sequential test. The result is more remarkable considering the sequential test is optimally calibrated to each simulation environment while the bandit test relies on a global configuration. In a practical scenario where the true parameter is unknown, the bandit test can perform even better.
 
 
 ### Simulated Experiments
 
 The simulation shows that bandit test reaches conclusion every time except for the vocabulary scaffolding intervention for the transfer skill. This fits with expert's prior hypothesis. 
 
-For comparison, run t-test on each simulated data set. Define pvalue smaller than 0.05 as rejecting the null hypothesis, the power of t-test is large only for the video scaffolding for the transfer skill. Compared to the analysis in the last chapter, the bandit test assign more obs to the better arm, resulting in significant findings.
+For comparison, run a t-test on each simulated data set. Define p-value smaller than 0.05 as rejecting the null hypothesis, the power of t-test is large only for the video scaffolding for the transfer skill. Compared to the analysis in the last chapter, the bandit test assign more observations to the better arm, resulting in significant findings.
 
 Assessment | treamtnet   | t-test power  | bandit test power  
 ---   | --- | ---| ---| ---    | ---
@@ -192,7 +194,7 @@ r_{x}(t) = N_0(t)*p*\triangle
 $$
 where $N_0$ is the number of participants assigned to the inferior option  
 
-Therefore, the expected regret for seqential test ended before $T$ is 
+Therefore, the expected regret for sequential test ended before $T$ is 
 
 $$
 E(r_x|t\leq T) = \int_{m_0}^{T} r_{x}(t) f(t|t\leq T) dt
@@ -207,7 +209,7 @@ R_x(T) = \frac{E(r_x|t\leq T)}{r_{welch}}
 $$
 
 
-Figure 2 shows the relative regret of the sequential test and the bandit test compared to fixed sample student t test. The bandit regret is about 10% compared while the sequential test regret is about 30%. More importantly, the sequential test regret percentage grows as the sample size increases, while the bandit regret percentage flats out. The slow growth of regret of the bandit test may be attributed to the stratified sampling strategy when explores. In later stage, the sample are more frequently assigned to the optimal arm, in contrast to sequential probability ratio test's equal assignment due to pairing.
+Figure 2 shows the relative regret of the sequential test and the bandit test compared to fixed sample student t-test. The bandit regret is about 10% compared while the sequential test regret is about 30%. More importantly, the sequential test regret percentage grows as the sample size increases, while the bandit regret percentage flats out. The slow growth of regret of the bandit test may be attributed to the stratified sampling strategy. In the later stage, the sample is more frequently assigned to the optimal arm, in contrast to sequential probability ratio test's equal assignment due to pairing.
 
 
 ```{r,message=FALSE,warning=FALSE,echo=FALSE}
@@ -243,7 +245,7 @@ qplot(data=regret_res,x=i,y=regret_ratio,col=method.x,geom='line', facets = p~ra
 
 ### Simulated Experiments
 
-The regret is hard to define in the simulated experiment since the true superior arm is unknown. However, the resulting success rate is a proxy for learning gain since the data set conditions on making initial mistakes. When there is a significant finding, the bandit test provides modest boost to student's learning performance. However, when the truth is close to equivalent, the bandit test actually performs worse. **How COME**
+The regret is hard to define in the simulated experiment since the true superior arm is unknown. However, the resulting success rate is a proxy for learning gain since the data set conditions on making initial mistakes. When there is a significant finding, the bandit test provides a modest boost to student's learning performance. However, when the truth is close to equivalent, the bandit test actually performs worse. **How COME**
 
 Assessment | treamtnet   | bandit test learning gain/raw learning gain 
 ---   | --- | ---| ---| ---    | ---
@@ -269,7 +271,7 @@ Assessment | treamtnet   | bandit test sample/raw sample
 The prior for the Thompson sampling is Beta(2,5) and the stop threshold for potential value remaining is (1%, 5%). For each simulation, the max iteration for Thompson sampling is 30,000. Each base rates runs 100 simulations. The type I error is calculated as the percentage of simulations that stops before reaches the max iteration.
 
 
-The simulation demostrates two observations for the type I error for "two sided tests":
+The simulation demonstrates two observations for the type I error for "two-sided tests":
 (1) As the sample size grows, the Thompson test is more prone to type I error
 (2) As the base rate increases, the Thompson test is more prone to type I error
 
@@ -289,14 +291,14 @@ However, the posterior probability of either arm being the optimal arm is close 
 
 
 
-The two observations can be explained by the imbalance sample allocation due to the tendency favoring exploitation. If the sample are equally distributed among the two arms, simulation shows that type I error decreases slowly as the sample size grow, albeit still at a high level (on average 40% for the exact sample size of 30,000). However, the favored arm receives more sample than the other, shrinks its beta posterior faster than the alternative, thickens the right tail and increases the type I error rate. Similarly, the higher base rate, the higher the variance of posterior distribution, and the larger the imbalance sample effect is. 
+The two observations can be explained by the imbalance sample allocation due to the tendency favoring exploitation. If the sample is equally distributed among the two arms, the simulation shows that type I error decreases slowly as the sample size grow, albeit still at a high level (on average 40% for the exact sample size of 30,000). However, the favored arm receives more sample than the other, shrinks its beta posterior faster than the alternative, thickens the right tail and increases the type I error rate. Similarly, the higher base rate, the higher the variance of the posterior distribution, and the larger the imbalance sample effect is. 
 
 
 
 ## Conclusion
-This paper introduces the mult-armed bandit problem, outlines several algorithms and describes Thompson sampling algorithm in details. Further, this paper describes the value remaining stop condition, which enables the Thompson sampling algorithm to function like a hypothesis test. For binary data generated by two static latent parameters, simulation shows that the Thompson sampling with value remaing test has better power compared to a modified sequential probability ratio test for given sample size and similar power to fixed sample welch t-test in large sample size. In addition, the Thompson sampling test has significant lower regret than frequentist test procedures. In short, for atheoretical optimization experiment, high power and low cost makes Thompson sampling test an attractive hypothesis testing procedure.  
+This paper introduces the multi-armed bandit problem, outlines several algorithms and describes Thompson sampling algorithm in details. Further, this paper describes the value remaining stop condition, which enables the Thompson sampling algorithm to function like a hypothesis test. For binary data generated by two static latent parameters, the simulation shows that the Thompson sampling with value remaining test has better power compared to a modified sequential probability ratio test for given sample size and similar power to fixed sample welch t-test in large sample size. In addition, the Thompson sampling test has significant lower regret than frequentist test procedures. In short, for atheoretical optimization experiment, high power and low cost make Thompson sampling test an attractive hypothesis testing procedure.  
 
-Future work can be extended to study the power of multiple hypothesis comparison and the PAC stop condition family with the form that $\Pr(p_1 - p_0 \geq \epsilon)<\delta$ where $\epsilon$ does not vary with the base rate. Such stop condition is likely to have lower type I error rate for two sided null hypothesis testing without sacrificing too much test power, and thus can be used in a wider range of experiment scenarios.
+Future work can be extended to study the power of multiple hypothesis comparison and the PAC stop condition family with the form that $\Pr(p_1 - p_0 \geq \epsilon)<\delta$ where $\epsilon$ does not vary with the base rate. Such stop condition is likely to have lower type I error rate for two-sided null hypothesis testing without sacrificing too much test power, and thus can be used in a wider range of experiment scenarios.
 
 
 
@@ -310,7 +312,7 @@ $$
 
 
 
-Siegmund[@siegmund_sequential_2013] provides an approximiation for choosing the parameter $m$, $a$ and $d$. However, in monte carlo simulation, the chosen parameter does not achieved the alleged power and significance combination. Therefore, the test parameters are chosen by brutal force grid search. It should be noticed that the only parameter relevant is the effect size ratio because of the adverse event transformation. The significance and power are calibrated based on 500 repetitions.
+Siegmund[@siegmund_sequential_2013] provides an approximation for choosing the parameter $m$, $a$ and $d$. However, in Monte Carlo simulation, the chosen parameter does not achieve the alleged power and significance combination. Therefore, the test parameters are chosen by brutal force grid search. It should be noticed that the only parameter relevant is the effect size ratio because of the adverse event transformation. The significance and power are calibrated based on 500 repetitions.
 
 ```{r, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tabl <- " 
@@ -324,7 +326,8 @@ Ratio | a   | d  | m  | sig    | power
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 ```
 
-Notice that $m$ is the number of pairs with different values, namely the adverse events. The expected number of adverse events is related to the base rate by $2*N*p*(1-p)$.
+Notice that $m$ is the number of pairs of different values, namely the adverse events. The expected number of adverse events is related to the base rate by $2*N*p*(1-p)$.
 
 The minimum reject time $m0$ is set at 10.
+
 

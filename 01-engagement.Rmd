@@ -7,178 +7,217 @@ load(paste0(getwd(),'/_data/01/production_data.RData'))
 
 
 ## Motivation
-The routine tasks are foundations of many subjects. For example, alphabetas are the foundation of English, times table is that of Math. Routine task has a well founded success recipe: practice makes perfect. Focus on routine task is one of the key corner stones of Chinese education philosophy. Recently routine task has also gained momentum in the States(Lemov et al 2012). 
+The routine tasks are foundations of many subjects. For example, alphabets are the foundation of English, times table is that of Math. The routine task has a well-founded success recipe: practice makes perfect. Focus on routine task is one of the key cornerstones of Chinese education philosophy. Recently routine task has also gained momentum in the States(Lemov et al 2012). 
 
-The routine task is a good candidate for online learning: High frequency, efficient in scattered time, effective even without human instruction. Duolingo has demonstrated how beginner language learning can be formated into a series of routine task. Subsequently, Duolingo launched tinycards, extending routine task to the education of chemistry, geography, history, programmering and least of all, trivia. Khan Academy, to a less extent, demonstrates how repeated exercises can help users master elementary math skills.
+The routine task is a good candidate for online learning: High frequency, efficient in scattered time, effective even without human instruction. Duolingo has demonstrated how beginner language learning can be formatted into a series of routine task. Subsequently, Duolingo launched Tinycards, extending routine task to the education of chemistry, geography, history, programming and least of all, trivia. Khan Academy, to a less extent, demonstrates how repeated exercises can help users master elementary math skills.
 
-The achilles' hill of the routine task is user engagement. The routine task is boring, except for when it is hard; then it is frustrating. Evidence for such claim is hard to come by because good quality user retention rate data are considered as commercial secret. In 2012, Duolingo has a retention rate around 20% (Luis von Ahn,2012, ** need citation format for youtube interview **), since then the retention rate should have gone up. That said, Duolingo is the best in the industry, thus the monthly retention rate of most online learning service is probably at teens.
+The Achille's' hill of the routine task is user engagement. The routine task is boring, except for when it is hard; then it is frustrating. Evidence for such claim is hard to come by because good quality user retention rate data are considered as a commercial secret. In 2012, Duolingo has a retention rate around 20% (Luis von Ahn,2012, **need citation format for youtube interview**), since then the retention rate should have gone up. That said, Duolingo is the best in the industry, thus the monthly retention rate of most online learning service is probably at teens.
 
-Such is the dilemma of online rountine task: Perfect only comes from practice, but users do not persist in practicing. Thus for the routine task, persistence of practices is key to learning outcome. Yet it has attracted little attention in the learning analytics community.
+**NEED BACKGROUND DESCRIPTION OF THE DATA**
 
-
-
-
-
-## Literature Review
-
-Learning curve is a key concept in learning analytics. Explicitly, it describes the relationship between error rate and number of practice. Implicitly, it models the dynamics of mastering a latent skill in the class of task where practice makes perfect (PMP task). The basic training for many disciplines are PMP task, including but not limited to elementary math, beginner lanaguage learning and basic computer science. In principle, PMP task can extend to all repetive tasks that aim for muscle memory.
-
-The key decision for PMP learning task is the stop condition. One can either stop when no progress can be expected or when the expected success rate is achieved. The former stop condition requires the knowledge of the slope of the learning curve while the later requires that of the level of the learning curve. Therefore, it is crucial to identify the learning curve of the PMP task.
-
-
-The seminal study of learning curve conducted by Colbert and Anderson (Corbett & Anderson, 1994) popularized the Bayesian Knowedge Tracing model (BKT) invented by Atkinson&Paulson(1970). In essence, BKT model assumes that the learning curve is an exponential curve. The intercept is the guess rat. The horizontal asymptote is the slip rate. 
-
-The Bayesian knowledge tracing model makes a strong assumption that the learn rate is fixed for each practice opportunity regardless of the response. Performance factor analysis(PFA) model relaxes the assumption and allows for different learn rate for right and wrong response. The learning curve of the PFA model assumes a logit curve. Despite its parametric flexibility, the performance gain of PFA over BKT is not stable in real dataset(Baker et al, 2011).  
-
-Matthew Streeter(2015) proposes a non-parametric model that does not make any parametric assumption about the shape of the learning curve, the mixture learning curve model (MLC). It can be shown that the BKT model is a special case of MLC and thus the performance of MLC, in theory, is weakly stronger than the BKT model, when the number of componenent is correctly specified. Applied in Duolingo's language learning data, Matthew reports that Duolingo has out performed the BKT family, mostly because of its ability to distinguish flat learning curve corresponding to device failure. Although Matthew Streeter provides the pesudo-code for the discrete version of the MLC, he leaves out key step to pin down a unique set of mixture parameters. As the model currently stands, it is not uniquely identified and thus suffers from stability problem.
-
-
-
-## Structural Model of Mastery
-
-### Bayesian Knowledge Tracing Model
-Following Brett Van De Sande(2013)'s formulation, the cannoical Bayesian Knowledge Tracing(bkt) model can be written as 
-
-$$
-P(C_t) = c - Ae^{-\beta t}
-$$
-
-$P(C_t)$ is the probability of a correct answer at practice period t. $C=1-P(S)$ where $P(S)$ is the slippage probability. $A=(1-P(S)-P(G))*(1-P(L_0)$  where $P(G)$ is the guess probability, $P(L_0)$ is the initial latent mastery. $\beta = -log(1-P(T))$ where $P(T)$ is the learn rate. 
-
-Such specification cannot identify $P(G)$ and $P(L_0)$. For the model to make intuitive sense, guess and slip parameter has to be bounded between (0,1). The industry convention is between (0,0.5). Combined with the constraints that initial mastery is bounded by (0,1), constraints can be put on $C$, $A$ and $\beta$.
-
-To reduce the chance of local minima, several random start points are used. The estimated parameter set with the best AUC wins.
-
-
-
-### Mixture Learning Curve Model
-
-The key feature of MLC model is that it foregos explicit measures of latent knowledge mastery. Instead, it uses error rate as a proxy of mastery and describes the learner status with an error rate profile. MLC model assumes there are N different learning curve. Users is described as a mixture of such learning curves, whose weights sum to 1. 
-
-
-The log likelihood function for the observed data is 
-$$
-\mathcal{L} = \sum_{s}\{log[\sum_{j}p_j\prod_{t}\mathcal{B}(q_t^j, v_t)]\}
-$$
-
-$p_j$ is user profile's mixture weight. $q_t^j$ is probability of correct answer at practice opportunity $t$ for $j^{th}$ learning curve, and $v_t$ is the response at practice opportunity $t$. $\mathcal{B}(*,*)$ is the Bernoulli distribution. 
-
-To increase stability of the estimation, Streeter(2015) suggests to shrink the estimated $\mathcal{B}(*,*)$ toward a beta prior. The $p_j$ is initialized as equal weight and $q_t^j$ as uniform random variable between (0,1).  
-
-The current model specification, with $nt$ actual data points, there are $k(n+1)t$ parameters to be estimated. without extra constraints on the learning curve and mixture weight, the MLC is not uniquely identified.   The current routine estimates five separate models and chooses the parameter set that maximizes l2 norm of learning curves so that the model has the strongest power to differentiate learner type. 
-
-
-
-## Facts about User Persistence
-The individual learning data are extracted from 17zuoye in Dec, 2016.
-
-### Wrong Response Hurts
-A wrong answer is (unconditionally) 2 times more likely leading to a stop. About 14% spell ends after the first error. It speaks volume to the lack of user persistence. 
-
-Moreover, it matters what item the student trips over. Otherwise, the conditional stop rate for right/wrong answer should be identical across items (here defined as the knowledge point tested by the quiz). Figure 1 shows that is not the case. There is a wide dispersion of the conditional rate for wrong answer, and less so for the right answer. Therefore the item characteristics need to be modeled.
-
-It is not clear why failure tastes different across items. The educated guess is careless V.S. powerless. The student slips even if he has already mastered the knowledge point. In the Bayesian Knowledge Tracing literature, the average slip rate is about 10%, which fits the current data set. If the student knows the error is a slippage and thus is likely to get the next item right, he is more likely to persist. Instead, if the student makes an error because he cannot solve it, the prospect of future success also dims, consequently he quits. Therefore, some failures are careless while others are powerless, homogeneous within knowledge points, heterogeneous across knowledge points.
+Such is the dilemma of online routine task: Perfect only comes from practice, but users do not persist in practicing. Empirical data shows that a wrong answer is (unconditionally) 2 times more likely leading to a stop. About 14% spell ends after the first error, which speaks volume to the lack of user persistence. Figure 1 shows the distribution of hazard rate for different items when the current response is a failure. Although there is a good dispersion, the overriding theme is student is far more likely to quit when confronted with a failure.
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 qplot(data=fig_1_data, x=pct, col=ans_tag,geom='density')
 ```
 
-### Duration dependence
-The data exihibt duration dependence. Figure 2 describes the probability of termination at each period. There is a significant difference for the level of hazard rate, but less so for the shape. The zigzag shape of the hazard rate curve for the wrong response may be a result of insufficient wrong data at each period.  
 
-For right answer, the hazard rate peaks at period #3 and trends down afterwards. Such shape results from the product design. Presented as a role playing game, the student clears a level to claim virtual reward. If the student answers a quiz right, the "monster" takes a hit; while if the student gives a wrong answer, the avartar takes a hit. On average, both the monster and the avartar can take 3 hits before yields. The student usually does not give up until they clear the level. The gentle decline of hazard rate after period 3 may reflect the dynamical selection process: There are more gritty students in the latter periods than in the earlier periods.
+Thus for the routine task, the persistence of practices is key to learning gain. Yet it has attracted little attention in the learning analytics community.
+
+## Literature Review
+
+
+Learning curve is a key concept in learning analytics. Explicitly, it describes the relationship between error rate and the number of practice. Implicitly, it models the dynamics of mastering a latent skill in the class of task where each practice. The seminal study of learning curve conducted by Colbert & Anderson [-@corbett1994knowledge] popularized the Bayesian Knowledge Tracing model (BKT), whose model is invented by Atkinson & Paulson [-@atkinson1972approach]. The BKT model makes several strong assumptions. It assumes constant learning rate at each practice opportunity independent of the response. Performance factor analysis [@pavlik2009performance] relaxes this assumption. The BKT model also assumes that homogeneity in learner's initial ability and slip/guess rate, a few extensions allows for learner heterogeneity [@pardos2010modeling;@d2010contextual].Implicitly, BKT model assumes an exponential curve, which is contested by alternative parametric model[@heathcote2000power] or completely non-parametric model[@streeter2015mixture].
+
+For estimation of BKT model, the most popular solution is the Expectation-Maximization (EM) method to the Hidden Markov Model(HMM)[@@chang2006bayes;@falakmasir2015spectral], derived from the Baum's re-estimation method[@baum1966statistical;@rabiner1989tutorial]. However, Em method does not guarantee convergence to the global optimal the problem is even worse for the BKT model which is theoretically unidentified[@beck2007identifiability]. Because of the lack of convergence guarantee, a brute force grid search algorithm [@d2010contextual] is proposed. 
+
+This chapter contributes to the literature in two ways. The first contribution is to jointly model the practice result and the practice dropout. The simple fact that not all learners practice the same length suggests that the dropout decision is informed by latent mastery, and possibly grit. However, the spell length is a blind spot for learning analytics literature although survival analysis is a common idea in econometrics(**NOT SURE WHAT TO CITE HERE**). The second contribution is to provide a Monte Carlo Markov Chain (MCMC) estimation routine for the parameter identification. It is not a new idea to use MCMC in estimating HMM[@scott2002bayesian]. MCMC has some theoretical advantages, such as structural flexibility and convergence to global optimal under correct model specification[@@ryden2008versus], and practical disadvantages, such as slow convergence and computational intensity. The most important advantage of MCMC is to estimate a model that is untractable for EM method.
+
+## A Model of Latent Mastery and Practice Duration
+
+This section extends the classical Bayesian Tracing model[@corbett1994knowledge] to jointly model the latent mastery and the practice duration. The extension builds on the intuition that learners stop practicing because they are frustrated with failures during the process .
+
+
+### A Model of Latent Mastery
+
+
+Let $X$ denote the discrete state of the latent knowledge mastery, taking value either 0 or 1. Let $O$ denote the response observed in data, taking value either 0 or 1.
+
+At each period, the transit probability from 0 to 1 is $\ell$ and that of 1 to 0 is 0. It means that learner master the skill with probability $\ell$ with each practice if he has not yet mastered it; however the learner never forgets once the skill is mastered. Because most routine practice sequence happens in a very short time, the no forget assumption is plausible.
+
+If the state is 0, the probability of observing a right response is $g$; while if the state is  1, the probability of observing a wrong response is $s$. It means that the learner has can guess right $g$% if he does not master and slip into mistake $s$% of the time if he masters.
+
+The setup is a classical example of Hidden Markov Model(HMM) with state transition matrix 
+$$
+\begin{bmatrix}
+1-\ell & \ell \\
+0 & 1
+\end{bmatrix}
+$$
+
+and observation matrix
+
+$$
+\begin{bmatrix}
+1-g & g \\
+s & 1-s
+\end{bmatrix}
+$$
+
+### A Model of Practice Duration
+In practice, the sequence duration is observed along with the response. Since the start of the practice sequence is usually logged, the issue of left-censor can be ignored. 
+
+
+Assume learner decides whether or not drop out after observing the state and response at the same period.Let $h_{i,j}$ denote the hazard rate with state $i$ and observation $j$. Let $E_t$ denote if the spell ends in time $t$, value 1 if yes and 0 otherwise. 
+
+
+The probability of observing $E_T$ is thus
+
+$$
+P(E_T) = [\prod_t^{T-1} (1-h_{X_t,O_t})] [(h_{X_T,O_T})^{E_t}*(1-h_{X_T,O_T})^{1-E_t}]
+$$
+
+The model assumes learner's dropout decision is based only on the current state and response, which is not supported by the empirical evidence. However, the dependence structure depends on the learning environment. If the learning environment has an "X-strike" rule, the hazard rate mechanically depends on the number of past failures. For general purpose, the current configuration demonstrates the key feature of dynamic selection bias in a parsimonious model.
+
+The model assumes no duration dependence, which is not supported by empirical evidence. The assumption lessens the computation burden of the MCMC sampling because hazard function makes it difficult to come with conjugate prior and posterior distribution whose marginal distribution is easy to calculate.
+
+
+### Dynamic Selection Bias
+
+The important implication of state dependent hazard rate model is dynamic selection bias. If the wrong response leads to higher hazard rate, it can be proved (as in Appendix I) that observed density of skill mastery is different from the density if all learners are observed in the next period :
+
+$$
+P(X_t = 1| E_{t-1} = 0) \neq P(X_t=1)
+$$
+
+Even without heterogeneity in the learner parameters, dynamic selection bias can be observed in the learning curve, result in biased parameter estimation by classical Bayesian Knowledge Tracing model. Most importantly, if the learner drops out faster when confronted with a failure, the learn rate estimation will be biased upward in the classical BKT model. The less "user-friendly" the practice is, the more effective the practice appears to be, which can be detrimental to the service quality.
+
+
+## Monte Carlo Markov Chain Method of Parameter Estimation
+
+It is difficult to estimate the BKT-Survival hybrid model by EM algorithm because taking derivative with respect to the hazard rate does not have closed form solution.  If one wishes to elaborate on the functional form hazard rate, the estimation routine of EM algorithm can become prohibitively difficult to write. Motivated by the rigidity of the EM method, this chapter attempts to provide a general alternative, Monte Carlo Markov Chain method, with the BKT-hybrid model as a special case.
+
+### Backward Recursion Forward Sampling MCMC Scheme
+
+The general idea of MCMC estimation for HMM model is to first augment the hidden state then update the model parameter with Gibbs sampler. The latter step is usually trivial when the "complete" data is observed, thus various latent state sampling schemes have been proposed, on which Scott[-@scott2002bayesian] provides an extensive survey.
+
+In general, for a Markov Chain, the state can be sampled with the following two steps:
+
+(1) Initialize the state by $P(X_1|O_1,...,O_T,\theta)$
+(2) permutate the state by $P(X_t|X_{t-1},O_t,..,O_T,\theta)$
+
+Notice that $P(X_t|X_{t-1},O_t,..,O_T,\theta) \propto P(X_t|X_{t-1})P(O_t|X_t) P(X_t=i|X_{t-1}=j,O_{t+1},..,O_T,\theta)$. Thus the key quantity to compute is $P(X_t=i|X_{t-1}=j,O_{t+1},..,O_T,\theta)$, exactly the backward factor in the Baum-Welch re-estimation algorithm. Therefore, an efficient sample scheme is to first calculate the backward recursion according to Baum-Welch algorithm then sample the states forward, hench the name "backward recursion forward sampling".
+
+### Brute Force Data Augmentation
+
+Unfortunately, as the BKT-Hybrid model specified in the previous section, the backward recursion is not feasible because the event of observing $O_t$ depends on the survival probability as a function of ${O_1,..,O_{t-1}}$. This problem can be simply solved by dropping the recursion scheme and the calculate posterior transition probability with brute force.
+
+The brute force is deemed as infeasible in the HMM literature because its computation complexity is $O(N^TT)$ where $N$ is the number of possible states and  $T$ is the length of chain. In the 1970s when the HMM algorithm is born, computation power was expensive and memory space is scarce. The current cloud computing and parallel computing technology make $O(N^TT)$ computation only a nuisance for most practical application of learning analytics. In addition, the model proposed in this chapter put a critical constraint on the possible states because mastery becomes an absorbing state, result in a reduced computation complexity of $O(T^2)$ for a single chain. 
+
+The brute force state augmentation scheme is described as following:
+
+(1) Generate all possible state combinations according to the transit matrix. It can be shown that there are T+1 possible combinations under the constraint of no forgetting.
+
+(2) For each combination, calculate the full data likelihood by 
+$$
+P({X},{O},{E}) = \prod_{t=0}^T P(E_t|O_t,X_t)P(O_t|X_t)P(X_t|X_{t-1})
+$$
+where $P(X_0|X_{-1}) = P(X_0)$
+
+(3) Calculate the conditional probability of state sequence by numerical integration.
+
+The algorithm can further speed up by observing that there are at most $\sum_{t=1}^{T-1} 2^t + 2^{T+1}$ observation tuple of ${O_t,E_t}$. In moderate spell length, it is usually a fraction of the data size. In addition, if the model is correctly specified, the parameter can be estimated from arbitrary practice length so right censoring the practice sequence does not endanger consistency.
+
+### Gibbs Sampler for Parameter Update
+
+Once the state is sampled, the parameter is updated by Gibbs sampler:
+
+(1) The learn rate is sampled from Beta($\beta^l_1+n^l_{0,1}$,$\beta^l_0+n^l_{0,0}$) where $\beta^l_0$, $\beta^l_1$ are prior parameters, $n^l_{0,1} = I{X_t=1,X_{t-1}=0}$ and  $n^l_{0,0} = I{X_t=0,X_{t-1}=0}$
+
+(2) The slip rate is sampled  from Beta($\beta^s_1+n^s_{0,1}$,$\beta^s_0+n^s_{1,1}$) where $\beta^s_0$, $\beta^s_1$ are prior parameters, $n^s_{0,1} = I{Y_t=1,X_t=1}$ and  $n^s_{0,0} = I{Y_t=0,X_t=0}$
+
+(3) The guess rate is sampled from Beta($\beta^g_1+n^g_{1,0}$,$\beta^g_0+n^g_{0,0}$) where $\beta^g_0$, $\beta^g_1$ are prior parameters, $n^g_{1,0} = I{Y_t=1,X_t=0}$ and  $n^s_{1,0} = I{Y_t=1,X_t=0}$
+
+(4) The hazard rateof $h_{i,j}$ is sample from
+Beta($\beta^h_1+n^h_{1,i,j}$,$\beta^h_0+n^h_{0,i,j}$) where $\beta^h_0$, $\beta^h_1$ are prior parameters and $n^h_{k,i,j} = I{E_t=k,X_t=i=Y_t=j}$ 
+
+### Simulation Result
+
+The simulation shows that BKT-Survival has the best learning curve fit. BKT estimated by MCMC outperforms BKT estimated by Baum-Welch algorithm. However, the current MCMC sampling scheme suffers from slow convergence and is prone to be trapped in the local optimum near the random start.
+
+**NEED TO SOLVE THE CONVERGENCE PROBLEM**
+
+## Comparison of Model Performance
+**TOBEDONE**
+
+### Forecast Response
+
+**Compare BKT-EM, BKT-MCMC with BKT-Survival**
+
+### Forecast Engagement
+
+**Compare logit with BKT-Survival**
+
+## Discussion and Future Results
+
+### Duration Dependence
+The data exhibit duration dependence. Figure 2 describes the probability of termination at each period. There is a significant difference for the level of hazard rate, but less so for the shape. The zigzag shape of the hazard rate curve for the wrong response may be a result of insufficient wrong data at each period.  
+
+For right answer, the hazard rate peaks at period #3 and trends down afterward. Such shape results from the product design. Presented as a role-playing game, the student clears a level to claim a virtual reward. If the student answers a quiz right, the "monster" takes a hit; while if the student gives a wrong answer, the avatar takes a hit. On average, both the monster and the avatar can take 3 hits before yields. The student usually does not give up until they clear the level. The gentle decline of hazard rate after period 3 may reflect the dynamical selection process: There are more gritty students in the latter periods than in the earlier periods.
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 qplot(data=fig_2_data, x=period, y=hazard_rate, col=ans_tag,geom='line')
 ```
 
-### Hot Streak
+### Hot Streak Effect
 If the user is on a winning streak, they are less likely to stop. Consequently the each response is not independent and cannot directly apply the product rule. 
 
-The "streak" (or sequence) dependence a testable hypothesis. Under the assumption of indepedent response sequence, the probability of termination is only a function of item characteristics. The probability distribution of termination shall be identical, conditioning on the preceding answer sequence, a direct application of the definition of statistical independence.
+The "streak" (or sequence) dependence a testable hypothesis. Under the assumption of independent response sequence, the probability of termination is only a function of item characteristics. The probability distribution of termination shall be identical, conditioning on the preceding answer sequence, a direct application of the definition of statistical independence.
 
-Figure 3 shows the (2nd) easiest case of sequence dependence. Conditioning on the answer sequence of last 2 items (2-item sequence), whether the user gets it right or worng influences the termination of a spell. The left panel shows the pdf of termination probability for the wrong answer while the right panel that of the right answer. Four numbers differentiate the previous answer patterns: 0 stands for two wrong, 1 for first wrong and second right, 10 for first right and second wrong, 11 for both right.
+Figure 3 shows the (2nd) easiest case of sequence dependence. Conditioning on the answer sequence of last 2 items (2-item sequence), whether the user gets it right or wrong influences the termination of a spell. The left panel shows the pdf of termination probability for the wrong answer while the right panel that of the right answer. Four numbers differentiate the previous answer patterns: 0 stands for two wrong, 1 for first wrong and second right, 10 for first right and second wrong, 11 for both right.
 
 There are two interesting observations from this figure:
     
-(1) If the current answer is wrong, the data generating process is close to sequence independence, with two winning streak slightly increases the chance of keep practicing.
+(1) If the current answer is wrong, the data generating process is close to sequence independence, with two winning streaks slightly increases the chance of keep practicing.
 
-(2) If the current answer is right, the data generating process is sequence dependent, especially for 3 win in a row, with the rest scenario close to sequence independent.
+(2) If the current answer is right, the data generating process is sequence dependent, especially for 3 wins in a row, with the rest scenario close to sequence independent.
 
-Similar pattern can be found for 3-item sequence or 4 item sequence.
+A similar pattern can be found for 3-item sequence or 4 item sequence.
 
-The caveat of such exploratory analysis is a selection process. Group the data by the triplet of items, retain the group that has more than 400 data points. Then group those retain triplets by combination of the current and previous responses, retain those triplets that have data in all 8 possible combinations. After the two step filtering, only 215 item triplets remains, accounting for around 60% of the total response data.
+The caveat of such exploratory analysis is a selection process. Group the data by the triplet of items, retain the group that has more than 400 data points. Then group those retain triplets by a combination of the current and previous responses, retain those triplets that have data in all 8 possible combinations. After the two-step filtering, only 215 item triplets remains, accounting for around 60% of the total response data.
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 qplot(data=fig_3_data, x=pct, col=factor(streak_id),geom='density', facets=.~ans_tag)
 ```
+### user Heterogeneity
 
-## Predict User Engagement
-
-### Survival Model
-The following assumptions are needed to formulate a survial analysis model:
-    
-(1) Dropping out at each item is a independent event, conditioning on the variables. There are no "n-gram" effect where n items arranged in a particular order have different hazard rates from shown to students one by one. In another words, the model rules out "scaffolding" where preceding easy items prepare students for the hard climax.
-
-(2) The item hazard rate is not a function of exposure. Item shown twice have identical hazard rate.
-
-(3) The probability of training sequence is not a function of user characteristics.
-
-(4) The duration dependences are identical for all items
-
-(5) Conditional on winning streak, each response is i.i.d.
+**Hierarchical model**
 
 
-
-The hazard rate of period $t$ for spell $i$ is modeled as 
+## Appendix I: A Proof of Dynamic Selection Bias
 
 $$
-h_{i,t} = h_{t} \times (\beta_{1}Streak_{i,t} + \beta_{2}Y_{i,t} + \beta_{3}Streak_{i,t} \times Y_{i,t}  + \beta_{5}Item_{i,t})
+P(X_t|E_{t-1}) = \frac{P(X_t,E_{t-1}}{P(E_{t-1})} p(X_t)
 $$
 
-where $h_{t}$ is the baseline hazard rate, $Y_{i,t}$ the boolean value of whether the response is right, $Streak_{i,t}$ is the boolean value of whether the student is on a winning spell until $t-1$, and $Item_{i,t}$ the item id encountered in spell i and period t.
-
-The likelihood function for spell $i$ is thus
+If $P(X_t|E_{t-1}) = p(X_t)$ then $P(X_t,E_{t-1} = P(E_{t-1})$, implies $X_t$ and $E_{t-1}$ are independent. If independence stands, the following equality must hold:
 
 $$
-P(S_{i,1},\dots,S_{i,T}) = \prod_{t=1,\dots,T} h_{i,t}^{S_{i,t}}*(1-h_{i,t})^{1-S_{i,t}}
-$$
-where $S_{i,t}$ is the boolean value of whether the spell terminates for spell i at period t.
-
-Unfortunately, I did not have time to finish the EM routine for this hazard model, which is something I will focus on after the proposal.
-
-
-### OLS model as proxy model
-To illustrate, the current draft adopts the machine learning routine and try to predict the termination of a spell.
-
-To establish a baseline, fit the following OSL model. Fit a (unconstrained) logit model has essentially the same parameter estimation, and almost identical area under curve (auc) statistics.
-
-$$
-    S_{i,t} = \beta_{1}Streak_{i,t} + \beta_{2}Y_{i,t} + \beta_{3}Streak_{i,t}*Y_{i,t}  + \beta_{4}t + \beta_{5}Item_{i,t} + \epsilon_{i,t}
+P(E_{t-1}|X_{t}=1) - P(E_{t-1}|X_{t}=0) = 0
 $$
 
-To fit the data one must define spell. As a practical (temporary) solution. This paper follow a "30 minute" rule that if two practices are done 30 minutes apart, they are separated into two spells.
+Since 
 
+$$
+\begin{aligned}
+P(E_{t-1}|X_t=1) &= P(E_{t-1}|X_{t-1}=0)P(X_{t-1}=0|X_t=1)+ P(E_{t-1}|X_{t-1}=1)P(X_{t-1}=1|X_t=1) \\
+P(E_{t-1}|X_t=0) &= P(E_{t-1}|X_{t-1}=0)
+\end{aligned}
+$$
 
-## Characteritics of the item hazard rate
+The equality implies 
 
-The paper estimated the hazard rate of the knowledge points, rather than the quiz items, because items are quite homogeneous within knowledge point and because computational power only allows for the former. 
+$$
+P(E_{t-1}|X_{t-1}=0) = P(E_{t-1}|X_{t-1}=1)
+$$
 
-Figure 4 shows the histogram and density of the item hazard rate. There is one outlier that is excluded: long division. Students have to type in multiple numbers to complete the long division formula, instead of one number or a comparative sign in the rest of the items. The poorly designed user interface results in user confusion and frustration, and subsequently, user attrition. The long division items account for only less than 0.1% response data, thus dropped for simplicity.
-
-The variation of the item hazard rate is meaningful, compared to that of the duration dependence. The 75%-25% difference of item hazard rate is 2.3% while that of the duration dependence is 1.7%.  
-
-
-
-The item hazard rate variation is strongly associated with item difficulty, measured as success rate and average time required. It is positively correlated with average time spent and negative correlated with success rate. 
-
-In this dataset, all items are explict mental calculation questions (such as "0.5 $\times$ 0.75 = ?"), therefore difficulty reflects the calculation complexity ( "0.5 $\times$ 85 = ?" V.s "0.5 $\times$ 8 = ?"), rather than the level of abstract thinking ("0.5 $\times$ 8 = ?" V.s. "8 Dollars spent on apples and bananas equally. How much are the apples?"). In this case, success rate and time spent are strongly correlated, although there is a decent varation except for the easy ones.
-
-
-## Learning Curve and Item Hazard Rate
-For the class of PMP problem, high value item has a steep learning curve where each practice opportunity offers non-trivial improvement, at least for the early period. To offer a succinct summary of the learning curve value, define the learning potential as the population success rate at 10th attempt minus that of the 1st attempt. The learning potential is mechanically linked to the initial success rate (and to an extent the average success rate). If the knowledge point starts with a success rate of 98%, there is little room for upside.
-
-
-The scatter plot of learning potential and item hazard rate shows a negative correlation: Items with low learning potential (high initial success rate) have low hazard rate, while items with high learning potential have high hazard rate. *It points to dilemma of PMP task: Feed students with real learning chanllenge, they drop out. Engage students with easy routine, they do not learn.* 
-
-Or alternatively, it demonstrates the importance of non-cognitive skill. Grit is a critical pre-requisite for effective self-learning service. 
-
+which is false under the assumption of heterogeneous hazard rate.
