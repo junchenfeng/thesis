@@ -1,0 +1,15 @@
+# Issues with High Resolution Pedagogical Research  {#issues}
+
+## Privacy Protection and Open Data
+
+Who has the ownership of the learning data?
+
+Can user behavior data be used in advertisement or other targeted commercial activity?
+
+How to prevent user identity leak?
+
+## Preservation of the Learning Context
+
+The learning environment is vital to correctly the analysis result. 
+
+Without the environment data, high resolution data analysis has external validity issue.

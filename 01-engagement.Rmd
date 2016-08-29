@@ -7,7 +7,7 @@ load(paste0(getwd(),'/_data/01/production_data.RData'))
 
 
 ## Motivation
-The routine tasks are foundations of many subjects. For example, alphabets are the foundation of English, times table is that of Math. The routine task has a well-founded success recipe: practice makes perfect. Focus on routine task is one of the key cornerstones of Chinese education philosophy. Recently routine task has also gained momentum in the States(Lemov et al 2012). 
+The routine tasks are foundations of many subjects. For example, learning vocaburary in language, times table in math and basic logic in programming. The routine task has a well-founded success recipe: practice makes perfect. The emphasis on routine task is one of the key cornerstones of Chinese education philosophy. Recently routine task has also gained momentum in the States(Lemov et al 2012). 
 
 The routine task is a good candidate for online learning: High frequency, efficient in scattered time, effective even without human instruction. Duolingo has demonstrated how beginner language learning can be formatted into a series of routine task. Subsequently, Duolingo launched Tinycards, extending routine task to the education of chemistry, geography, history, programming and least of all, trivia. Khan Academy, to a less extent, demonstrates how repeated exercises can help users master elementary math skills.
 
@@ -67,7 +67,6 @@ $$
 ### A Model of Practice Duration
 In practice, the sequence duration is observed along with the response. Since the start of the practice sequence is usually logged, the issue of left-censor can be ignored. 
 
-
 Assume learner decides whether or not drop out after observing the state and response at the same period.Let $h_{i,j}$ denote the hazard rate with state $i$ and observation $j$. Let $E_t$ denote if the spell ends in time $t$, value 1 if yes and 0 otherwise. 
 
 
@@ -97,18 +96,19 @@ Even without heterogeneity in the learner parameters, dynamic selection bias can
 
 It is difficult to estimate the BKT-Survival hybrid model by EM algorithm because taking derivative with respect to the hazard rate does not have closed form solution.  If one wishes to elaborate on the functional form hazard rate, the estimation routine of EM algorithm can become prohibitively difficult to write. Motivated by the rigidity of the EM method, this chapter attempts to provide a general alternative, Monte Carlo Markov Chain method, with the BKT-hybrid model as a special case.
 
-### Backward Recursion Forward Sampling MCMC Scheme
+### Forward Recursion and Backward Sampling MCMC Scheme
 
-The general idea of MCMC estimation for HMM model is to first augment the hidden state then update the model parameter with Gibbs sampler. The latter step is usually trivial when the "complete" data is observed, thus various latent state sampling schemes have been proposed, on which Scott[-@scott2002bayesian] provides an extensive survey.
+The general idea of MCMC estimation for HMM model is to first augment the hidden state then update the model parameter with Gibbs sampler. The latter step is usually trivial when the "complete" data is observed, thus various latent state sampling schemes have been proposed, on which Scott[-@scott2002bayesian] provides an extensive survey. This chapter uses forward recursion and backward sampling scheme (FB), which has better rapid-mix property than the "backward recursion forward sampling" counterparts[@scott2002bayesian].
 
-In general, for a Markov Chain, the state can be sampled with the following two steps:
+(1) Initialize the state from the end by $P(X_T|O_1,...,O_T,\theta)$
+(2) permutate the state by $P(X_t|X_{t+1},O_1,...,O_T,\theta)$. By the first order markov chain assumption, it is equivalent to $P(X_t|X_{t+1},O_1,...,O_{t+1},\theta)$
 
-(1) Initialize the state by $P(X_1|O_1,...,O_T,\theta)$
-(2) permutate the state by $P(X_t|X_{t-1},O_t,..,O_T,\theta)$
-
-Notice that $P(X_t|X_{t-1},O_t,..,O_T,\theta) \propto P(X_t|X_{t-1})P(O_t|X_t) P(X_t=i|X_{t-1}=j,O_{t+1},..,O_T,\theta)$. Thus the key quantity to compute is $P(X_t=i|X_{t-1}=j,O_{t+1},..,O_T,\theta)$, exactly the backward factor in the Baum-Welch re-estimation algorithm. Therefore, an efficient sample scheme is to first calculate the backward recursion according to Baum-Welch algorithm then sample the states forward, hench the name "backward recursion forward sampling".
+Let $\pi_t(i) = P(X_t=i|O_1,...,O_t)$ and $p_{t,i,j} = P(X_t=i|X_{t+1}=j,O_1,...,O_{t+1},\theta) \propto \pi_t(i)P(X_t=i|X_{t+1}=j)P(O_{t+1}|X_{t+1})$ be the $(i,j)$th element of transit matrix $P_t$. Given vector $\pi_{t-1}$, $P_t$ can be calculated and given $P_t$, $\pi_t(i) = \sum_{j}p_{t,i,j}$. Thus all quantity can be calculated.
 
 ### Brute Force Data Augmentation
+
+
+**WITH FB algorithm, recursive sampling is possible!**
 
 Unfortunately, as the BKT-Hybrid model specified in the previous section, the backward recursion is not feasible because the event of observing $O_t$ depends on the survival probability as a function of ${O_1,..,O_{t-1}}$. This problem can be simply solved by dropping the recursion scheme and the calculate posterior transition probability with brute force.
 
@@ -130,7 +130,7 @@ The algorithm can further speed up by observing that there are at most $\sum_{t=
 
 ### Gibbs Sampler for Parameter Update
 
-Once the state is sampled, the parameter is updated by Gibbs sampler:
+Once the state is sampled, the parameter is updated by Gibbs sampler(derived in Appendix II):
 
 (1) The learn rate is sampled from Beta($\beta^l_1+n^l_{0,1}$,$\beta^l_0+n^l_{0,0}$) where $\beta^l_0$, $\beta^l_1$ are prior parameters, $n^l_{0,1} = I{X_t=1,X_{t-1}=0}$ and  $n^l_{0,0} = I{X_t=0,X_{t-1}=0}$
 
@@ -141,9 +141,14 @@ Once the state is sampled, the parameter is updated by Gibbs sampler:
 (4) The hazard rateof $h_{i,j}$ is sample from
 Beta($\beta^h_1+n^h_{1,i,j}$,$\beta^h_0+n^h_{0,i,j}$) where $\beta^h_0$, $\beta^h_1$ are prior parameters and $n^h_{k,i,j} = I{E_t=k,X_t=i=Y_t=j}$ 
 
-### Simulation Result
+### Multimodality and  Simulated Tempering
 
-The simulation shows that BKT-Survival has the best learning curve fit. BKT estimated by MCMC outperforms BKT estimated by Baum-Welch algorithm. However, the current MCMC sampling scheme suffers from slow convergence and is prone to be trapped in the local optimum near the random start.
+A well known characteristic of the BKT model is its multimodality[@beck2007identifiability]. Because the beta posterior shrinks too fast with moderate sample size, MCMC chain can be trapped in local optimal value for a long time, known in the literature as a "critical slowdown". Simulated tempering[@marinari1992simulated] runs parallel chains from different start point and switch states between the chains to accelerate the convergence to stationarity. 
+
+**To be DONE**
+
+
+### Simulation Result
 
 **NEED TO SOLVE THE CONVERGENCE PROBLEM**
 
@@ -158,7 +163,7 @@ The simulation shows that BKT-Survival has the best learning curve fit. BKT esti
 
 **Compare logit with BKT-Survival**
 
-## Discussion and Future Results
+## Discussion and Future Research
 
 ### Duration Dependence
 The data exhibit duration dependence. Figure 2 describes the probability of termination at each period. There is a significant difference for the level of hazard rate, but less so for the shape. The zigzag shape of the hazard rate curve for the wrong response may be a result of insufficient wrong data at each period.  
@@ -221,3 +226,6 @@ P(E_{t-1}|X_{t-1}=0) = P(E_{t-1}|X_{t-1}=1)
 $$
 
 which is false under the assumption of heterogeneous hazard rate.
+
+## Appendix II: Derivation of the Gibbs Sampling Scheme
+**To be Done**

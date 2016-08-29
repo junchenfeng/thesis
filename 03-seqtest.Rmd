@@ -24,7 +24,6 @@ Therefore, this chapter focuses on the sequential test as a tool for continuous 
 
 
 
-
 ## Literature Review
 Experiments are no stranger to education literature. **Add a review of experiments in education**. Yet very few publication has used experiments as a tool for improvement. **Need a more thorough search**
 
@@ -245,7 +244,7 @@ qplot(data=regret_res,x=i,y=regret_ratio,col=method.x,geom='line', facets = p~ra
 
 ### Simulated Experiments
 
-The regret is hard to define in the simulated experiment since the true superior arm is unknown. However, the resulting success rate is a proxy for learning gain since the data set conditions on making initial mistakes. When there is a significant finding, the bandit test provides a modest boost to student's learning performance. However, when the truth is close to equivalent, the bandit test actually performs worse. **How COME**
+The regret is hard to define in the simulated experiment since the true superior arm is unknown. However, the resulting success rate is a proxy for learning gain since the data set conditions on making initial mistakes. When there is a significant finding, the bandit test provides a modest boost to student's learning performance. However, when the truth is close to equivalent, the bandit test actually performs worse. The negative return is a consequence of imbalanced sample design because Thompson sampling favors one arm over another even though the stop condition is not met at the end of the trial. 
 
 Assessment | treamtnet   | bandit test learning gain/raw learning gain 
 ---   | --- | ---| ---| ---    | ---
@@ -277,7 +276,7 @@ The simulation demonstrates two observations for the type I error for "two-sided
 
 ```{r,message=FALSE,warning=FALSE,echo=FALSE}
 sig_Thompson = read.table(paste0(proj_dir, '/_data/03/sig_Thompson.txt'), sep=',', col.names=c('p','k','sig'))
-sig_Thompson = sig_Thompson %>% filter(p!=0.1 & p!=0.01) 
+sig_Thompson = sig_Thompson %>% filter(p %in% c(0.03,0.07,0.15,0.25,0.4,0.5))
 sig_Thompson$type='Thompson'
 
 sig_Thompson$p = factor(sig_Thompson$p)
