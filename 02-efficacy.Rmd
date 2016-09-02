@@ -11,9 +11,6 @@ input_file_path = paste0(proj_dir,'/_data/02/production_data.RData')
 load(input_file_path)
 ```
 
-
-
-
 ## Motivation
 
 The past decade has witnessed  the rise of recommendation service based on machine learning algorithm. Success stories are abundant in online service sectors: from online shopping, such as Amazon, to entertainment, such as Netflix, or even dating, such as OKcupid. Naturally, it inspires people to revive the old ideal of adaptive(personalized) learning with the modern information technology. Although there are many types of adaptive learning, they share one common feature: There is little evidence that any of the adaptive learning engines has produced significant more learning gain than the non-personalized pedagogy.
@@ -244,7 +241,7 @@ Retain those did not give up on the original question and the training question,
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
 mod_9d = lm(data=ydata_p %>% filter(is_placebo==0&is_retain==1),y~t+dt+d2t)
 mod_10d = lm(data=ydata_s %>% filter(is_placebo==0&is_retain==1),y~t+dt+d2t)
-stargazer(mod_9d,mod_10d, header=FALSE, type='text', 
+stargazer(mod_9d,mod_10d, header=FALSE, type='latex', 
           dep.var.labels = 'Response', keep=c('dt','d2t'), covariate.labels=c('delta0','delta2'), column.labels=c('Primary','Secondary'), keep.stat=c("adj.rsq","n"))
 ```
 

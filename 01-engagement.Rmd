@@ -2,7 +2,11 @@
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(ggplot2)
-load(paste0(getwd(),'/_data/01/production_data.RData'))
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+proj_dir = getwd()
+load(paste0(proj_dir,'/_data/01/production_data.RData'))
 ```
 
 
@@ -13,16 +17,8 @@ The routine task is a good candidate for online learning: High frequency, effici
 
 The Achille's' hill of the routine task is user engagement. The routine task is boring, except for when it is hard; then it is frustrating. Evidence for such claim is hard to come by because good quality user retention rate data are considered as a commercial secret. In 2012, Duolingo has a retention rate around 20% (Luis von Ahn,2012, **need citation format for youtube interview**), since then the retention rate should have gone up. That said, Duolingo is the best in the industry, thus the monthly retention rate of most online learning service is probably at teens.
 
-**NEED BACKGROUND DESCRIPTION OF THE DATA**
 
-Such is the dilemma of online routine task: Perfect only comes from practice, but users do not persist in practicing. Empirical data shows that a wrong answer is (unconditionally) 2 times more likely leading to a stop. About 14% spell ends after the first error, which speaks volume to the lack of user persistence. Figure 1 shows the distribution of hazard rate for different items when the current response is a failure. Although there is a good dispersion, the overriding theme is student is far more likely to quit when confronted with a failure.
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-qplot(data=fig_1_data, x=pct, col=ans_tag,geom='density')
-```
-
-
-Thus for the routine task, the persistence of practices is key to learning gain. Yet it has attracted little attention in the learning analytics community.
+Such is the dilemma of online routine task: Perfect only comes from practice, but users do not persist in practicing. Empirical data shows that a wrong answer is (unconditionally) 2 times more likely leading to a stop. About 14% spell ends after the first error, which speaks volume to the lack of user persistence. Thus for the routine task, the persistence of practices is key to learning gain. Yet it has attracted little attention in the learning analytics community.
 
 ## Literature Review
 
@@ -67,18 +63,18 @@ $$
 ### A Model of Practice Duration
 In practice, the sequence duration is observed along with the response. Since the start of the practice sequence is usually logged, the issue of left-censor can be ignored. 
 
-Assume learner decides whether or not drop out after observing the state and response at the same period.Let $h_{i,j}$ denote the hazard rate with state $i$ and observation $j$. Let $E_t$ denote if the spell ends in time $t$, value 1 if yes and 0 otherwise. 
-
+Assume learner decides whether or not drop out after observing the response. Let $E_t$ denote if the spell ends in time $t$, value 1 if yes and 0 otherwise. Let $h_{t,i} = P_t(E=1|O_t=i)$ denote the conditional hazard rate at time $t$ for response $i$ .  
 
 The probability of observing $E_T$ is thus
 
 $$
-P(E_T) = [\prod_t^{T-1} (1-h_{X_t,O_t})] [(h_{X_T,O_T})^{E_t}*(1-h_{X_T,O_T})^{1-E_t}]
+P(E_T) = [\prod_t^{T-1} (1-h_{t,O_t})] [(h_{t,O_T})^{E_t}*(1-h_{t,O_T})^{1-E_t}]
 $$
 
-The model assumes learner's dropout decision is based only on the current state and response, which is not supported by the empirical evidence. However, the dependence structure depends on the learning environment. If the learning environment has an "X-strike" rule, the hazard rate mechanically depends on the number of past failures. For general purpose, the current configuration demonstrates the key feature of dynamic selection bias in a parsimonious model.
+The non-parametric description of the hazard rate curve is the most flexible form under the assumption that the hazard rate only depends on the current response. However, this assumption proves to be too strong. If the learning environment has an "X-strike" rule, the hazard rate mechanically depends on the number of past failures. 
 
-The model assumes no duration dependence, which is not supported by empirical evidence. The assumption lessens the computation burden of the MCMC sampling because hazard function makes it difficult to come with conjugate prior and posterior distribution whose marginal distribution is easy to calculate.
+The non-parametric specification reduces the complexity of the Gibbs sampling scheme because general hazard function makes it difficult to come with conjugate prior and posterior distribution whose marginal distribution is easy to calculate.
+
 
 
 ### Dynamic Selection Bias
@@ -89,7 +85,7 @@ $$
 P(X_t = 1| E_{t-1} = 0) \neq P(X_t=1)
 $$
 
-Even without heterogeneity in the learner parameters, dynamic selection bias can be observed in the learning curve, result in biased parameter estimation by classical Bayesian Knowledge Tracing model. Most importantly, if the learner drops out faster when confronted with a failure, the learn rate estimation will be biased upward in the classical BKT model. The less "user-friendly" the practice is, the more effective the practice appears to be, which can be detrimental to the service quality.
+Even without heterogeneity in the learner parameters, dynamic selection bias can be observed in the learning curve, result in biased parameter estimation by classical Bayesian Knowledge Tracing model. If there is a selection for learned user, the learn rate will be biased downward because there is less transition in the later stage. If there is a selection for the unlearned user, the learn rate will be biased upward for the opposite reasons.
 
 
 ## Monte Carlo Markov Chain Method of Parameter Estimation
@@ -105,26 +101,9 @@ The general idea of MCMC estimation for HMM model is to first augment the hidden
 
 Let $\pi_t(i) = P(X_t=i|O_1,...,O_t)$ and $p_{t,i,j} = P(X_t=i|X_{t+1}=j,O_1,...,O_{t+1},\theta) \propto \pi_t(i)P(X_t=i|X_{t+1}=j)P(O_{t+1}|X_{t+1})$ be the $(i,j)$th element of transit matrix $P_t$. Given vector $\pi_{t-1}$, $P_t$ can be calculated and given $P_t$, $\pi_t(i) = \sum_{j}p_{t,i,j}$. Thus all quantity can be calculated.
 
-### Brute Force Data Augmentation
 
+It should be noticed that the backward recursion and forward sampling scheme[@chib1996calculating] is not feasible in this case becaue because the event of observing $O_t$ depends on the survival probability as a function of ${O_1,..,O_{t-1}}$. 
 
-**WITH FB algorithm, recursive sampling is possible!**
-
-Unfortunately, as the BKT-Hybrid model specified in the previous section, the backward recursion is not feasible because the event of observing $O_t$ depends on the survival probability as a function of ${O_1,..,O_{t-1}}$. This problem can be simply solved by dropping the recursion scheme and the calculate posterior transition probability with brute force.
-
-The brute force is deemed as infeasible in the HMM literature because its computation complexity is $O(N^TT)$ where $N$ is the number of possible states and  $T$ is the length of chain. In the 1970s when the HMM algorithm is born, computation power was expensive and memory space is scarce. The current cloud computing and parallel computing technology make $O(N^TT)$ computation only a nuisance for most practical application of learning analytics. In addition, the model proposed in this chapter put a critical constraint on the possible states because mastery becomes an absorbing state, result in a reduced computation complexity of $O(T^2)$ for a single chain. 
-
-The brute force state augmentation scheme is described as following:
-
-(1) Generate all possible state combinations according to the transit matrix. It can be shown that there are T+1 possible combinations under the constraint of no forgetting.
-
-(2) For each combination, calculate the full data likelihood by 
-$$
-P({X},{O},{E}) = \prod_{t=0}^T P(E_t|O_t,X_t)P(O_t|X_t)P(X_t|X_{t-1})
-$$
-where $P(X_0|X_{-1}) = P(X_0)$
-
-(3) Calculate the conditional probability of state sequence by numerical integration.
 
 The algorithm can further speed up by observing that there are at most $\sum_{t=1}^{T-1} 2^t + 2^{T+1}$ observation tuple of ${O_t,E_t}$. In moderate spell length, it is usually a fraction of the data size. In addition, if the model is correctly specified, the parameter can be estimated from arbitrary practice length so right censoring the practice sequence does not endanger consistency.
 
@@ -132,47 +111,315 @@ The algorithm can further speed up by observing that there are at most $\sum_{t=
 
 Once the state is sampled, the parameter is updated by Gibbs sampler(derived in Appendix II):
 
-(1) The learn rate is sampled from Beta($\beta^l_1+n^l_{0,1}$,$\beta^l_0+n^l_{0,0}$) where $\beta^l_0$, $\beta^l_1$ are prior parameters, $n^l_{0,1} = I{X_t=1,X_{t-1}=0}$ and  $n^l_{0,0} = I{X_t=0,X_{t-1}=0}$
+(1) The learn rate is sampled from Beta($\beta^l_1+n^l_{0,1}$,$\beta^l_0+n^l_{0,0}$) where $\beta^l_0$, $\beta^l_1$ are prior parameters, $n^l_{0,1} = sum(I{X_t=1,X_{t-1}=0})$ and  $n^l_{0,0} = sum(I{X_t=0,X_{t-1}=0})$
 
-(2) The slip rate is sampled  from Beta($\beta^s_1+n^s_{0,1}$,$\beta^s_0+n^s_{1,1}$) where $\beta^s_0$, $\beta^s_1$ are prior parameters, $n^s_{0,1} = I{Y_t=1,X_t=1}$ and  $n^s_{0,0} = I{Y_t=0,X_t=0}$
+(2) The slip rate is sampled  from Beta($\beta^s_1+n^s_{0,1}$,$\beta^s_0+n^s_{1,1}$) where $\beta^s_0$, $\beta^s_1$ are prior parameters, $n^s_{0,1} = sum((I{Y_t=1,X_t=1})$ and  $n^s_{0,0} = sum(I{Y_t=0,X_t=0})$
 
-(3) The guess rate is sampled from Beta($\beta^g_1+n^g_{1,0}$,$\beta^g_0+n^g_{0,0}$) where $\beta^g_0$, $\beta^g_1$ are prior parameters, $n^g_{1,0} = I{Y_t=1,X_t=0}$ and  $n^s_{1,0} = I{Y_t=1,X_t=0}$
+(3) The guess rate is sampled from Beta($\beta^g_1+n^g_{1,0}$,$\beta^g_0+n^g_{0,0}$) where $\beta^g_0$, $\beta^g_1$ are prior parameters, $n^g_{1,0} = sum(I{Y_t=1,X_t=0})$ and  $n^s_{1,0} = sum(I{Y_t=1,X_t=0})$
 
-(4) The hazard rateof $h_{i,j}$ is sample from
-Beta($\beta^h_1+n^h_{1,i,j}$,$\beta^h_0+n^h_{0,i,j}$) where $\beta^h_0$, $\beta^h_1$ are prior parameters and $n^h_{k,i,j} = I{E_t=k,X_t=i=Y_t=j}$ 
+(4) The hazard rateof $h_{t,i}$ is sample from
+Beta($\beta^h_1+n^h_{1,t,i}$,$\beta^h_0+n^h_{0,t,i}$) where $\beta^h_0$, $\beta^h_1$ are prior parameters and $n^h_{k,t,i} = sum(I{E_t=k,Y_t=i})$ 
 
-### Multimodality and  Simulated Tempering
+### Data Dependent prior
 
-A well known characteristic of the BKT model is its multimodality[@beck2007identifiability]. Because the beta posterior shrinks too fast with moderate sample size, MCMC chain can be trapped in local optimal value for a long time, known in the literature as a "critical slowdown". Simulated tempering[@marinari1992simulated] runs parallel chains from different start point and switch states between the chains to accelerate the convergence to stationarity. 
+A well-known characteristic of the BKT model is its multimodality[@beck2007identifiability]. A random initial guess runs the risk of trapping the chain in a local optimum walled off to the global optimum. Given the strong model structure, much can be learned about the parameter by examing various moments of the observed data. Therefore, this chapter uses a data dependent initial guess. 
 
-**To be DONE**
+The educated guess of the parameter follows these heuristics:
+
+(1) The initial distribution of state: the success rate at the first attempt
+
+(2) Learn rate: the difference of success rate between the first and the second attempt
+
+(3) Slip rate: One minus the success rate at the last observed attempt. To fend off inference from small data, one may add a condition of at least 100 data points are observed at that length.
+
+(4) Guess rate: set to 0.3
+
+(5) Hazard rate: The observed hazard rate curve condition on right and wrong responses.
+
+To ensure that the convergence is not a spurious result of the start position, appendix II performs an analysis of point parameter estimation from random initial guess drew from the prior distribution. The algorithm demonstrates its convergence under random initiation. 
+
+### Point Estimation
+
+The point estimation takes the mean of the MCMC sample chain, which approximates the expected parameter value of the posterior parameter distribution.  
+
+
 
 
 ### Simulation Result
 
-**NEED TO SOLVE THE CONVERGENCE PROBLEM**
+#### Simulation settings
+The parameters are $\ell = 0.3$, $\pi = 0.4$, $s = 0.05$, $g = 0.2$. The hazard rates are calibrated from real data set to demonstrate significanct selection bias and the model's ability to identify parameters. 
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+hazard_rate = data.frame(t=seq(5), correct=c(0.3, 0.3, 0.4, 0.4, 0.5), wrong=c(0.4, 0.5, 0.6, 0.6, 0.6))
+long_hazard_rate = hazard_rate %>% gather(response, harzard_rate,-t)
+long_hazard_rate$response = factor(long_hazard_rate$response)
+qplot(data=long_hazard_rate, x=t, y = harzard_rate, geom='line', col=response)
+```
+
+The initial distribution and the slip rate are also informed by the real data, while the guess rate and learn rate are set according to literature tradition. The resulting learning curve is shown as the following.
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+
+update_mastery <- function(mastery, learn_rate){
+  return (mastery + (1-mastery)*learn_rate)
+} 
+
+compute_success_rate <- function(slip, guess, mastery){
+  return ( guess*(1-mastery) + (1-slip)*mastery )
+}
+
+generate_learning_curve <- function(slip, guess, init_mastery, learn_rate, Tl){
+  p = init_mastery
+  lc = data.frame(t= seq(1,Tl), ypct = as.numeric(0), xpct=as.numeric(0) )
+  
+	lc$ypct[1] = compute_success_rate(slip, guess, p)
+	lc$xpct[1] = p
+	
+	for (t in seq(2,Tl)){
+		p = update_mastery(p,learn_rate)
+		lc$ypct[t] = compute_success_rate(slip, guess, p) 	
+		lc$xpct[t] = p
+	}
+	return(lc)
+}
+
+true_lc = generate_learning_curve(0.05, 0.2, 0.7, 0.3, 5)
+
+# the analytical solution for the censored data has difficult analytical form, thus solve the average by simulation (10Krun)	
+# read in the simualted result
+file_path = paste0(proj_dir,'/_data/01/single_sim.txt')
+sim_data = read.table(file_path, sep=',', col.names=c('i','t','y','x','e','a'))
+obs_stat = sim_data %>% filter(a==1) %>% group_by(t) %>% summarize(ypct=mean(y),xpct=mean(x))
+
+lc_data = data.frame(t=seq(5), true=as.numeric(0), obs=as.numeric(0))
+lc_data$true = true_lc$ypct
+lc_data$obs = obs_stat$ypct
+long_lc_data = lc_data %>% gather(type,prob,-t)
+m11 = qplot(data=long_lc_data, x=t,y=prob,col=factor(type),geom='line') + ggtitle('Success Rate')
+
+# lc_data = data.frame(t=seq(5), true=as.numeric(0), obs=as.numeric(0))
+# lc_data$true = true_lc$xpct
+# lc_data$obs = obs_stat$xpct
+# long_lc_data = lc_data %>% gather(type,prob,-t)
+# m12 = qplot(data=long_lc_data, x=t,y=prob,col=factor(type),geom='line')+ ggtitle('Latent Mastery')
+
+grid.arrange(m11, ncol=1)
+
+```
+
+
+#### Parameter Estimate Precision
+
+The train set has 2000 observations. The MCMC chain iterates 10000 times. The distribution of the estimated parameter from MCMC is inferred from second half the chain with a sample interval of 10 iterations.
+
+The MCMC algorithm is compared to the EM algorithm. The two algorithms are very close in terms of slip rate, guess rate and initial mastery. The selection bias in EM algorithm is visible in the learn rate estimation. 
+
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+# read in the point estimation
+file_path = paste0(proj_dir,'/_data/01/res/sim/incomplete_point_estimation.txt')
+point_est = read.table(file_path, sep=',', col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
+file_path = paste0(proj_dir,'/_data/01/res/sim/true_param.txt')
+true_param = read.table(file_path, sep=',', col.names=c('s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
+
+
+# read in the chain
+#file_path = paste0(proj_dir,'/_data/01/res/incomplete_mcmc_parameter_chain.txt')
+#mcmc_chains = read.table(file_path, sep=',', col.names=c('s','g','pi','l'))
+#mcmc_chains$t = seq(10000)
+
+file_path = paste0(proj_dir,'/_data/01/res/sim/incomplete_mcmc_survival_parameter_chain.txt')
+mcmc_survive_chains = read.table(file_path, sep=',', col.names=c('s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
+mcmc_survive_chains$t = seq(10000)
+mcmc_survive_sample_chains = mcmc_survive_chains %>% filter(t>5000) %>% filter(t%%10==0)
+
+
+
+m21 = qplot(data=mcmc_survive_sample_chains,x=s,geom='density') + geom_vline(xintercept = point_est$s[point_est$algo=='em'], colour="blue", linetype = "longdash") + geom_vline(xintercept = point_est$s[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$s) + ggtitle('slip')
+
+m22 = qplot(data=mcmc_survive_sample_chains,x=g,geom='density') + geom_vline(xintercept = point_est$g[point_est$algo=='em'], colour="blue", linetype = "longdash") + geom_vline(xintercept = point_est$g[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$g) + ggtitle('guess')
+
+m23 = qplot(data=mcmc_survive_sample_chains,x=pi,geom='density') + geom_vline(xintercept = point_est$pi[point_est$algo=='em'], colour="blue", linetype = "longdash") + geom_vline(xintercept = point_est$pi[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$pi) + ggtitle('pi')
+
+m24 = qplot(data=mcmc_survive_sample_chains,x=l,geom='density') + geom_vline(xintercept = point_est$l[point_est$algo=='em'], colour="blue", linetype = "longdash") + geom_vline(xintercept = point_est$l[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$l) + ggtitle('learn rate')
+
+
+grid.arrange(m21, m22, m23, m24, ncol=2)
+
+```
+
+
+The hazard rate curve of the wrong response has convergence problem at both tails, while the rest parameters are well estimated.
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+
+h01 = qplot(data=mcmc_survive_sample_chains, x=h01, geom='density') + geom_vline(xintercept = point_est$h01[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h01) + ggtitle('hazard rate |t = 1, Y=0')
+
+h02 = qplot(data=mcmc_survive_sample_chains, x=h02, geom='density') + geom_vline(xintercept = point_est$h02[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h02) + ggtitle('hazard rate |t = 2, Y=0')
+
+h03 = qplot(data=mcmc_survive_sample_chains, x=h03, geom='density') + geom_vline(xintercept = point_est$h03[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h03) + ggtitle('hazard rate |t = 3, Y=0')
+
+h04 = qplot(data=mcmc_survive_sample_chains, x=h04, geom='density') + geom_vline(xintercept = point_est$h04[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h04) + ggtitle('hazard rate |t = 4, Y=0')
+
+h05 = qplot(data=mcmc_survive_sample_chains, x=h05, geom='density') + geom_vline(xintercept = point_est$h05[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h05) + ggtitle('hazard rate |t = 5, Y=0')
+
+grid.arrange(h01,h02,h03,h04,h05,ncol=2)
+
+```
+
+The hazard curve of correct response has convergence issue with the hazard rate of the first period, but the rest of the hazard curve is well estimated.
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+
+h11 = qplot(data=mcmc_survive_sample_chains, x=h11, geom='density') + geom_vline(xintercept = point_est$h11[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h11) + ggtitle('hazard rate |t = 1, Y=1')
+
+h12 = qplot(data=mcmc_survive_sample_chains, x=h12, geom='density') + geom_vline(xintercept = point_est$h12[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h12) + ggtitle('hazard rate |t = 2, Y=1')
+
+h13 = qplot(data=mcmc_survive_sample_chains, x=h13, geom='density') + geom_vline(xintercept = point_est$h13[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h13) + ggtitle('hazard rate |t = 3, Y=1')
+
+h14 = qplot(data=mcmc_survive_sample_chains, x=h14, geom='density') + geom_vline(xintercept = point_est$h14[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h14) + ggtitle('hazard rate |t = 4, Y=1')
+
+h15 = qplot(data=mcmc_survive_sample_chains, x=h15, geom='density') + geom_vline(xintercept = point_est$h15[point_est$algo=='mcmc_s'], colour="red", linetype = "dotdash") + geom_vline(xintercept=true_param$h15) + ggtitle('hazard rate |t = 5, Y=1')
+
+grid.arrange(h11,h12,h13,h14,h15,ncol=2)
+
+```
+
+Surprisingly, the distribution of estimated parameters of the simple HMM model and that of the hybrid HMM and survival model are very close, even though the simple HMM model is under-specified. It demonstrates the effectiveness of the data augmentation.
+
 
 ## Comparison of Model Performance
-**TOBEDONE**
+
+To examine the performance of the hybrid model in practice, this chapter uses the data from a Chinese online learning service provider.
+
+### Data Description
+
+The data are collected from December 2015 and January 2016. The practices took place in a gamified learning environment. Each practice sequence is framed as a turn-based game. Each turn, the learner answers a quiz. If he/she responds correctly, he/she is rewarded with a small amount of in-game currency; If else, he/she took a damage from the monster. The game continues until the HP of the player drops to zero or the player chooses to exit. The player can withstand three or four errors because the amount of damage is random. Each practice sequence trains one knowledge point from different perspectives. For each knowledge point, the question bank is sizable but finite. If the learner practices long enough to exhaust the question bank, he/she encounters questions from the past. The learning game is a supplemental learning task that the students can play on their own initiative. 
+
+This chapter chooses three representative knowledge points from more than 200 knowledge points:  sequential order within 5, two digit number minus one digit number and vertical division. Appendix IV details the data cleaning process. The learning curves are plotted as the following:
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+kpids =  c('2','87','138')
+kp_names = c('sequential order','two digit subtraction','vertical division')
+for (i in seq(3)){
+    file_path = paste0(proj_dir,'/_data/01/spell_data_',kpids[i],'.csv')
+    tmp_data = read.csv(file_path, col.names=c('spell_id','t','atag','idx'),header=F)  
+    tmp_data$kpid = kpids[i]
+    if (i==1){
+        spell_data = tmp_data
+    }else{
+        spell_data = rbind(spell_data, tmp_data)
+    }
+}
+
+spell_data$kpname = factor(spell_data$kpid, labels=c('vertical division', 'sequential order','two digit subtraction'))
+lc_plot = spell_data %>% group_by(kpname, t) %>% summarize(pct=mean(atag)) %>% filter(t<=5)
+qplot(data=lc_plot , x=t, y=pct, geom='line', col=kpname) 
+```
+
+The hazard rate curve is plotted as the following. The hazard rate curves for sequential order and two digit subtraction are not very different but the hazard rates are very different for the vertical division.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+#Check the hazard rate
+#There is significant difference for item 138. Not so much for other items
+imputate_hazard_rate <- function(test_data, Tmax){
+  harzard_rate_data = data.frame(t=seq(1,Tmax), hr=as.numeric(0), yhr = as.numeric(0), whr = as.numeric(0))
+  for (t in seq(1,Tmax)){
+    base_num = sum(test_data$t==t)
+    exit_num = sum(test_data$t==t & test_data$idx==1)
+    base_yes_num = sum(test_data$t==t & test_data$atag==1)
+    base_no_num = sum(test_data$t==t & test_data$atag==0)
+    exit_yes_num = sum(test_data$t==t & test_data$atag==1 & test_data$idx==1)
+    exit_no_num =  sum(test_data$t==t & test_data$atag==0 & test_data$idx==1)
+    harzard_rate_data[t,] = c(t, exit_num/base_num, exit_yes_num/base_yes_num, exit_no_num/base_no_num)
+  }
+  harzard_rate_data =  harzard_rate_data %>% select(t,yhr,whr) %>% gather(res,hr,-t)
+  return(harzard_rate_data)
+}
+
+
+test_data = spell_data %>% filter(kpid==2)
+hr_data = imputate_hazard_rate(test_data, 5)
+h1=qplot(data=hr_data, x=t, y=hr, col=factor(res), geom='line')
+
+test_data = spell_data %>% filter(kpid==87)
+hr_data = imputate_hazard_rate(test_data, 5)
+h2=qplot(data=hr_data, x=t, y=hr, col=factor(res), geom='line')
+
+test_data = spell_data %>% filter(kpid==138)
+hr_data = imputate_hazard_rate(test_data, 5)
+h3=qplot(data=hr_data, x=t, y=hr, col=factor(res), geom='line')
+
+grid.arrange(h1, h2, h3, ncol=1)
+
+```
+
+### Compare the Learning Curves
+Similar to the result in the simulation study, the estimated slip rate, guess rate, and initial mastery are very close between the two models, whereas the learn rate estimated by the hybrid model is much larger than the classical BKT model.  
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+for (i in seq(3)){
+    file_path = paste0(proj_dir,'/_data/01/res/',kpids[i],'/full_point_estimation.txt')
+    param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'), header=F,sep=',') 
+    
+    em_lc = generate_learning_curve(param_data[1,2], param_data[1,3], param_data[1,4], param_data[1,5], 5)
+    mcmc_s_lc = generate_learning_curve(param_data[2,2], param_data[2,3], param_data[2,4], param_data[2,5], 5)
+    
+    tmp_data = data.frame(t=seq(5))
+    tmp_data$em = em_lc$ypct
+    tmp_data$hybrid = mcmc_s_lc$ypct
+    tmp_data$empirical = lc_plot$pct[lc_plot$kpname==kp_names[i]]
+    tmp_data = tmp_data %>% gather(algo, pct, -t)
+    tmp_data$kpname =kp_names[i]
+    
+    if(i==1){
+      lc_data = tmp_data
+    }else{
+      lc_data = rbind(tmp_data, lc_data)
+    }
+}
+
+qplot(data=lc_data, x=t, y=pct, geom='line', col=factor(algo), facets=.~kpname)
+```
 
 ### Forecast Response
 
-**Compare BKT-EM, BKT-MCMC with BKT-Survival**
+The predicted response at time $t$ given the observation sequence $O_{1,...,t}$ is:
+$$
+P(Y_{t+1} =1 | O_{1,...,t},E_{1,..t}) = (1-s) * (P(X_t | O_{1,...,t},E_{1,..t} + (1-P(X_t | O_{1,...,t},E_{1,..t})*\ell ) + g((1-P(X_t | O_{1,...,t},E_{1,..t})*(1-\ell))
+$$
+
+However, notice that for the forecast to make sense, the spell has to survive, thus $E_21=...=E_t=0$. Therefore, the hybrid model shares the same forecast formula as the classical BKT model.The most important ingredient $P(X_t | O_{1,...,t})$ can be retrieved by the forward recursion algorithm. 
+
+The prediction performance is done on a separate sample of the original data so as to avoid the taint of in-sample overfitting.
+
+There is no significant differnece in the forecast performance. Both Area Under Curve(AUC) and $R^2$ are essentially the same for both model.
 
 ### Forecast Engagement
+The predicted hazard rate at time $t$ given the observation sequence $O_{1,...,t}$ is:
+$$
+P(E_{t+1} = 1 | O_{1,...,t}) = P(Y_{t+1} =1| O_{1,...,t})*\hat{h_{t,1}} + P(Y_{t+1} =0| O_{1,...,t})*\hat{h_{t,0}}
+$$
 
-**Compare logit with BKT-Survival**
+The key ingredient $P(Y_{t+1} =1| O_{1,...,t})$ can be calculated by the previous formula. The AUC and $R^2$ are reported in the following tables. 
+
+Knowledge Point | AUC   | $R^2$ 
+---   | --- | ---
+Sequential Order   | 0.632 | 0.483
+Two digit subtraction   | 0.56 | 0.49
+vertical division   | 0.579 | 0.485
+
+
+
+
+**Compare the HMM-Survival with another surival model**
+
+
+
+
 
 ## Discussion and Future Research
-
-### Duration Dependence
-The data exhibit duration dependence. Figure 2 describes the probability of termination at each period. There is a significant difference for the level of hazard rate, but less so for the shape. The zigzag shape of the hazard rate curve for the wrong response may be a result of insufficient wrong data at each period.  
-
-For right answer, the hazard rate peaks at period #3 and trends down afterward. Such shape results from the product design. Presented as a role-playing game, the student clears a level to claim a virtual reward. If the student answers a quiz right, the "monster" takes a hit; while if the student gives a wrong answer, the avatar takes a hit. On average, both the monster and the avatar can take 3 hits before yields. The student usually does not give up until they clear the level. The gentle decline of hazard rate after period 3 may reflect the dynamical selection process: There are more gritty students in the latter periods than in the earlier periods.
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-qplot(data=fig_2_data, x=period, y=hazard_rate, col=ans_tag,geom='line')
-```
 
 ### Hot Streak Effect
 If the user is on a winning streak, they are less likely to stop. Consequently the each response is not independent and cannot directly apply the product rule. 
@@ -195,7 +442,9 @@ qplot(data=fig_3_data, x=pct, col=factor(streak_id),geom='density', facets=.~ans
 ```
 ### user Heterogeneity
 
-**Hierarchical model**
+The key insight of this chapter is that selection bias does influence parameter estimate. However, the basis for latent knowledge modelling may be too strong. Bayesian Knowledge Tracing model makes very strong assumption about the process which is unlikely to be met in reality. Duolingo[@streeter2015mixture] proposes a nonparametric mixture model to replace the BKT, which claims to have superior empirical performance. Mixture model can be implemented in MCMC by data augmentation scheme and it may helps to solve the identification problem of the mxiture learning curve model as well.
+
+
 
 
 ## Appendix I: A Proof of Dynamic Selection Bias
@@ -229,3 +478,7 @@ which is false under the assumption of heterogeneous hazard rate.
 
 ## Appendix II: Derivation of the Gibbs Sampling Scheme
 **To be Done**
+
+## Appendix III: Convergence on Random Initial Start
+
+## Appendix IV: Data Cleaning Process
