@@ -1,9 +1,10 @@
-# Evaluating Pedagogical Efficacy with Randomized Control Trials {#efficacy}
+# Evaluating Pedagogical Efficacy in Low Stake Environment {#efficacy}
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 library(dplyr)
 library(ggplot2)
 library(stargazer)
+library(gridExtra)
 rm(list=ls())
 
 proj_dir = getwd()
@@ -11,93 +12,68 @@ input_file_path = paste0(proj_dir,'/_data/02/production_data.RData')
 load(input_file_path)
 ```
 
-## Motivation
-
-The past decade has witnessed  the rise of recommendation service based on machine learning algorithm. Success stories are abundant in online service sectors: from online shopping, such as Amazon, to entertainment, such as Netflix, or even dating, such as OKcupid. Naturally, it inspires people to revive the old ideal of adaptive(personalized) learning with the modern information technology. Although there are many types of adaptive learning, they share one common feature: There is little evidence that any of the adaptive learning engines has produced significant more learning gain than the non-personalized pedagogy.
-
-At K-12 level, there is three major digital-only personalized learning service provider. Khan Academy, ALEKS, and Knewton. Although all institutions claim learning gain in observational studies, none has been evaluated by an RCT. Funded by the Gates Foundation and fielded by SRI, an implementation report on Khan Academy [@murphy2014research] found a positive correlation between Khan Academy usage and student math outcome. Evaluation studies on ALEKS found that it does not outperform teacher lecture in K-12[@craig2013impact] and in college[@taylor2008effects]. In a college setting, a positive relation is also found between ALEKS exposure and outcome gain[@angus2009does]. There has been no peer reviewed publication that evaluates Knewton's efficacy, although Knewton's own [whitepaper](http://learn.knewton.com/improvement-index-white-paper) claims to find a positive correlation between usage and outcome improvement (**website citation needed**). The common positive finding, a positive correlation between usage and performance, has the critical weakness of founding learner agency and pedagogical efficacy. It may be gritty or smart students who made large progress during the intervention also well utilized the technology. Thus a positive correlation can be found where true treatment effect is Null. Smaller education technology providers do not fare well either. What works Clearinghouse reviews 10 evaluation of education technologies as of August 2016. 5 are disqualified because they are not random or quasi-random experiment. Out of the remaining 5 valid studies, only 2 found statistical significant improvement[@barrow2009technology;@roschelle2007can] in small sample, 1 reported negative impact[@carter2016impact] and 2 reported mixed results[@berkowitz2015math;@campuzano2009effectiveness]. Taken into consideration the publication bias for significant results, the case for the learning technology is quite weak.
-
-
-There are digital learning service providers that stand up to the random control trials in a large-scale field test. RAND corp[@pane2013effectiveness] reported statistically significant improvement in high school algebra in the second year of implementation, but not in the first year and not for the middle school. The exceptional case is Reasoning mind, a Houston-based math education provider.In summary of a decade of evaluations, [SRI](https://www.reasoningmind.org/rmwp/wp-content/uploads/2015/12/SRI-Report-Strength-of-Research-for-Reasoning-Mind.pdf) (**web citation needed **) concludes that there is strong evidence to prove the efficacy of reasoning mind in both engagement[@mulqueeny2015improving] and standardized test outcome[@khachatryan2014reasoning]. However, both Carnegie Learning and Reasoning Mind uses blended learning model that combines new curriculum with new technology. Thus it is not clear whether the curriculum design or the adaptive learning technology shall take the credit.
-
-It is a stark contrast between the success of recommendation algorithm in consumer service sector and the failure in the education sector. This chapter does not attempt to explain this contrast with empirical evidence but will nonetheless offer an educated speculation. The current recommendation algorithm, be it collaborative filtering or supervised classification, focuses on discovering or describe the latent preference and provides little insight into its changes. The consumer service can provide superior service if the consumer preference is revealed, while the education service can only deliver learning gain if the latent knowledge mastery is changed because the K12 curriculum aims to raise student's latent ability to a certain standard.
-
-To illustrate the point, consider the following mental experiment on literature "recommendation". Say there is a teenage girl who enjoys the twilight saga and a curriculum requires students to master "Romeo and Juliet". Amazon will be content to with a recommendation algorithm that recommends similar teenage romance novels, such as the hunger games. However, for the learning recommendation engine, it has to provide a series of books leading the student to appreciate the deep link between the two and become a fan of Shakespear. The task will be much more daunting if the curriculum instead requires a mastery of Shakespeare's "King Lear".
-
-This chapter defines the capability of altering learner's latent knowledge mastery to certain state as pedagogical efficacy.The pedagogical efficacy is the key to the performance of the recommendation system. Unfortunately, learning science itself does not lend much insight into either definition or discovery of pedagogical efficacy and it mostly boils down to an empirical question.
-
-This chapter aims to take the first step into build a recommendation engine based on pedagogical efficacy: the definition and measurement of pedagogical efficacy. 
-
-## Pedagogical Efficacy and its Evaluation
+## Pedagogical Efficacy and its Measurement
 ### Definition
-The pre-requisite to discuss pedagogical efficacy is an understanding how people learn in general. It is a very broad field[@bransford1999people] and many foundings are open to debate, even on what counts as instruction[@kirschner2006minimal;@hmelo2007scaffolding]. Thus a general definition of pedagogical efficacy is beyond this dissertation. This chapter defines pedagogical efficacy as delta over a naive repetition strategy rather than the absolute task improvement (or learning gain). An accurate measurement of the absolute pedagogical efficacy requires stronger assumption, which is unlikely to be met in practice. This is a slight difference from Khan Academy's learning gain metrics[@faus2015systems]. To be more specific, this chapter focuses on the remedial instruction: If the learner fails to correctly solve a problem, him/her is supplied with a set of remedial material so that he/she can solve another problem with identical latent knowledge requirement and skill requirement.
+The pre-requisite to discuss pedagogical efficacy is an understanding how people learn in general. It is a very broad field[@bransford1999people] and many foundings are open to debate, even on what counts as instruction[@kirschner2006minimal;@hmelo2007scaffolding]. 
+
+A general definition of pedagogical efficacy is beyond the scope of this dissertation. Since most of the learning services rely on practice question to gauge the learner's mastery level, this chapter defines pedagogical efficacy in reference to user's practice result.  Learning gain is defined as the absolute performance difference in quizzes before and after the pedagogical intervention. It is a metric Khan Academy used to improve their video instructions in experiments[@faus2015systems].
+
+This chapter defines pedagogical efficacy similar to the learning gain metric with a slight twist. The pedagogical efficacy is defined as the difference in learning gain compared to a naive repetition strategy. The second difference relaxes some strong assumptions required for the consistency of the learning metric.
 
 ### Three Obstacles
 
-Although massive online experiment(MOE) in education is not new ideas[@williams_mooclet_2014], and many experiments have been carried out in the industry (most noticeably by Khan Academy and Duolingo), with few exceptions[@paunesku2015mind], the idea is yet to catch fire in the academia. By the highest academic standard, MOE suffers from two critical weakness: selection bias induced by differential user attrition and measurement error induced by slacking. Furthermore, at item level, the magnitude of expected effect size is small, which requires a sample size the is sometimes impractically large.
+Conducting educational experiments online is not new ideas[@williams_mooclet_2014]. Many experiments have been carried out in the industry , such as Khan Academy[@Wang2014Khan] and Duolingo[@Ahn2012User]. However, with few exceptions[@paunesku2015mind], the idea is yet to catch fire in the academia. By the highest academic standard, online education experiments suffer from two critical weakness: selection bias induced by differential user attrition and measurement error induced by slacking. 
 
-#### Attrition Rate
-Compared to offline experiments that are usually coupled with regular school year, MOE has an extremely high attrition rate due to the voluntary nature of the online learning service.  
-Unlike instantaneous outcome that requires only one measurement, such as click rate, learning gain requires at least two measurements. The success rate per se does not indicate the learning gain: A difficult question can be enlightening while an easy question may offer no boost. However, users enrolled in the baseline test may not be observed again in the post-test, attriting from the sample for analytical purpose. In contrast, offline education experiment conducted in a school setting does not need to sweat over user attrition as much because school attendance or high stake test is somewhat mandatory. 
+#### High Attrition Rate
+Compared to offline experiments that are usually coupled with the regular school year, online experiments have an extremely high attrition rate due to the voluntary nature of the online learning service.  
+Unlike instantaneous outcome that requires only one measurement, such as click rate, learning gain requires at least two measurements. Users enrolled in the baseline test may not be observed again in the post-test. In contrast, offline experiments conducted in a school setting does not need to sweat over user attrition as much because school attendance or high stake test is somewhat mandatory. 
 
-The sample attrition does not equal selection bias for the average treatment estimation. First of all, the "population" of interest needs to be defined. For practical purpose , the population of interest can be reduced to the active user of the learning service. Except for the notable few exception such as facebook, month by month user retention rate falls between 30% to 60% (** web citation needed**). For example, if the learning service provider has a monthly retention rate of 20%, an experiment that runs for a month is expected to lose 80% of the enrolled participants, yet still be representative of the active users, as long as the drop out decision is independent to the experiment per se.
+The sample attrition does not equal selection bias for the average treatment effect. First of all, the "population" of interest needs to be defined. For practical purpose , the population of interest can be reduced to the active user of the learning service. The natural attrition rate is very high even for social apps, Except for the notable few exception such as facebook, monthly user retention rate falls between 30% to 60%[@Efrati2015Which].  If a learning service provider has a monthly retention rate of 30%, an experiment that runs for a month is expected to lose 70% of the enrolled participants, yet still be representative of the active users, as long as the drop out decision is independent to the experiment per se. Because online experiments are usually small tweaks to the overall user experience, the missing at random assumption is likely to hold.
 
-However, differential user attrition rate resulted from the experiment cannot be ruled out logically, and it produces selection bias. From field experience, the most likely confounding factor of learning gain and user attrition is grit. Learning gain is only made if users overcome their previous ignorance/failure. If they run away at the first sight of trouble, they are less likely to produce a positive outcome.
+However, differential user attrition rate caused by the experiment cannot be ruled out logically. From field experience, the most likely confounding factor of learning gain and user attrition is grit. Learners need the grit to overcome their previous failure in order to achieve learning gain. Users need the grit to log into the learning service regularly.
 
-The natural attrition leads to a loss of precision, which can be compensated by the large user base. The selective attrition leads to a loss in consistency, which has to be addressed deliberately by research design. One way to distinguish the natural attrition from selective attrition is to check if the users continue to be active other modules. However, depends on the nature of the product environment, such method may not always be reliable. For example, if the experiment is hosted in a paid product with free "tasting" period, users that are active on the website but inactive in the specific product may have nothing to do with the experiment. In general, without contextual information, natural attrition and selective attrition is observational equivalent.
+The natural attrition leads to a loss of precision, which can be compensated by the large user base. The selective attrition leads to a loss in consistency, which has to be addressed a deliberate research design. 
 
 #### Measurement Error
 
 The low stake of the online learning task does not incentivize student to exert their best effort. Error due to a lack of effort rather than a lack of mastery is considered as measurement error when trying to measure pedagogical efficacy. Here mastery stands for cognitive skill while effort, for a lack of better terms, stands for the non-cognitive skills.
 
-Knowledge mastery is a latent variable. It can only be inferred from observed test response. The classical model of learning analytics, be it Item Response Model or Bayesian Knowledge Tracing, assumes a link function where knowledge mastery is the only argument. However, a growing body of research distinguishes low performance due to lack of mastery and low performance due to lack of effort. Baker et al [-@baker2004off] have studied the "off-task" behavior on digital learning while Fryer [-@fryer2010financial] has shown that lack of effort may account for about 2/3 of the race gap in achievement as measured by low stake test. In online learning environment, the learning task is usually low stake because they are used as a formative assessment or optional self-learning material, where wrong response has little negative consequence. A student with inadequate grit is likely to shirk from exerting full effort.
+Incorrect responses have been traditionally associated with ONLY with a lack of mastery, such as in Item Response Theory or in Bayesian Knowledge Tracing model. In a high-stake test environment, it may be innocuous to assume that learners exert full effort. However, a growing body of research has shown that is not the case in low stake test environment. Baker et al [-@baker2004off] have studied the "off-task" behavior on digital learning while Fryer [-@fryer2010financial] has shown that lack of effort may account for about 2/3 of the racial gap in achievement as measured by low stake test. In an online learning environment, the learning task is usually low stake because they are used as a formative assessment or optional self-learning material, where an incorrect response has little negative consequence. A student without adequate grit is likely to shirk from exerting full effort.
 
-The identification of effort induced measurement error is not a trivial task. Without the behavior data that characterize how students answer the question, the error due to a lack of trying and the error due to a lack of mastery is observational equivalent. Furthermore, the sign of the bias in the average treatment effect is not definite(Appendix I provides a formal discussion). Thus one cannot use Minsky bound to provide an interval estimation.
-
-#### Low Signal to Noise Ratio
-The choice of sample size is an important yet often ignored issue in the experiment design[@list2011so]. In theory, any effect size can be estimated with desired precision given a large enough sample. However, recent work by Lewis and Rao[@lewis2015unfavorable] points out that the "large enough" sample size may be economically infeasible for online advertisement. Although it is cheaper to collect learner log than to bid for advertising exposure, the expected effect sizes relative to standard deviation are small in both scenarios.   
+The identification of effort induced measurement error is not a trivial task. Without the behavior data that characterize how students answer the question, the error due to a lack of trying and the error due to a lack of mastery is observational equivalent. Furthermore, the sign of the bias in the average treatment effect is not definite (Appendix II.1 provides a formal discussion). Thus one cannot use Minsky bound to provide an interval estimation.
 
 
-## Research Design
 
-This section details the research design with the three obstacles in mind. It mainly deals with the attrition rate and measurement error and the next chapter discusses how to tackle the problem of low signal to noise ratio.
+ 
+## Case Study: Efficacy Evaluation of Scaffolding Delivery 
 
-#### The Learning Environment
-The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is presented as a role-playing game where the user can claim reward once they clear a level, defined as accumulating 12 right answers. The user can re-try a similar question if they make mistakes to claim additional reward. In addition, if the user drops out in the middle of a level when they log into the same level, the wrong items will be shown again while the right items are skipped. The overall design aims to encourage students to "practice until right".
+This section describes a field experiment that evaluates the pedagogical efficacy of remedial exercises in primary school math learning. Remedial exercises give learners extra practice opportunities to strengthen their understanding of certain knowledge points or problem-solving skills. It is a highly valued pedagogical method in China. A learning service providers usually have a large stock of similar items on a particular knowledge point or skill, but it is not clear what item to present and whether or not the remedial exercises actually achieve the learning gain. These are the questions that can be answered by a series of online experiments.
 
-The reward is not cash incentive since it cannot be directly cashed out. They are virtual currency that can only be used to purchase in-game gears or exchange real gifts. When exchange for the gift, the exchange rate between RMB and virtual currency is 1 : 10000 at the time of the experiment. The reward per level is about 10, which translates to a tenth of a penny in RMB, thus negligible in real value. 
+The experiment evaluates the efficacy of different delivery methods for remedial scaffolding. The scaffolding is delivered either by vocabulary description or by video instruction. The efficacies on both routine skill and transfer skill are evaluated.
 
-That said, users have exhibited severe "nominal illusion": they mine the virtual currency with similar enthusiasm despite waves of massive inflation. A few efficient reward mining patterns have been spotted. One pattern is to skip any difficult items by submitting a blank answer to fish for easy questions. The other pattern is to jump out the level whenever makes a wrong answer then enter again with the knowledge of the right answer peeping from the hint section. 
 
-The experiment is administrated from June 9th to June 10th to third-grade users who used the paid learning product. By then, in theory, all users should have been taught the learning task in the school. About 10 thousand users are recruited.Users are not aware that they are part of an experiment.
+### The Learning Environment
 
-### The Learning Tasks and Assignment
+The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is framed as a role-playing game where the learner can claim the reward by clearing a level, defined as accumulating 12 correct answers. There is no punishment for an incorrect answer and the correct answer is shown to them before they go to the next question. The learner can practice a similar item to those that they have made a mistake on, earning an additional but smaller reward. If the learner drops out in the middle of a level,  when they log into the same level again, the incorrect items on this level will be shown while the correct items are skipped. The overall design aims to "encode success into exercises"[@lemov2012practice].
+
+The reward is virtual currency that can be used to exchange for gifts or in-game objects. Although the currency cannot be cashed out but there is an exchange rate to cash(RMB) because of the gift exchange. During the experiment, the reward for a correct response on the first attempt is about  a tenth of a penny in RMB (about $0.00014). The low stake encourages students to skip difficult items by submitting a blank answer or non-sense answer such as emoji in hope to get an easier one to score a correct response on the first attempt. Some learners also exploit the system design to "mine" rewards efficiently by repeat log in&out of the level to peep at the correct answer and explanation. All these system gaming behavior results in significant measurement error in the dataset.
+
+
+The experiment is administrated from June 9th to June 10th to third-grade students whose parents paid for the learning product. By then, in theory, all users should have been taught the required knowledge point in the school. Users were not aware that they were participating in an experiment.
+
+### The Learning Tasks
 
 The primary learning objective is to apply the circumference and area formula of rectangles. 
 
-The original question (as shown in figure 2) ask the learner to calculate the circumference and area of merged rectangles joined by length, given the length and width of the merged rectangle.
+The original question (Figure 3.1) asks the learner to calculate the circumference and area of two identical rectangles joined by length, given the length and width of the small rectangle.
 
-![Figure 2: The Original Question](fig/f1.png)
+<center>![Figure 3.1: The Original Question](fig/f1.png)</center>
 
+The remedial exercise is a modified version of the original question(Figure 3.2). The question is identical to the original except for the value of the length and width. It also preserves the feature that the joined width is the new length.
 
-The first assessment (shown as figure 3) asks the learner to calculate the same quantity for two rectangles joined by width. Using a similar yet non-identical item enhance the measurement validity yet avoid student memorizing the answer.
+<center>![Figure 3.2: The Remedial Exercise](fig/f2.png)</center>
 
-![Figure 3: Assessment for the Primary Objective](fig/f3.png)
-
-
-The second assessment (shown as figure 3) asks the learner to calculate the circumferences and areas of the smaller rectangles when split the large rectangle in half by length. 
-
-![Figure 4: Assessment for the Secondary Objective](fig/f4.png)
-
-The learning task is a modified version of the original question(shown in Figure 5). The question is identical to the original other than the value of the length and width. It should be noted that the training question also preserves the feature that the joined width is the new length.
-
-![Figure 5: The Remedial Learning Task](fig/f2.png)
-
-The variation of a learning task is in the format that the training question is delivered.
-
-The first pedagogical method is to direct deliver the question without futher hints and instruction.
-
-The second pedagogical method is to use sub-questions as scaffolding to mimic the tutor interaction. The scaffolding 3 steps:
+The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. The scaffolding is drew from the teaching experiment of in-house tutor experts. To wit:
 
 (1) What is the length and width of the new rectangle
 
@@ -105,15 +81,30 @@ The second pedagogical method is to use sub-questions as scaffolding to mimic th
 
 (3) What is the area of the new rectangle
 
-The third pedagogical method is to use a 50-second video instruction that animates the scaffolding. 
+The assessment of routine skill (Figure 3.3) asks the learner to calculate the same quantities for two rectangles joined by width. A highly similar yet not identical item enhances the measurement validity while prevents student memorizing the answer.
 
-Each student receives the original question, one practice, and two assessments together as a packet. The recruited users are randomly assigned with one of three item packets based on the remainder of their user id divided by 5. The remainder 0,2,4 are assigned diferent packets respectively. 
+<center>![Figure 3.3: Assessment for the Routine Skill](fig/f3.png)</center>
 
-### Delivery and Selection Bias from User Attrition in Learning Gain Measurement
+The assessment of transfer skill (Figure 3.4) asks the learner to calculate the areas of the smaller squares when split the large rectangle in half by length, given the difference in circumferences. The learner cannot blindly apply the scaffolding of the previous items, but have to use th properties of the square.
 
-Acknowledging that attrition is common in field experiments and only differential attrition matters, What works clearinghouse(WWC) evidence standard 3.0[@clearinghouse2008wwc] provides a guideline on what user attrition profile is acceptable. The x-axis is the overall attrition rate while the y-axis is the differential attrition rate between the treatment and the control. The conservative zone is colored green, which meets with WWC evidence standard without reservation. The acceptable zone is colored red, which meets the WWC evidence standard with reservation. The unaccetpable attrition profile is colored red.
+<center>![Figure 3.4: Assessment for the Transfer Skill](fig/f4.png)</center>
 
-![Figure 1: Relationship between overall attrition rate and differential attrition rate, from WWC evidence standard 3.0 figure III.2](fig/attrition_boundary_wwc.png)
+### Group Assignment
+
+Each learner receives a packet of 4 items: the original question, the remedial exercise, and two assessments. Packets differ only in the remedial exercise. The control group receives the item without scaffolding. The first treatment group receives the item with vocabulary description of the scaffolding that the learner solves step by step as sub-questions. The second treatment group receives the item with a link to the animation of the scaffolding with human voice over. If the learner cho0ses not to open the link and directly answers the item, it is effectively the same as the naive repetition.
+
+The recruited users are randomly assigned with one of three item packets based on the remainder of their user id divided by 5: 0 is the control group, 2 vocabulary treatment, and 4 video treatment. The user id is randomly generated.
+
+
+
+## Attrition Rate and Measurement Error
+
+
+### Missing at Random
+
+Acknowledging that attrition is common in field experiments and only differential attrition matters, What works clearinghouse(WWC) evidence standard 3.0[@clearinghouse2008wwc] provides a guideline on the acceptable user attrition profile. Figure 3.5 characterizes three types of attrition profile: without reservation(green), with reservation(yellow), and unacceptable(red). The x-axis is the overall attrition rate while the y-axis is the differential attrition rate between the treatment and the control. 
+
+<center>![Figure 3.5: Relationship between overall attrition rate and differential attrition rate, from WWC evidence standard 3.0 figure III.2](fig/attrition_boundary_wwc.png)</center>
 
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
@@ -130,61 +121,99 @@ ret_dif_composition = merge(tr_ret,ctr_ret,by='k') %>% mutate(ret_dif = ctr_pct-
 
 ```
 
-To get in the conservative region, the experiment has to be designed as a short-term intervention. The previous experiments in the same environment have shown a retention rate of 0.1% for a 3-month duration experiment and 12% for a 14-day duration experiment. Therefore, the current experiment is chosen to be delivered in one request session from the student, so as to minimize the attrition rate. The learner is expected to finish the session within 10 minutes. **A description of the session time length.**  
+Previous experiments in the same learning environment have shown an attrition rate of 99.9% for a 3-month experiment and 88% for a 14-day experiment. To be within the green zone of the WWC standard, the current experiment deliberately chooses a small packet so that the student can finish in one session On average, the learners spent less than 2 minutes on the packet. 
 
-The experiment achieves a retention rate of `r tot_retention_rate`%. The control group has the highest retention rate of `r ctrl_retention_rate`%, that of verbal scaffolding and video scaffolding are `r tr1_retention_rate`% and `r tr2_retention_rate`% respectively and the maximum differential attrition rate between groups is about 7%. Such profile meets the WWC evidence with reservation. 
+|Items| Time (Seconds) |
+|:-------------| -------------------:|
+|Original | 34 |
+|Naive Repetition | 27 |
+|Vocabulary Scaffolding | 24 |
+|Video Scaffolding | 40 |
+|Routine Assessment | 25 |
+|Transfer Assessment | 8 |
+Table: Table 3.1 Average Time Spent on Items
 
-However, further examination of the attrition rate by item shows that the largest difference occurs in the first item (**NEED GRAPH EXPLANATION**), as shown in figure 6. Since the learners have not experienced the treatment, the differential attrition can probably be attributed to chance. Thus the meaningful attrition rate shall exclude the dropouts from the first item. By this calculation, the maximum differential attrition rate is 3% between vocabulary scaffolding and the other two groups. Such profile meets the WWC evidence without reservation. 
+Despite the short time required to finish the experiment,  only `r tot_retention_rate`% finished all four items. The attrition rates differ among the three groups. The maximum differential attrition rate between groups is about 7%. Such profile meets the WWC evidence with reservation. 
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE}
-ggplot(data=ret_dif_composition,aes(x=k,y=ret_dif,fill=factor(gid)))+geom_bar(stat='identity',position = "dodge")
+|Group|Attrition Rate(%)|
+|:-------------| -------------------:|
+|Control|`r 100-ctrl_retention_rate`|
+|Vocabulary Treatment|`r 100-tr1_retention_rate`|
+|Video Treatment|`r 100-tr2_retention_rate`|
+Table: Table 3.2 Retention Rate by Assignment Group
+
+
+Further examination of the attrition rate by item shows that the largest difference occurs in the first item(Figure 3.1). Since the learners have not experienced the treatment, the differential attrition can probably be attributed to chance. Thus the meaningful attrition rate shall exclude the dropouts from the first item. By this calculation, the maximum differential attrition rate is 3%. Such profile meets the WWC evidence without reservation. 
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Relative Attrition Rate Compared to the Control Group", fig.align='center'}
+ret_dif_composition$group = factor(ret_dif_composition$gid, labels=c('Vocabulary','video'))
+
+ggplot(data=ret_dif_composition,aes(x=k,y=-ret_dif,fill=group)) +
+  geom_bar(stat='identity',position = "dodge") +
+  ggtitle('Relative Attrition Rate Compared to the Control Group') +
+  ylab('Attrition Rate Difference') + 
+  scale_x_discrete(name ="Item Sequence", 
+                    limits=c("Original","Remedial","Routine","Transfer"))
+
 ```
 
-In sum, although the experiment has substantial attrition rate, there is no substantial difference in the attrition rate among groups. Therefore, the main analysis will be carried under the assumption of missing random. The analysis does not use the inverse probability weighting to compensate the precision loss because the dataset does not contain enough auxilary learner information to model the sample attrition. 
-
-### Relative Measurement and Effort Induced Measurement Error 
+In sum, although the experiment has substantial attrition rate, there is no substantial difference in the attrition rate among groups. Therefore, the following analysis is carried under the assumption of missing at random. The analysis does not use the inverse probability weighting to compensate the precision loss because the dataset does not contain enough auxiliary learner information to model the sample attrition. 
 
 
-The relative ranking of different pedagogical methods is consistently identified under the assumption that the distribution of slacking is identical with random assignment, although the point estimation of absolute pedagogical efficacy is biased. However, since the experiment has access to the student's detailed response answer, a direct identification of the measurement error is possible. A detailed identification procedure is described in appendix II. The main analysis demonstrates how filtering measurement error reduces bias in the estimates and different treatment solicit different effort levels.
+### Measurement Error Due to A Lack of Effort
+Thanks to the log level data collection, it is possible to directly classify incorrect responses into two categories: error due to a lack of mastery (valid attempt) and error due to a lack of effort (give-up). However, even with the knowledge of response time and response answer, the classification is not very accurate. Future high-resolution data are likely to include more behavior data that shed light on the learner's affective state[@baker2014extending], but now this chapter has to do with the limited information.
 
-**Try different measurement error identification strategies**
+Since there are numerous ways to provide an incorrect answer (emoji included) but manageable amount of "innocent" mistakes, this chapter adopts the principle of "guilty until proved innocent" and only count "innocent" mistakes as valid attempts, whose definition is in Appendix II.2. Following this classification, about `r round(mean(c2a2f1_data$giveup)*100,2)` % of the wrong response are classified as give-ups. Although there is no way to measure the true classification error, an examination of the distribution of response time can serve as a check of face validity. If the learner is not going to try, he is unlikely to spend much time on the exercises. Therefore the distribution of response time for the giveups is expected to severely skewed to the left. Empirically, the response time is defined as the time between the user's requests for next item. It is not guaranteed that the learner is on task for the entire duration. The empirical distribution of response time (Figure 3.2) conforms to the prior expectation. However, the giveups has significant density mass in the longer duration. This can be either classification error or the possibility that the learner's attention wander off between two clicks. Appendix II.3 replicates the following analysis with an alternative defintion of give-ups (all error whose response time is shorter than 10 seconds), the finding remains robust.
 
 
-### Hypothesis and Identification Strategy
 
-The expert postulates that both scaffolding and video lecture are better than the naive repetition, which only changes the number. She also postulates that although scaffolding and video lecture may be as effective in the first assessment, the video lecture is more effective at the second assessment.
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item by Error Types", fig.align='center'}
+# create new error type
+c2a2f1_data$type = c2a2f1_data$giveup
+c2a2f1_data$type[c2a2f1_data$is_blank_ans==1] = 2
+c2a2f1_data$type = factor(c2a2f1_data$type, labels=c('A lack of Mastery','A lack of Effort-Non blank', 'A lack of Effort-Blank'))
 
-The identification strategy is difference in difference. Denote the baseline question as T=0 and the assessments questions as T = 1. Let variable $D^1$ takes value 1 if the user is in the treatment I, variable $D^2$ takes value 2 if the user is in treatment II. A fully specified DID model is 
+qplot(data=c2a2f1_data %>% filter(cmt_timelen<=60), x=cmt_timelen, geom='density',col=type) +
+  ggtitle('Distribution of Time Spent on Item by Error Types(<= 60s)') +
+  xlab('Seconds')
+```
+
+
+
+## Analysis
+
+### Identification Strategy
+
+
+
+The identification strategy is the Difference in Difference specification. Denote the baseline question as T=0 and the assessments questions as T = 1. Let variable $D^1$ takes value 1 if the user is in the treatment I, variable $D^2$ takes value 2 if the user is in treatment II. A fully specified DID model is 
 
 $$
 Y_{i,T} = \beta_1 D^1_i + \beta_2 D^2_i + \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
 $$
 
-To facilitate the test whether the two treatment has the same effect, let $\tilde{D}_i$ take value 1 if the user is not in the control group. Rewrite 
+Alternatively, to facilitate the comparison between two treatment alternatives, let $\tilde{D}_i$ denotes if the learner is in either of the treatment group:
+$$
+\tilde{D}_i = D^1_i + D^2_i
+$$
+
+The specification can be expressed as a combination of the level and the difference.
 
 $$
-\delta_1 D^1_i T + \delta_2 D^2_i T = (\delta_0 + \delta_2 D^2_i)(\tilde{D}_i) T 
+\delta_1 D^1_i T + \delta_2 D^2_i T = \delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T
 $$
 
-Therefore, the three hypothesis can be written as the following 
+where $\delta_{level} = \delta_1$ and $\delta_{difference} = \delta_2 - \delta_1$
 
-(1) Both treatment are better than vanilla. $\delta_0^{Primary}>0$, $\delta_0^{Secondary}>0$
+If conditions on failures in the first attempt, the group's fixed effect can not be seperated from the treatment effect. Thus the identification strategy reverts to first difference:
 
-(2) Scalefolding and video lecture are as effective in reaching the primary objective. $\delta_2^{Primary} = 0$
-
-(3) Video lecture is more effective in reaching the secondary objective. $\delta_2^{Secondary} > 0$
-
-
-## Results
+$$
+Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
+$$
 
 ### Full Dataset
 
-The full dataset shows that 
-
-(1) Vocabulary scaffolding is not superior to naive repetition for the two assessment
-(2) Video scaffolding has stronger efficacy than the alternative in the first assessment but not the second assessment.
-
-The result does not agree with the prior belief at all.
+Apply the model on the full dataset, the results (Table 3.5) suggests that neither vocabulary scaffolding nor video scaffolding is superior to naive repetition. The vocabulary scaffolding is less effective than the naive repetition to achieve proficiency for the routine task. However, compared to vocabulary scaffolding, video scaffolding is a more effective pedagogical method for both tasks.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
 y0data = workdata %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
@@ -193,65 +222,118 @@ y1sdata = workdata %>% filter(eid=='Q_10200351208705') %>% mutate(t=1)
 
 ydata_p = rbind(y0data,y1pdata)
 ydata_p = ydata_p %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
-ydata_p = ydata_p %>% transform(dt=d*t,d2t=d2*t,d1t=d1*t)
 
 ydata_s = rbind(y0data,y1sdata)
 ydata_s = ydata_s %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
-ydata_s = ydata_s %>% transform(dt=d*t,d2t=d2*t,d1t=d1*t)
 
-#mod_1 = lm(data=ydata_p,y~d1+d2+t+d1t+d2t)
-mod_1d = lm(data=ydata_p,y~d1+d2+t+dt+d2t)
-#mod_2 = lm(data=ydata_s,y~d1+d2+t+d1t+d2t)
-mod_2d = lm(data=ydata_s,y~d1+d2+t+dt+d2t)
+ydata_p = ydata_p %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
+ydata_s = ydata_s %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
 
-stargazer(mod_1d,mod_2d, header=FALSE,type='latex', dep.var.labels = 'Response',
-          keep=c('dt','d2t'), covariate.labels=c('delta0','delta2'), column.labels=c('Primary','Secondary'), keep.stat=c("adj.rsq","n"))
+mod_1d = lm(data=ydata_p,y~d1+d2+t+dt+ddt)
+mod_2d = lm(data=ydata_s,y~d1+d2+t+dt+ddt)
+
+mod_1 = lm(data=ydata_p,y~d1+d2+t+d1t+d2t)
+mod_2 = lm(data=ydata_s,y~d1+d2+t+d1t+d2t)
+
+stargazer(mod_1, mod_2, mod_1d,mod_2d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
 
 
 ```
 
+The inferior performance of vocabulary scaffolding is a puzzling result. Since vocabulary scaffolding has the same question as the naive repetition, it is expected to be at least as effective as the naive repitition, which is not the case.
 
-### Condition on Wrong First Response
-To understand the puzzling result, sample those who are successful in their first attempt. Since there is negligible chance that they guessed it right, they must have mastered the learning objective and shall replicate their success in the training question and the first assessment. However, there is a general decline in the success rate of the first assessment and the decline is statistically significant for the vocabulary scaffolding compared to the naive repetition. Meanwhile, there is a climb in the give-up rate, especially for the vocabulary scaffolding group. Numerically, the increased give-up almost explains all of the descrease in success rate for that group: They are too bored to take the easy scaffolding seriously.
+
+### Addressing the Measurement Error
+To understand the puzzling result, sample those who are successful in their first attempt. Since there is negligible chance that they guessed it right, they must have mastered the learning objective and shall replicate their success in the routine assessment. The placebo group shall report null effect. However, the vocabulary scaffolding reports a significant drop in success rate for the routine assessment (Table 3.6), compared to the naive repetition. The giveup rate climbs almost one for one for the vocabulary scaffolding compared to the naive repetition. There is no similar phemonenon for the transfer assessment. The result suggests that the vocabulary scaffolding has the unintented consequence of decreasing the learner's engagement in the learning task: They are too bored to make an effort.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
 mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
 mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
 
-stargazer(mod_3, mod_4, header=FALSE,type='latex', dep.var.labels = c('Response','Giveup'),
-          keep=c('d1t','d2t'), covariate.labels=c('delta-voca','delta-video'), column.labels=c('Primary','Primary'), keep.stat=c("adj.rsq","n"))
+mod_5 = lm(data=ydata_s %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
+mod_6 = lm(data=ydata_s %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
+
+stargazer(mod_3, mod_4,mod_5,mod_6, 
+          header=FALSE,type='latex', 
+          dep.var.labels = c('Response','Giveup','Response','Giveup'),
+          keep=c('d1t','d2t'), 
+          covariate.labels=c('vocabulary','video'), 
+          column.labels=c('Routine','Routine','Transfer','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
 ```
 
 
-Exclude the placebo group and focus on those failed the first attempt. almost all the effects are gone, at least statistically.
+Exclude the placebo group because logically their behavior is not informative of the pedagogical efficacy of remedial exercises. However, the confounding effect of lesser engagement still remains. Table 3.7 reports no statistically significant findings.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_7d = lm(data=ydata_p %>% filter(is_placebo==0),y~d1+d2+t+dt+d2t)
-mod_8d = lm(data=ydata_s %>% filter(is_placebo==0),y~d1+d2+t+dt+d2t)
+mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
+mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
 
-stargazer(mod_7d,mod_8d, header=FALSE,type='latex', dep.var.labels = 'Response', 
-          keep=c('dt','d2t'), covariate.labels=c('delta0','delta2'), column.labels=c('Primary','Secondary'), keep.stat=c("adj.rsq","n"))
+mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
+mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
+
+stargazer(mod_7, mod_8, mod_7d,mod_8d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
 ```
 
-### Condition on Exposure to the Treatment 
+Excluding observations with measurement error violates the assumption of missing at random because some unobserved factor can affect both effort and performance, such as grit. The research design does not offer an identification strategy that can separate the clean response from measurement error. It requires an instrument variable that changes learner's choice of effort while not affect their performance, such as a variation in incentive scheme[@fryer2010financial]. Such design was declined by the platform due to the issue of implementation cost and user experience consistency. Therefore, the analysis corrects for the measurement error by excluding observations that are identified as give-ups in their exposure to the treatment.
 
-Retain those did not give up on the original question and the training question, as to ensure they are at least somewhat exposed to the learning task. The result shows that vocabulary scaffolding is no more effective than naive repetition while video scaffolding is statistically significant and has an effect size about 0.3 standard deviation for both assessments.  
+The retention rate are not even across three groups, but are almost identical for the both treament groups. It suggests that the comparison between the treatment and the control shall be taken with a grain of salt, the comparison between two treatment groups is still very likely to be valid.
 
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+retain_rate_stat =  ydata_p %>% filter(is_placebo==0) %>% group_by(gid) %>% summarize(pct=mean(is_retain)) 
+```
+
+|Group|Attrition Rate(%)|
+|:-------------| -------------------:|
+|Control|`r 100-round(retain_rate_stat$pct[1]*100)`|
+|Vocabulary Treatment|`r 100-round(retain_rate_stat$pct[2]*100)`|
+|Video Treatment|`r 100-round(retain_rate_stat$pct[3]*100)`|
+Retention Rate by Assignment Group
+
+The analysis on the filtered dataset (Table 3.8) shows vocabulary scaffolding is almost as effective as naive repetition in both rountine and transfer assessment but video scaffolding is more effective in both cases. The pedagogical superiority of the video instruction over vocabulary instruction is only confirmed in the transfer assessment. The result confirms in-house pedagogical expert's expectation at large. She postulates that both vocabulary scaffolding and video scaffolding are more effective than the naive repetition. She also postulates that both delivery methods are equivalent at the routine assessment, while the video scaffolding is more effective at the transfer assessment.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_9d = lm(data=ydata_p %>% filter(is_placebo==0&is_retain==1),y~t+dt+d2t)
-mod_10d = lm(data=ydata_s %>% filter(is_placebo==0&is_retain==1),y~t+dt+d2t)
-stargazer(mod_9d,mod_10d, header=FALSE, type='latex', 
-          dep.var.labels = 'Response', keep=c('dt','d2t'), covariate.labels=c('delta0','delta2'), column.labels=c('Primary','Secondary'), keep.stat=c("adj.rsq","n"))
+mod_9d = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+mod_10d = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+
+mod_9 = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+mod_10 = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+
+stargazer(mod_9, mod_10, mod_9d,mod_10d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
 ```
 
 
 ## Discussion
 
-**Observation study that user engagement is the key to better results even in comprehension task**
+Although the central theme of this chapter is the evaluation of pedagogical efficacy, the previous analysis demonstrates the importance of addressing the effort induced measurement error in a low stake test environment. The measurement error can result in qualitatively different findings in a randomized control experiment where the true effect is moderately small. Actual text answer to the question is instrumental in identifying the effort induced measurement error, but higher resolution data are required to improve the identification accuracy. In short, it is not enough to know what response the learner gives, but also how he arrives at it. 
 
 
-## Appendix I: The sign of Bias from Measurement Error
+## Appendix II
+
+
+### 1. The sign of Bias from Measurement Error
 
 Let learner's latent knowledge mastery be $\theta$, which is drawn from distribution $F(\theta)$. The true state of $\theta$ is not observable but can only be inferred from an observed binary response $Y$. The link function is $p(\theta)$
 
@@ -293,21 +375,109 @@ Unfortunately, the sign of the bias cannot be determined. To illustrate, conside
 In another mental experiment. If $p(\theta)$ is flat while $G(\beta p(\theta))$ is monotonic. The observed ATE is purely the reduction in measurement error, thus bias upward. If instead $G(\beta p(\theta))$ is flat (neither 0 nor 1), the observed ATE is always a fraction of the true ATE, thus bias downward. 
 
 
-## Appendix II: Identification of Error Due to Slacking
 
-Even with the aid of response time and response answer, it is not an easy task to distinguish between error due to effort and error due to mastery. In the extreme case where student gives up immediately and leave a blank answer, it can still be blamed on error due to mastery: student has failed the same task before and they rationally give up the second chance if the goal is to maximize reward collection rather than learning gain. In addition, it is imprecise to characterize continuous effort by a binary status, but a necessary simplification to make the identificaiton feasible.
 
-Since there are numerous ways to provide a wrong answer (emojis included) but only manageable amount of "innocent" mistakes, the chapter adopts the principle of "guilty until proved innocent". The innocent mistakes include the following type:
+### 2. Identifcation of Valid Attempts
 
-(1) Add or leave out trailing zeros. For example, if the right answer is 120, both 12, 120 and 1200 are admitted as valid attempts.
-(2) Add when multiply or multiply when add. For example, when calculating area with length 6 and width 4, 10 is admitted as a valid attempt.
-(3) Apply the wrong formula. For example, when calculating the circumferences of the rectangle with length 6 and width 4, 10 is admitted as a valid attempt.
+(1) Add or omit trailing zeros. For example, if the right answer is 120, both 12, 120 and 1200 are admitted as valid attempts.
 
-In addition, when the question has multiple sub-questions, if the student manages to answer any of the sub-question correctly, the log is admitted as a valid attempt. 
+(2) Add when shall multiply or vice versa. For example, when calculating area with length 6 and width 4, 10 is admitted as a valid attempt.
 
-Following this classification, about `round(mean(c2a2f1_data$giveup)*100,2)` % of the wrong response are classified as error due to slack, or give up. Figure 6 showed the estimated density plot of response time for a valid attempt and give up. The density of response time for the give-ups centers around 3 seconds, which indicates face validity. However, there are also significat density in longer duration. A long duration blank answer can indicate long thought or just the learner's attention wandering off task. Because the question used in this experiment is quite easy, it is unlikely that the students struggled and ended up with nothing to show. Therefore, long duration blank answer is categorized as giveup for the main analysis. 
+(3) Apply the wrong formula. For example, when calculating the circumferences of the rectangle with length 6 and width 4, 10(forget to double) or 24(formula of the area) are admitted as valid attempts. 
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE}
-qplot(data=c2a2f1_data, x=cmt_timelen, geom='density',col=factor(giveup))
+(4) Calculation mistakes. For example, 13*4 = 42
+
+(5) Fail to understand the question. For example, calculate the circumference and the area of the small rectangle
+
+(6) Typo: For example, 36 as 35
+
+### 3. Alternative Valid Attempts Identification
+
+Alternatively, define error due to a lack of effort as all errors whose response time is shorter than 10 second. The gist the main analysis remains robust.
+
+Replication of Table 3.3. Strong negative for the vocabulary.
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+y0data = bkp_data %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
+y1pdata = bkp_data %>% filter(eid=='Q_10201056666357') %>% mutate(t=1)
+y1sdata = bkp_data %>% filter(eid=='Q_10200351208705') %>% mutate(t=1)
+
+ydata_p = rbind(y0data,y1pdata)
+ydata_p = ydata_p %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
+
+ydata_s = rbind(y0data,y1sdata)
+ydata_s = ydata_s %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
+
+ydata_p = ydata_p %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
+ydata_s = ydata_s %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
+
+mod_1d = lm(data=ydata_p,y~d1+d2+t+dt+ddt)
+mod_2d = lm(data=ydata_s,y~d1+d2+t+dt+ddt)
+
+mod_1 = lm(data=ydata_p,y~d1+d2+t+d1t+d2t)
+mod_2 = lm(data=ydata_s,y~d1+d2+t+d1t+d2t)
+
+stargazer(mod_1, mod_2, mod_1d,mod_2d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
+
 ```
 
+Replication of Table 3.4. Give-up increases sharply for the routine assessment of vocabulary scaffolding group.
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
+mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
+
+mod_5 = lm(data=ydata_s %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
+mod_6 = lm(data=ydata_s %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
+
+stargazer(mod_3, mod_4,mod_5,mod_6, 
+          header=FALSE,type='latex', 
+          dep.var.labels = c('Response','Giveup','Response','Giveup'),
+          keep=c('d1t','d2t'), 
+          covariate.labels=c('vocabulary','video'), 
+          column.labels=c('Routine','Routine','Transfer','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
+```
+
+Replication of Table 3.5. Null effect across the board.
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
+mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
+
+mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
+mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
+
+stargazer(mod_7, mod_8, mod_7d,mod_8d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
+```
+
+Replication of Table 3.7. Slightly different from the main analysis. Video scaffolding appears to be more effective than vocabulary scaffolding, although the difference magnitude is moderated.
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+mod_9d = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+mod_10d = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+
+mod_9 = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+mod_10 = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+
+stargazer(mod_9, mod_10, mod_9d,mod_10d,
+          header=FALSE,type='latex',
+          dep.var.labels = 'Response',
+          keep=c('d1t','d2t','dt','ddt'),
+          covariate.labels=c('vocabulary','video','level','difference'), 
+          column.labels=c('Routine','Transfer','Routine','Transfer'), 
+          keep.stat=c("adj.rsq","n")
+          )
+```

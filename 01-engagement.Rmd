@@ -562,20 +562,19 @@ file_path = paste0(proj_dir,'/_data/01/res/sim/true_param.txt')
 true_param = read.table(file_path, sep=',', col.names=c('s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
 
 
-m21 = qplot(data=mcmc_est,x=s,geom='density') + 
+m21 = ggplot(data=mcmc_est,aes(x=s)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$s,  colour="blue", linetype = "longdash") + 
     ggtitle('slip')
 
-m22 = qplot(data=mcmc_est,x=g,geom='density') + 
+m22 = ggplot(data=mcmc_est,aes(x=g)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$g,  colour="blue", linetype = "longdash") + 
     ggtitle('guess')
 
-m23 = qplot(data=mcmc_est,x=pi,geom='density') + 
-
+m23 = ggplot(data=mcmc_est,aes(x=pi)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$pi,  colour="blue", linetype = "longdash") + 
     ggtitle('Initial Probability of Mastery')
 
-m24 = qplot(data=mcmc_est,x=l,geom='density') + 
+m24 =ggplot(data=mcmc_est,aes(x=l)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$l,  colour="blue", linetype = "longdash") +
     ggtitle('learning rate')
 
@@ -588,23 +587,23 @@ The hazard curve of correct responses has convergence issue with the hazard rate
 
 ```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Convergence: Hazard Rate Curve of Correct Responses", fig.align='center'}
 
-h11 = qplot(data=mcmc_est, x=h11, geom='density') +
+h11 = ggplot(data=mcmc_est,aes(x=h11)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h11,  colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 1, Y=1')
 
-h12 = qplot(data=mcmc_est, x=h12, geom='density') + 
+h12 = ggplot(data=mcmc_est,aes(x=h12)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h12,  colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 2, Y=1')
 
-h13 = qplot(data=mcmc_est, x=h13, geom='density') + 
+h13 = ggplot(data=mcmc_est,aes(x=h13)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h13, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 3, Y=1')
 
-h14 = qplot(data=mcmc_est, x=h14, geom='density') + 
+h14 = ggplot(data=mcmc_est,aes(x=h14)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h14,  colour="blue", linetype = "longdash") +
     ggtitle('hazard rate | t = 4, Y=1')
 
-h15 = qplot(data=mcmc_est, x=h15, geom='density') + 
+h15 = ggplot(data=mcmc_est,aes(x=h15)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h15,  colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 5, Y=1')
 
@@ -617,23 +616,23 @@ The hazard rate curve of incorrect responses if off both tails, while the rest p
 
 ```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Convergence: Hazard Rate Curve of Incorrect Responses: MCMC(Dot), True(Solid)", fig.align='center'}
 
-h01 = qplot(data=mcmc_est, x=h01, geom='density') + 
+h01 = ggplot(data=mcmc_est,aes(x=h01)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h01, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 1, Y=0')
 
-h02 = qplot(data=mcmc_est, x=h02, geom='density') +
+h02 = ggplot(data=mcmc_est,aes(x=h02)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h02, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 2, Y=0')
 
-h03 = qplot(data=mcmc_est, x=h03, geom='density') + 
+h03 = ggplot(data=mcmc_est,aes(x=h03)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h03, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 3, Y=0')
 
-h04 = qplot(data=mcmc_est, x=h04, geom='density') + 
+h04 = ggplot(data=mcmc_est,aes(x=h04)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h04, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 4, Y=0')
 
-h05 = qplot(data=mcmc_est, x=h05, geom='density') + 
+h05 = ggplot(data=mcmc_est,aes(x=h05)) + geom_histogram(binwidth=0.01) +
     geom_vline(xintercept=true_param$h05, colour="blue", linetype = "longdash") + 
     ggtitle('hazard rate | t = 5, Y=0')
 
