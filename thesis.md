@@ -39,7 +39,7 @@ But...
     + Parallel computing
 
 - More money than ever
-    + More than 3 billions dollars in VC funding in 2015
+    + More than 3 billion dollars in VC funding in 2015
     + 500% Growth since 2010
 
 Why...
@@ -54,7 +54,7 @@ incremental: true
     + Engagement and Grit
     + Change Preference rather than Exploit it
     + *Teacher Human Capital Deficit
-    + *Organizational Struture misfit
+    + *Organizational Structure misfit
     + Slow iteration and dissemination
 
 What is High Solution Data and How it Helps?
@@ -80,8 +80,8 @@ type: section
 Routine Task
 ========================================================
 - Routine Task:
-    + Muscle Memeory **Over** Knowledge Transfer
-    + Wide Application
+    + Muscle Memeory **OVER** Knowledge Transfer
+    + Wide Applications
         * Sports
         * Mathematics
         * Language Learning
@@ -131,7 +131,7 @@ id: hybrid
 - The hazard rate can be expressed as $h_{t,O_t} = P(E_t=1|O_t)$
     + First Order Markov Chain: No X strike rule
     + Capture duration dependence
-    + Does not explicitly depend on the latent state ($X_t$) for agility in extention
+    + Does not explicitly depend on the latent state ($X_t$) for agility in extension
 - [Full Likelihood](#/hybridllk)
 
 
@@ -210,15 +210,16 @@ type: prompt
 - Attrition Rate
     + require **TWO** observations to make an inference
     + Online service suffers from a large natural attrition
-    + The differential attrition is observational equivalent to the random attrition
+    + The differential attrition is observationally equivalent to the random attrition
 - Measurement Error
     + Student does not exert full effort in low stake learning environment
-    + Effort induced measurement error is equivalent to selection bias
+    + Effort-induced measurement error is equivalent to selection bias
     + The sign of the bias is unknown
 
 Assessment
 ========================================================
 - Original
+
 ![plot of chunk unnamed-chunk-4](fig/f1.png)
 
 ***
@@ -283,13 +284,20 @@ id:mei
 
 Identification Strategy
 ========================================================
-- The DID design when all response in the first period is failure ($\mu_0=0$)
+- The DID design when all response in the first period is failure
 
-![plot of chunk unnamed-chunk-12](fig/chp2-regression-1.png)
+$$
+Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
+$$
 
 - Alternative configuration to compare the relative gain between two treatments
 
-![plot of chunk unnamed-chunk-13](fig/chp2-regression-2.png)
+$$
+Y_{i,T} = \gamma T +\delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T + \epsilon_{i,T} 
+$$
+
+where $\delta_{level} = \delta_1$ and $\delta_{difference} = \delta_2 - \delta_1$
+
 
 - Binary result: Correctly compute both circumference and area
 
@@ -369,7 +377,7 @@ Effective Exposure to Treatment
 Robust Check
 ========================================================
 - Alternative measurement error identification
-    + 10 second rule
+    + 10-second rule
     + Blank response
 - Alternative performance measurement
     + Allow for partial grade
@@ -387,7 +395,7 @@ Future Work
     + Check if error persists
     + Check how the response in the vocabulary scaffolding affects the response in routine assessment
 - *Try Adaptive instructional material as vocabulary scaffolding
-- *Better data for measurement error identifcation 
+- *Better data for measurement error identification 
 
 
 
@@ -422,8 +430,8 @@ The Relative Cost of Type I and Type II error
 =======================================================
 type:prompt
 - The opportunity cost of wait outweighs the opportunity cost of action
-    - If the null hypothesis of null effect is true, there is no cost to service receiver, although there maybe cost to service provider
-    - If the null hypothesis of null effect is false, cumulative loss to service receiver overtime is considerable
+    - If the null hypothesis of null effect is true, there is no cost to service receiver, although there may be cost to service provider
+    - If the null hypothesis of null effect is false, cumulative loss to service receiver over time is considerable
     
 - Prefer high power to low significance level
 
@@ -495,24 +503,30 @@ Modified Sequential Likelihood Ratio Test
 
 Power
 =======================================================
-<img src="thesis-figure/unnamed-chunk-19-1.png" title="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" alt="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" style="display: block; margin: auto;" />
+<img src="thesis-figure/unnamed-chunk-17-1.png" title="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" alt="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" style="display: block; margin: auto;" />
 Significance Level
 =======================================================
 - If using balanced sample and potential value remaining stop condition, on average, the type I error rate decreases to 40%
 
-<img src="thesis-figure/unnamed-chunk-20-1.png" title="Significance leve of Bandit Test on Simulation Data" alt="Significance leve of Bandit Test on Simulation Data" style="display: block; margin: auto;" />
+<img src="thesis-figure/unnamed-chunk-18-1.png" title="Significance leve of Bandit Test on Simulation Data" alt="Significance leve of Bandit Test on Simulation Data" style="display: block; margin: auto;" />
+
 Regret: Simulation
 =======================================================
 - regret for the fixed sample t-test is a fixed number $r_{welch} = N*p*\triangle$
 - Measure the saving in regret by 
 $$
-R_x(T) = \frac{E(r_x|t\leq T)}{r_{welch}}
+R_{method}(T) = \frac{E(r_{method}|t\leq T)}{r_{welch}}
 $$
-- Result
-<img src="thesis-figure/unnamed-chunk-21-1.png" title="Relative Regret Saving compared to t-test" alt="Relative Regret Saving compared to t-test" style="display: block; margin: auto;" />
+
+Regret: Simulation
+=======================================================
+
+<img src="thesis-figure/unnamed-chunk-19-1.png" title="Relative Regret Saving compared to t-test" alt="Relative Regret Saving compared to t-test" style="display: block; margin: auto;" />
 
 Regret: Simulated Experiment
 =======================================================
+
+- Calculate the percentage of execessive of learning gain over the experiments result
 
 
 
@@ -527,7 +541,14 @@ Transfer   | Video       | 22.6%  | 1.5%          | 5.8%         |
 
 Sample Saving: Simulation
 =======================================================
-<img src="thesis-figure/unnamed-chunk-23-1.png" title="Relative Sample Saving compared to t-test" alt="Relative Sample Saving compared to t-test" style="display: block; margin: auto;" />
+$$
+saving_ratio_{method} = 100 - \frac{\bar{N_{method}}}{N_{t-test}}
+$$
+
+
+Sample Saving: Simulation
+=======================================================
+<img src="thesis-figure/unnamed-chunk-21-1.png" title="Relative Sample Saving compared to t-test" alt="Relative Sample Saving compared to t-test" style="display: block; margin: auto;" />
 
 
 Sample Saving: Simulated Experiment
@@ -546,18 +567,19 @@ Future Work
 =======================================================
 - Stop Conditions
     + Explore the properties of potential value remaining condition
-    + Explore other stop conditions that is robust to measurement error
-- Performance in multiple comparison
+    + Explore other stop conditions that are robust to measurement error
+- Performance in multiple comparisons
 
 Appendix I.2 Derivation of the Gibbs Sampling Scheme
 =======================================================
 id: hybridllk
-![plot of chunk unnamed-chunk-25](fig/appI2-1.png)
+
+![plot of chunk unnamed-chunk-23](fig/appI2-1.png)
 
 [return](#/hybrid)
 
 
-Appendix II.2 Identifcation of Give-up
+Appendix II.2 Identifcation of Give-up(1)
 =======================================================
 id: giveupdef
 
@@ -569,6 +591,9 @@ id: giveupdef
 
 3. Apply the wrong formula. 
     - When calculating the circumferences of the rectangle with length 6 and width 4, 10(forget to double) or 24(formula of the area) are admitted as valid attempts. 
+
+Appendix II.2 Identifcation of Give-up(2)
+=======================================================
 
 4. Calculation mistakes. 
     - 13*4 = 42
