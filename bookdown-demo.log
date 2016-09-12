@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (MiKTeX 2.9) (preloaded format=xelatex 2016.8.1)  11 SEP 2016 13:06
+This is XeTeX, Version 3.14159265-2.6-0.99996 (MiKTeX 2.9) (preloaded format=xelatex 2016.8.1)  12 SEP 2016 09:30
 entering extended mode
 **./bookdown-demo.tex
 (bookdown-demo.tex
@@ -738,14 +738,26 @@ Package grffile Info: Option `space' is set to `true'.
 Package grffile Info: \Gin@ii of package `graphicx' fixed on input line 486.
 ) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ltxmisc\parskip.sty"
 Package: parskip 2001/04/09 non-zero parskip adjustments
-) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\setspace\setspace.sty"
-Package: setspace 2011/12/19 v6.7a set line spacing
 ) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\titling\titling.sty"
 Package: titling 2009/09/04 v2.1d maketitle typesetting
 \thanksmarkwidth=\skip59
 \thanksmargin=\skip60
 \droptitle=\skip61
+) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\setspace\setspace.sty"
+Package: setspace 2011/12/19 v6.7a set line spacing
 ) (bookdown-demo.aux
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
+
+LaTeX Warning: Label `' multiply defined.
+
 
 LaTeX Warning: Label `' multiply defined.
 
@@ -770,37 +782,37 @@ LaTeX Warning: Label `' multiply defined.
 )
 \openout1 = `bookdown-demo.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for EU1/lmr/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 92.
-LaTeX Font Info:    Try loading font information for T3+cmr on input line 92.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for EU1/lmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 93.
+LaTeX Font Info:    Try loading font information for T3+cmr on input line 93.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\tipa\t3cmr.fd"
 File: t3cmr.fd 2001/12/31 TIPA font definitions
 )
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 92.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 92.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 93.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 93.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\ts1cmr.fd"
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 92.
-LaTeX Font Info:    ... okay on input line 92.
-LaTeX Info: Redefining \microtypecontext on input line 92.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Info: Redefining \microtypecontext on input line 93.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: No adjustment of tracking.
@@ -845,7 +857,7 @@ ern Roman (RS)
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \AtBeginShipoutBox=\box49
-Package hyperref Info: Link coloring OFF on input line 92.
+Package hyperref Info: Link coloring OFF on input line 93.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\gettitlestring.sty"
@@ -853,9 +865,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count166
 )
-LaTeX Info: Redefining \ref on input line 92.
-LaTeX Info: Redefining \pageref on input line 92.
-LaTeX Info: Redefining \nameref on input line 92.
+LaTeX Info: Redefining \ref on input line 93.
+LaTeX Info: Redefining \pageref on input line 93.
+LaTeX Info: Redefining \nameref on input line 93.
 (bookdown-demo.out) (bookdown-demo.out)
 \@outlinefile=\write3
 \openout3 = `bookdown-demo.out'.
@@ -949,7 +961,7 @@ File: bookdown-demo_files/figure-latex/unnamed-chunk-7-1.pdf Graphic file (type
 File: bookdown-demo_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type
  QTm)
 <use  "bookdown-demo_files/figure-latex/unnamed-chunk-8-1.pdf" >
-Overfull \hbox (38.92802pt too wide) detected at line 637
+Overfull \hbox (38.92802pt too wide) detected at line 638
 \OML/lmm/m/it/10 P\OT1/lmr/m/n/10 (\OML/lmm/m/it/10 Y[] \OT1/lmr/m/n/10 = 1\OMS
 /lmsy/m/n/10 j\OML/lmm/m/it/10 O[]; E[]\OT1/lmr/m/n/10 ) = (1 \OMS/lmsy/m/n/10 
 ^^@ \OML/lmm/m/it/10 s\OT1/lmr/m/n/10 ) \OMS/lmsy/m/n/10 ^^C \OT1/lmr/m/n/10 (\
@@ -970,7 +982,7 @@ File: bookdown-demo_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [23] [24]
-Overfull \hbox (16.97675pt too wide) detected at line 795
+Overfull \hbox (16.97675pt too wide) detected at line 796
 [] []
  []
 
@@ -989,9 +1001,6 @@ e QTm)
 <use  "bookdown-demo_files/figure-latex/unnamed-chunk-12-1.pdf" > [27] [28] [29
 ] [30]
 Chapter 3.
-
-Underfull \vbox (badness 4752) has occurred while \output is active []
-
 [31
 
 ]
@@ -1023,580 +1032,52 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 File: bookdown-demo_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (typ
 e QTm)
 <use  "bookdown-demo_files/figure-latex/unnamed-chunk-16-1.pdf" > [40] [41] [42
-] [43]
-Overfull \vbox (274.47922pt too high) has occurred while \output is active []
-
-[44] [45] [46] [47] [48] [49] [50
+] [43] [44] [45] [46] [47] [48] [49] [50]
+Chapter 4.
+[51
 
 ]
-Chapter 4.
-[51]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [52] [53] [54] [55] [56]
-File: bookdown-demo_files/figure-latex/unnamed-chunk-27-1.pdf Graphic file (typ
+File: bookdown-demo_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (typ
 e QTm)
-<use  "bookdown-demo_files/figure-latex/unnamed-chunk-27-1.pdf" > [57] [58]
-File: bookdown-demo_files/figure-latex/unnamed-chunk-28-1.pdf Graphic file (typ
-e QTm)
-<use  "bookdown-demo_files/figure-latex/unnamed-chunk-28-1.pdf" >
-Underfull \vbox (badness 4366) has occurred while \output is active []
-
-[59] [60] [61]
-File: bookdown-demo_files/figure-latex/unnamed-chunk-29-1.pdf Graphic file (typ
-e QTm)
-<use  "bookdown-demo_files/figure-latex/unnamed-chunk-29-1.pdf" > [62]
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2247--2249
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2249--2251
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2251--2253
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2255--2257
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2261--2263
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2263--2265
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2265--2267
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2269--2271
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2274--2276
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2276--2278
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (7.07082pt too wide) in paragraph at lines 2282--2284
-[]|\EU1/lmr/m/n/10 0(0.55)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2285--2287
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2287--2289
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2289--2291
-[]|\EU1/lmr/m/n/10 94.9%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2293--2295
-[]|\EU1/lmr/m/n/10 0.01(0.03)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2296--2298
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2298--2300
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2304--2306
-\EU1/lmr/m/n/10 0.01(0.78)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2307--2309
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2309--2311
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (7.07082pt too wide) in paragraph at lines 2315--2317
-[]|\EU1/lmr/m/n/10 0(0.08)|  
- []
-
-
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2324--2326
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2326--2328
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2328--2330
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2332--2334
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2338--2340
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2340--2342
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2342--2344
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2346--2348
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2351--2353
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2353--2355
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2357--2359
-[]|\EU1/lmr/m/n/10 16.4%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2359--2361
-\EU1/lmr/m/n/10 0.01(0.42)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2362--2364
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2364--2366
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2370--2372
-[]|\EU1/lmr/m/n/10 0.02(0.25)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2373--2375
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2375--2377
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2381--2383
-\EU1/lmr/m/n/10 0.01(0.52)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2384--2386
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2386--2388
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2388--2390
-[]|\EU1/lmr/m/n/10 99.7%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2392--2394
-[]|\EU1/lmr/m/n/10 0.01(0.41)|  
- []
-
-[63]
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2401--2403
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2403--2405
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2405--2407
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2409--2411
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2415--2417
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2417--2419
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (6.11081pt too wide) in paragraph at lines 2419--2421
-[]|\EU1/lmr/m/n/10 Bandit 
- []
-
-
-Overfull \hbox (65.95082pt too wide) in paragraph at lines 2423--2425
-\EU1/lmr/m/n/10 Coefficient(p_value)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2428--2430
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2430--2432
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2434--2436
-[]|\EU1/lmr/m/n/10 34.8%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2436--2438
-[]|\EU1/lmr/m/n/10 0.01(0.55)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2439--2441
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2441--2443
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2445--2447
-[]|\EU1/lmr/m/n/10 81.5%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2447--2449
-[]|\EU1/lmr/m/n/10 0.05(0.03)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2450--2452
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2452--2454
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2454--2456
-[]|\EU1/lmr/m/n/10 42.9%|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2456--2458
-[]|\EU1/lmr/m/n/10 22.6%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2458--2460
-\EU1/lmr/m/n/10 0.01(0.78)|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2461--2463
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2463--2465
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2467--2469
-[]|\EU1/lmr/m/n/10 26.4%|  
- []
-
-
-Overfull \hbox (19.85081pt too wide) in paragraph at lines 2469--2471
-[]|\EU1/lmr/m/n/10 0.03(0.08)|  
- []
-
-
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2484--2486
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
-
-
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2486--2488
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (10.85081pt too wide) in paragraph at lines 2490--2492
-[]|\EU1/lmr/m/n/10 Filtered 
- []
-
-
-Overfull \hbox (0.95082pt too wide) in paragraph at lines 2490--2492
-\EU1/lmr/m/n/10 matic 
- []
-
-
-Overfull \hbox (38.29082pt too wide) in paragraph at lines 2490--2492
-\EU1/lmr/m/n/10 Classification)|  
- []
-
-
-Overfull \hbox (10.85081pt too wide) in paragraph at lines 2492--2494
-[]|\EU1/lmr/m/n/10 Filtered 
- []
-
-
-Overfull \hbox (0.62082pt too wide) in paragraph at lines 2492--2494
-\EU1/lmr/m/n/10 (Man- 
- []
-
-
-Overfull \hbox (38.29082pt too wide) in paragraph at lines 2492--2494
-\EU1/lmr/m/n/10 Classification)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2497--2499
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2499--2501
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (2.12082pt too wide) in paragraph at lines 2501--2503
-\EU1/lmr/m/n/10 12.3%|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2508--2510
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2510--2512
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2512--2514
-[]|\EU1/lmr/m/n/10 13.2%|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2519--2521
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2521--2523
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2523--2525
-[]|\EU1/lmr/m/n/10 52.8%|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2530--2532
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2532--2534
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (2.62082pt too wide) in paragraph at lines 2534--2536
-[]|\EU1/lmr/m/n/10 22.6%|  
- []
-
-
+<use  "bookdown-demo_files/figure-latex/unnamed-chunk-34-1.pdf" > [57]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[64]
-Underfull \vbox (badness 5862) has occurred while \output is active []
-
-[65]
-File: bookdown-demo_files/figure-latex/unnamed-chunk-32-1.pdf Graphic file (typ
+[58]
+File: bookdown-demo_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (typ
 e QTm)
-<use  "bookdown-demo_files/figure-latex/unnamed-chunk-32-1.pdf" >
-Overfull \hbox (26.15082pt too wide) in paragraph at lines 2587--2589
-[]|\EU1/lmr/m/n/10 Assessment|  
- []
+<use  "bookdown-demo_files/figure-latex/unnamed-chunk-35-1.pdf" > [59] [60]
+File: bookdown-demo_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (typ
+e QTm)
+<use  "bookdown-demo_files/figure-latex/unnamed-chunk-36-1.pdf" > [61] [62] [63
+]
+File: bookdown-demo_files/figure-latex/unnamed-chunk-39-1.pdf Graphic file (typ
+e QTm)
+<use  "bookdown-demo_files/figure-latex/unnamed-chunk-39-1.pdf" >
+Overfull \vbox (4.91502pt too high) has occurred while \output is active []
 
+[64] [65] [66] [67] [68
 
-Overfull \hbox (19.59082pt too wide) in paragraph at lines 2589--2591
-[]|\EU1/lmr/m/n/10 treamtnet|  
- []
-
-
-Overfull \hbox (10.85081pt too wide) in paragraph at lines 2593--2595
-[]|\EU1/lmr/m/n/10 Filtered 
- []
-
-
-Overfull \hbox (0.95082pt too wide) in paragraph at lines 2593--2595
-\EU1/lmr/m/n/10 matic 
- []
-
-
-Overfull \hbox (38.29082pt too wide) in paragraph at lines 2593--2595
-\EU1/lmr/m/n/10 Classification)|  
- []
-
-
-Overfull \hbox (10.85081pt too wide) in paragraph at lines 2595--2597
-[]|\EU1/lmr/m/n/10 Filtered 
- []
-
-
-Overfull \hbox (0.62082pt too wide) in paragraph at lines 2595--2597
-\EU1/lmr/m/n/10 (Man- 
- []
-
-
-Overfull \hbox (38.29082pt too wide) in paragraph at lines 2595--2597
-\EU1/lmr/m/n/10 Classification)|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2600--2602
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2602--2604
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (11.10081pt too wide) in paragraph at lines 2611--2613
-[]|\EU1/lmr/m/n/10 Routine|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2613--2615
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2622--2624
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (26.00082pt too wide) in paragraph at lines 2624--2626
-[]|\EU1/lmr/m/n/10 Vocabulary|  
- []
-
-
-Overfull \hbox (12.74081pt too wide) in paragraph at lines 2633--2635
-[]|\EU1/lmr/m/n/10 Transfer|  
- []
-
-
-Overfull \hbox (1.79082pt too wide) in paragraph at lines 2635--2637
-[]|\EU1/lmr/m/n/10 Video|  
- []
-
-[66]
-Underfull \vbox (badness 1946) has occurred while \output is active []
-
-[67] [68]
+]
 Chapter 5.
-(bookdown-demo.bbl [69
-
-] [70
+(bookdown-demo.bbl [69] [70
 
 ] [71] [72] [73] [74] [75])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2737.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2515.
 [76]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2737.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2515.
 (bookdown-demo.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 2737.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 2737.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 2515.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 2515.
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
  25071 strings out of 428409
- 440935 string characters out of 3159523
+ 440966 string characters out of 3159523
  506239 words of memory out of 3000000
  28227 multiletter control sequences out of 15000+200000
  16367 words of font info for 45 fonts, out of 3000000 for 9000

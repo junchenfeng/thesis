@@ -146,6 +146,8 @@ fig_3_data = test_stat %>% filter(seq_id %in% test_sum_stat$seq_id)
 ####
 
 
+
+
 # CLEAN and SAVE
 rm(list=setdiff(ls(),c('fig_1_data','fig_2_data','fig_3_data')))
 save.image(paste0(getwd(),'/_data/01/production_data.RData'))

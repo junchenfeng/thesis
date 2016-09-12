@@ -1,4 +1,4 @@
-# Evaluating Pedagogical Efficacy in Low Stake Environment {#efficacy}
+# Evaluating Pedagogical Efficacy in the Low Stake Environment {#efficacy}
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 library(dplyr)
@@ -16,9 +16,9 @@ load(input_file_path)
 ### Definition
 The pre-requisite to discuss pedagogical efficacy is an understanding how people learn in general. It is a very broad field[@bransford1999people] and many foundings are open to debate, even on what counts as instruction[@kirschner2006minimal;@hmelo2007scaffolding]. 
 
-A general definition of pedagogical efficacy is beyond the scope of this dissertation. Since most of the learning services rely on practice question to gauge the learner's mastery level, this chapter defines pedagogical efficacy in reference to user's practice result.  Learning gain is defined as the absolute performance difference in quizzes before and after the pedagogical intervention. It is a metric Khan Academy used to improve their video instructions in experiments[@faus2015systems].
+A general definition of pedagogical efficacy is beyond the scope of this dissertation. Since most of the learning services rely on practice question to gauge the learner's mastery level, this chapter defines pedagogical efficacy in reference to user's practice result.  Learning gain is defined as the absolute performance difference in quizzes before and after the pedagogical intervention. It is a metric Khan Academy used to improve their video instructions in experiments[@faus2015systems]. The first difference approach implicitly assumes that the measurement errors, if exists, are the same before and after the intervention.
 
-This chapter defines pedagogical efficacy similar to the learning gain metric with a slight twist. The pedagogical efficacy is defined as the difference in learning gain compared to a naive repetition strategy. The second difference relaxes some strong assumptions required for the consistency of the learning metric.
+This chapter defines pedagogical efficacy similar to the learning gain metric with a slight twist. The pedagogical efficacy is defined as the difference in learning gain compared to a naive repetition strategy. The difference in difference approaches only requires the trend of the measurement error between two periods are the same for both groups.
 
 ### Three Obstacles
 
@@ -73,7 +73,7 @@ The remedial exercise is a modified version of the original question(Figure 3.2)
 
 <center>![Figure 3.2: The Remedial Exercise](fig/f2.png)</center>
 
-The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. The scaffolding is drew from the teaching experiment of in-house tutor experts. To wit:
+The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. The scaffolding is drawn from the teaching experiment of in-house tutor experts. To wit:
 
 (1) What is the length and width of the new rectangle
 
@@ -85,7 +85,7 @@ The assessment of routine skill (Figure 3.3) asks the learner to calculate the s
 
 <center>![Figure 3.3: Assessment for the Routine Skill](fig/f3.png)</center>
 
-The assessment of transfer skill (Figure 3.4) asks the learner to calculate the areas of the smaller squares when split the large rectangle in half by length, given the difference in circumferences. The learner cannot blindly apply the scaffolding of the previous items, but have to use th properties of the square.
+The assessment of transfer skill (Figure 3.4) asks the learner to calculate the areas of the smaller squares when split the large rectangle in half by length, given the difference in circumferences. The learner cannot blindly apply the scaffolding of the previous items, but have to use the properties of the square.
 
 <center>![Figure 3.4: Assessment for the Transfer Skill](fig/f4.png)</center>
 
@@ -163,7 +163,7 @@ In sum, although the experiment has substantial attrition rate, there is no subs
 ### Measurement Error Due to A Lack of Effort
 Thanks to the log level data collection, it is possible to directly classify incorrect responses into two categories: error due to a lack of mastery (valid attempt) and error due to a lack of effort (give-up). However, even with the knowledge of response time and response answer, the classification is not very accurate. Future high-resolution data are likely to include more behavior data that shed light on the learner's affective state[@baker2014extending], but now this chapter has to do with the limited information.
 
-Since there are numerous ways to provide an incorrect answer (emoji included) but manageable amount of "innocent" mistakes, this chapter adopts the principle of "guilty until proved innocent" and only count "innocent" mistakes as valid attempts, whose definition is in Appendix II.2. Following this classification, about `r round(mean(c2a2f1_data$giveup)*100,2)` % of the wrong response are classified as give-ups. Although there is no way to measure the true classification error, an examination of the distribution of response time can serve as a check of face validity. If the learner is not going to try, he is unlikely to spend much time on the exercises. Therefore the distribution of response time for the giveups is expected to severely skewed to the left. Empirically, the response time is defined as the time between the user's requests for next item. It is not guaranteed that the learner is on task for the entire duration. The empirical distribution of response time (Figure 3.2) conforms to the prior expectation. However, the giveups has significant density mass in the longer duration. This can be either classification error or the possibility that the learner's attention wander off between two clicks. Appendix II.3 replicates the following analysis with an alternative defintion of give-ups (all error whose response time is shorter than 10 seconds), the finding remains robust.
+Since there are numerous ways to provide an incorrect answer (emoji included) but manageable amount of "innocent" mistakes, this chapter adopts the principle of "guilty until proved innocent" and only count "innocent" mistakes as valid attempts, whose definition is in Appendix II.2. Following this classification, about `r round(mean(c2a2f1_data$giveup)*100,2)` % of the wrong response are classified as give-ups. Although there is no way to measure the true classification error, an examination of the distribution of response time can serve as a check of face validity. If the learner is not going to try, he is unlikely to spend much time on the exercises. Therefore the distribution of response time for the give-up is expected to severely skew to the left. Empirically, the response time is defined as the time between the user's requests for next item. It is not guaranteed that the learner is on task for the entire duration. The empirical distribution of response time (Figure 3.2) conforms to the prior expectation. However, the give-up has significant density mass in the longer duration. This can be either classification error or the possibility that the learner's attention wander off between two clicks. Appendix II.3 replicates the following analysis with an alternative definition of the give-up (submitting a blank answer), the pattern of the finding remains robust.
 
 
 
@@ -184,12 +184,15 @@ qplot(data=c2a2f1_data %>% filter(cmt_timelen<=60), x=cmt_timelen, geom='density
 
 ### Identification Strategy
 
-
-
 The identification strategy is the Difference in Difference specification. Denote the baseline question as T=0 and the assessments questions as T = 1. Let variable $D^1$ takes value 1 if the user is in the treatment I, variable $D^2$ takes value 2 if the user is in treatment II. A fully specified DID model is 
 
 $$
 Y_{i,T} = \beta_1 D^1_i + \beta_2 D^2_i + \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
+$$
+
+However, since the remedial exercise means the student to make mistakes in the first place, the baseline mean is zero. Thus the fixed effect can be dropped.
+$$
+Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
 $$
 
 Alternatively, to facilitate the comparison between two treatment alternatives, let $\tilde{D}_i$ denotes if the learner is in either of the treatment group:
@@ -202,20 +205,20 @@ The specification can be expressed as a combination of the level and the differe
 $$
 \delta_1 D^1_i T + \delta_2 D^2_i T = \delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T
 $$
-
 where $\delta_{level} = \delta_1$ and $\delta_{difference} = \delta_2 - \delta_1$
 
-If conditions on failures in the first attempt, the group's fixed effect can not be seperated from the treatment effect. Thus the identification strategy reverts to first difference:
-
+The alternative regression model is thus
 $$
-Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
+Y_{i,T} = \gamma T +\delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T + \epsilon_{i,T} 
 $$
 
-### Full Dataset
 
-Apply the model on the full dataset, the results (Table 3.5) suggests that neither vocabulary scaffolding nor video scaffolding is superior to naive repetition. The vocabulary scaffolding is less effective than the naive repetition to achieve proficiency for the routine task. However, compared to vocabulary scaffolding, video scaffolding is a more effective pedagogical method for both tasks.
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+
+### Baseline Results
+The summary statistics of the post-treatment data are presented in Appdenix II.3
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
 y0data = workdata %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
 y1pdata = workdata %>% filter(eid=='Q_10201056666357') %>% mutate(t=1)
 y1sdata = workdata %>% filter(eid=='Q_10200351208705') %>% mutate(t=1)
@@ -229,11 +232,20 @@ ydata_s = ydata_s %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as
 ydata_p = ydata_p %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
 ydata_s = ydata_s %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
 
-mod_1d = lm(data=ydata_p,y~d1+d2+t+dt+ddt)
-mod_2d = lm(data=ydata_s,y~d1+d2+t+dt+ddt)
+# keep integer answer
+ydata_p$y = as.numeric(ydata_p$y==1)
+ydata_s$y = as.numeric(ydata_s$y==1)
 
-mod_1 = lm(data=ydata_p,y~d1+d2+t+d1t+d2t)
-mod_2 = lm(data=ydata_s,y~d1+d2+t+d1t+d2t)
+```
+
+Apply the identification to the full dataset, the results (Table 3.5) shows nothing at all.
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+mod_1d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
+mod_2d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
+
+mod_1 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
+mod_2 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
 
 stargazer(mod_1, mod_2, mod_1d,mod_2d,
           header=FALSE,type='latex',
@@ -243,22 +255,20 @@ stargazer(mod_1, mod_2, mod_1d,mod_2d,
           column.labels=c('Routine','Transfer','Routine','Transfer'), 
           keep.stat=c("adj.rsq","n")
           )
-
-
 ```
 
-The inferior performance of vocabulary scaffolding is a puzzling result. Since vocabulary scaffolding has the same question as the naive repetition, it is expected to be at least as effective as the naive repitition, which is not the case.
 
+### Differential Measurement Error Trend in the Placebo
+Because the package is administrated to all learners, the learners who correctly answered the original question also answered the following questions. Since there is negligible chance that they guessed it right, they must have mastered the learning objective. The placebo group thus shall report a null effect if the assumption of the same measurement error trend holds.
 
-### Addressing the Measurement Error
-To understand the puzzling result, sample those who are successful in their first attempt. Since there is negligible chance that they guessed it right, they must have mastered the learning objective and shall replicate their success in the routine assessment. The placebo group shall report null effect. However, the vocabulary scaffolding reports a significant drop in success rate for the routine assessment (Table 3.6), compared to the naive repetition. The giveup rate climbs almost one for one for the vocabulary scaffolding compared to the naive repetition. There is no similar phemonenon for the transfer assessment. The result suggests that the vocabulary scaffolding has the unintented consequence of decreasing the learner's engagement in the learning task: They are too bored to make an effort.
+However, the vocabulary scaffolding reports a significant drop in success rate for the routine assessment (Table 3.6), compared to the naive repetition. The rate  of give-up climbs almost one for one for the vocabulary scaffolding compared to the naive repetition. There is no similar phenomenon for the transfer assessment. The result suggests that the vocabulary scaffolding has the unintended consequence of decreasing the learner's engagement in the learning task: They are too bored to make an effort.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
-mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
+mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~t+d1t+d2t)
+mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~t+d1t+d2t)
 
-mod_5 = lm(data=ydata_s %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
-mod_6 = lm(data=ydata_s %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
+mod_5 = lm(data=ydata_s %>% filter(is_placebo==1),y~t+d1t+d2t)
+mod_6 = lm(data=ydata_s %>% filter(is_placebo==1),giveup~t+d1t+d2t)
 
 stargazer(mod_3, mod_4,mod_5,mod_6, 
           header=FALSE,type='latex', 
@@ -271,28 +281,9 @@ stargazer(mod_3, mod_4,mod_5,mod_6,
 ```
 
 
-Exclude the placebo group because logically their behavior is not informative of the pedagogical efficacy of remedial exercises. However, the confounding effect of lesser engagement still remains. Table 3.7 reports no statistically significant findings.
-
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
-mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
-
-mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
-mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
-
-stargazer(mod_7, mod_8, mod_7d,mod_8d,
-          header=FALSE,type='latex',
-          dep.var.labels = 'Response',
-          keep=c('d1t','d2t','dt','ddt'),
-          covariate.labels=c('vocabulary','video','level','difference'), 
-          column.labels=c('Routine','Transfer','Routine','Transfer'), 
-          keep.stat=c("adj.rsq","n")
-          )
-```
-
 Excluding observations with measurement error violates the assumption of missing at random because some unobserved factor can affect both effort and performance, such as grit. The research design does not offer an identification strategy that can separate the clean response from measurement error. It requires an instrument variable that changes learner's choice of effort while not affect their performance, such as a variation in incentive scheme[@fryer2010financial]. Such design was declined by the platform due to the issue of implementation cost and user experience consistency. Therefore, the analysis corrects for the measurement error by excluding observations that are identified as give-ups in their exposure to the treatment.
 
-The retention rate are not even across three groups, but are almost identical for the both treament groups. It suggests that the comparison between the treatment and the control shall be taken with a grain of salt, the comparison between two treatment groups is still very likely to be valid.
+The retention rates are not equal across three groups but are almost identical for the treatment groups. It suggests that the comparison between the treatment and the control shall be taken with a grain of salt, the comparison between two treatment groups is still very likely to be valid.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 retain_rate_stat =  ydata_p %>% filter(is_placebo==0) %>% group_by(gid) %>% summarize(pct=mean(is_retain)) 
@@ -305,16 +296,16 @@ retain_rate_stat =  ydata_p %>% filter(is_placebo==0) %>% group_by(gid) %>% summ
 |Video Treatment|`r 100-round(retain_rate_stat$pct[3]*100)`|
 Retention Rate by Assignment Group
 
-The analysis on the filtered dataset (Table 3.8) shows vocabulary scaffolding is almost as effective as naive repetition in both rountine and transfer assessment but video scaffolding is more effective in both cases. The pedagogical superiority of the video instruction over vocabulary instruction is only confirmed in the transfer assessment. The result confirms in-house pedagogical expert's expectation at large. She postulates that both vocabulary scaffolding and video scaffolding are more effective than the naive repetition. She also postulates that both delivery methods are equivalent at the routine assessment, while the video scaffolding is more effective at the transfer assessment.
+The analysis on the filtered dataset (Table 3.7) shows vocabulary scaffolding is almost as effective as naive repetition in both routine and transfer assessment but video scaffolding is more effective in both cases. The pedagogical superiority of the video instruction over vocabulary instruction is only confirmed in the transfer assessment. The result confirms in-house pedagogical expert's expectation at large. She postulates that both vocabulary scaffolding and video scaffolding are more effective than the naive repetition. She also postulates that both delivery methods are equivalent at the routine assessment, while the video scaffolding is more effective at the transfer assessment.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_9d = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
-mod_10d = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+mod_7d = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+mod_8d = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
 
-mod_9 = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
-mod_10 = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+mod_7 = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+mod_8 = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
 
-stargazer(mod_9, mod_10, mod_9d,mod_10d,
+stargazer(mod_7, mod_8, mod_7d,mod_8d,
           header=FALSE,type='latex',
           dep.var.labels = 'Response',
           keep=c('d1t','d2t','dt','ddt'),
@@ -330,6 +321,8 @@ stargazer(mod_9, mod_10, mod_9d,mod_10d,
 Although the central theme of this chapter is the evaluation of pedagogical efficacy, the previous analysis demonstrates the importance of addressing the effort induced measurement error in a low stake test environment. The measurement error can result in qualitatively different findings in a randomized control experiment where the true effect is moderately small. Actual text answer to the question is instrumental in identifying the effort induced measurement error, but higher resolution data are required to improve the identification accuracy. In short, it is not enough to know what response the learner gives, but also how he arrives at it. 
 
 
+
+
 ## Appendix II
 
 
@@ -337,7 +330,7 @@ Although the central theme of this chapter is the evaluation of pedagogical effi
 
 Let learner's latent knowledge mastery be $\theta$, which is drawn from distribution $F(\theta)$. The true state of $\theta$ is not observable but can only be inferred from an observed binary response $Y$. The link function is $p(\theta)$
 
-To simplify, assume learner can choose a binary effort level $\Gamma$. Further assume When the learner gives up ($\Gamma=0$), the observed response ($Y=0$) is wrong with prbability 1. Such assumption rules out item type such as multiple choice where blind guess still has non-trivial probability of being right.
+To simplify, assume learner can choose a binary effort level $\Gamma$. Further assume When the learner gives up ($\Gamma=0$), the observed response ($Y=0$) is wrong with probability 1. Such assumption rules out item type such as multiple choice where blind guess still has a non-trivial probability of being right.
 
 The data generating process borrows from the Roy model:
 
@@ -377,7 +370,7 @@ In another mental experiment. If $p(\theta)$ is flat while $G(\beta p(\theta))$ 
 
 
 
-### 2. Identifcation of Valid Attempts
+### 2. Identifcation of Give-up
 
 (1) Add or omit trailing zeros. For example, if the right answer is 120, both 12, 120 and 1200 are admitted as valid attempts.
 
@@ -391,13 +384,79 @@ In another mental experiment. If $p(\theta)$ is flat while $G(\beta p(\theta))$ 
 
 (6) Typo: For example, 36 as 35
 
-### 3. Alternative Valid Attempts Identification
 
-Alternatively, define error due to a lack of effort as all errors whose response time is shorter than 10 second. The gist the main analysis remains robust.
+### 3. Summary Statistics
 
-Replication of Table 3.3. Strong negative for the vocabulary.
+```{r,echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+# for summary statistics
+sum_stat_p = ydata_p %>% filter(is_placebo==0)%>% select(gid,t,y, cmt_timelen, giveup,is_blank_ans,is_retain) %>%
+  rename(response_time=cmt_timelen,effective_exposure=is_retain)
+
+
+sum_stat_s = ydata_s %>% filter(is_placebo==0)%>% select(gid,t,y, cmt_timelen, giveup,is_blank_ans,is_retain) %>%
+  rename(response_time=cmt_timelen,effective_exposure=is_retain)
+```
+
+Routine Assessment - Control
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_p %>% filter(gid==0&t==1) %>% select(-gid,-t), type = "latex")
+```
+
+Routine Assessment - Vocabulary Scaffolding Treatment
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_p %>% filter(gid==2&t==1) %>% select(-gid,-t), type = "latex")
+```
+
+
+Routine Assessment - Video Scaffolding Treatment
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_p %>% filter(gid==4&t==1) %>% select(-gid,-t), type = "latex")
+```
+
+
+Transfer Assessment - Control
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_s %>% filter(gid==0&t==1) %>% select(-gid,-t), type = "latex")
+```
+
+Transfer Assessment - Vocabulary Scaffolding Treatment
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_s %>% filter(gid==2&t==1) %>% select(-gid,-t), type = "latex")
+```
+
+
+Transfer Assessment - Video Scaffolding Treatment
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer(sum_stat_s %>% filter(gid==4&t==1) %>% select(-gid,-t), type = "latex")
+```
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+# save the result
+rm(list=setdiff(ls(),c('proj_dir','mod_1','mod_2','mod_1d','mod_2d','mod_3','mod_4','mod_5','mod_6','mod_7','mod_8','mod_7d','mod_8d')))
+output_file_path = paste0(proj_dir,'/_data/02/post_production_data.RData')
+save.image(output_file_path)
+
+```
+
+### 4. Alternative Valid Attempts Identification
+
+Alternatively, define submitting a blank answer as an error due to a lack of effort . The pattern of the main analysis remains robust.
+
+Replication of Table 3.5. Null effect.
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+rm(list=ls())
+
+proj_dir = getwd()
+input_file_path = paste0(proj_dir,'/_data/02/production_data.RData')
+load(input_file_path)
+
+
 y0data = bkp_data %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
 y1pdata = bkp_data %>% filter(eid=='Q_10201056666357') %>% mutate(t=1)
 y1sdata = bkp_data %>% filter(eid=='Q_10200351208705') %>% mutate(t=1)
@@ -411,13 +470,17 @@ ydata_s = ydata_s %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as
 ydata_p = ydata_p %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
 ydata_s = ydata_s %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
 
-mod_1d = lm(data=ydata_p,y~d1+d2+t+dt+ddt)
-mod_2d = lm(data=ydata_s,y~d1+d2+t+dt+ddt)
+ydata_p$y = as.numeric(ydata_p$y==1)
+ydata_s$y = as.numeric(ydata_s$y==1)
 
-mod_1 = lm(data=ydata_p,y~d1+d2+t+d1t+d2t)
-mod_2 = lm(data=ydata_s,y~d1+d2+t+d1t+d2t)
 
-stargazer(mod_1, mod_2, mod_1d,mod_2d,
+mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
+mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
+
+mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
+mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
+
+stargazer(mod_7, mod_8, mod_7d,mod_8d,
           header=FALSE,type='latex',
           dep.var.labels = 'Response',
           keep=c('d1t','d2t','dt','ddt'),
@@ -428,7 +491,7 @@ stargazer(mod_1, mod_2, mod_1d,mod_2d,
 
 ```
 
-Replication of Table 3.4. Give-up increases sharply for the routine assessment of vocabulary scaffolding group.
+Replication of Table 3.6. Give-up increases sharply for the routine assessment of vocabulary scaffolding group.
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
 mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~d1+d2+t+d1t+d2t)
 mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~d1+d2+t+d1t+d2t)
@@ -446,23 +509,6 @@ stargazer(mod_3, mod_4,mod_5,mod_6,
           )
 ```
 
-Replication of Table 3.5. Null effect across the board.
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
-mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
-
-mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
-mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
-
-stargazer(mod_7, mod_8, mod_7d,mod_8d,
-          header=FALSE,type='latex',
-          dep.var.labels = 'Response',
-          keep=c('d1t','d2t','dt','ddt'),
-          covariate.labels=c('vocabulary','video','level','difference'), 
-          column.labels=c('Routine','Transfer','Routine','Transfer'), 
-          keep.stat=c("adj.rsq","n")
-          )
-```
 
 Replication of Table 3.7. Slightly different from the main analysis. Video scaffolding appears to be more effective than vocabulary scaffolding, although the difference magnitude is moderated.
 ```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
