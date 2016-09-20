@@ -1,5 +1,5 @@
 --- 
-title: "Essays on Pedogogical Research With High Resolution Learning Data"
+title: "Essays on A General Model of Learning Through Practices"
 author: "Junchen Feng"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -8,20 +8,12 @@ documentclass: book
 bibliography: [ref01.bib,ref02.bib,ref03.bib]
 biblio-style: apalike
 link-citations: yes
-description: "This is the draft of Junchen Feng's dissertation."
+description: "Junchen Feng's dissertation."
 ---
 
 # Abstract
-The age of digital education is dawning. High-speed internet access and smart devices are ubiquitous in social life. Only a matter of time before it becomes ubiquitous in the classroom as well. With the boom of connectivity and computation power comes the blossom of digital learning service and learning data. Never before had the collection of high resolution learning data,  individual learning data collected at log level, been so cheap and so abundant. Consequently, it opens up new topics that are previously prohibitively expensive or of little importance. This dissertation capitalizes on the availability of high-resolution individual learning data to provide insight into learning engagement, content efficacy and continuous improvement of the learning service through experimentation.
+Chpater 2: General Model and identification
 
-This dissertation maps learning task into two categories: routine task and comprehension task. The routine task relies on repetition to formulate a reflex response. Learning times table is an example of the routine task. The comprehension task relies on cognitive understanding to transfer knowledge in solving a new problem. For instance, learning vertical multiplication is a comprehension task. The mastery of routine task  requires persistent practice while the mastery of comprehension task mainly requires high-quality instruction content. Therefore, engagement and content efficacy are key ingredients of an effective learning service.   
+Chapter 3: Selection bias caused by hazard rate
 
-Another salient feature of contemporary digital learning service is the rapid product iteration. For the purpose of the continuous improvement, the opportunity cost of wait and inaction outweighs the damage of false positive changes. Therefore, experiments designed based on t-test may not be the optimal solution and fail to exploit the sequential nature of the high resolution learning data .
-
-Chapter one  analyzes the engagement in the routine task practice. The current models of estimating the latent proficiency of single skill task are built on the false premise that learner will be persistent in practicing until perfect. However, a common feature in high-resolution learning data set is that practice sequences differ in length. If the dropout is correlated with latent proficiency, it results in selection bias in the estimated parameters. I propose a hybrid model of Bayesian knowledge tracing and survival analysis to jointly predict responses and the sequence length. To estimate the model that is intractable for the Expectation-Maximization method, I propose a Monte Carlo Markov Chain estimation routine. **A discussion of performance, expected to be positive**
-
-Chapter two provides a framework to quantitatively evaluate item level pedagogical efficacy for comprehension task by randomized control trial, the critical factor for an effective learning recommendation system. The three major obstacles are high sample attrition, measurement error due to user shirking and low signal to noise ratio. This chapter use one-session delivery to control attrition and text response to model measurement error in an field experiment that aims at evaluating pedagogical efficacy for remedial exercises. Video scaffolding is found to be more pedagogically effective than vocabulary scaffolding. 
-
-Chapter three explores the statistical test property and practical benefit of Thompson sampling, a multi-arm bandit algorithm, as a sequential test tool for continuous improvement.  By tolerating higher Type I error under the null hypothesis of null effect, Thompson sampling uses unbalanced dynamic sample assignment to exploits the sequential  nature of the high-resolution learning data,  result in higher power, decreased sample size and  improved pedagogical efficacy. This claim is supported by both simulation result and a replication analysis of the experiment described in Chapter two.
-
-The dissertation ends with a discussion of the limits to pedagogical research driven by high resolution learning data.
+Chapter 4: Selection bias casued by effort

@@ -18,14 +18,20 @@ bkp_meta_24921 = meta_24921
 
 
 # # filter
- test_data = meta_24921 %>% filter(eid %in% c('Q_10201056658103') & atag<1) %>%
-   group_by(answers) %>% summarize(n=n(),avg_time=mean(cmt_timelen)) %>%
-   arrange(desc(n))
+test_data = meta_24921 %>% filter(eid %in% c('Q_10201056658103') & atag<1) %>%
+ group_by(answers) %>% summarize(n=n(),avg_time=mean(cmt_timelen)) %>%
+ arrange(desc(n))
 #
 # meta_24921 %>% filter(eid %in% c('Q_10201056658103') & atag<1) %>% summarize(sum(atag<1), sum(giveup))
 
 
 identify_giveup <- function(data, target_eid){
+  data$giveup=0
+  data$is_slip = 0
+  data$wrong_shape = 0
+  data$is_circ_right = 0
+  data$is_area_right
+  data$is_blank_ans = 0
 
   # Rule of thumb, all wrong except for the following answers are identified as giveups
   data$giveup[data$atag_pct==0 & data$eid==target_eid] = 1
@@ -85,9 +91,6 @@ identify_giveup <- function(data, target_eid){
   return(data)
 }
 
-meta_24921$giveup=0
-meta_24921$is_sensible_ans = 0
-meta_24921$is_blank_ans = 0
 
 meta_24921 = identify_giveup(meta_24921, 'Q_10201056649366') # baseline
 

@@ -4,14 +4,16 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
+# result comes from bkt_item_fit_sim.py
+
 proj_dir = getwd()
-sim_data_path = paste0(proj_dir,'/_data/01/res/2/sim.txt')
+sim_data_path = paste0(proj_dir,'/_data/02/res/2/sim.txt')
 data_2 = read.table(sim_data_path, sep=',', col.names=c('i', 't', 'y', 'x', 'e', 'a'))
 data_2$kpid=2
-sim_data_path = paste0(proj_dir,'/_data/01/res/87/sim.txt')
+sim_data_path = paste0(proj_dir,'/_data/02/res/87/sim.txt')
 data_87 = read.table(sim_data_path, sep=',', col.names=c('i', 't', 'y', 'x', 'e', 'a'))
 data_87$kpid=87
-sim_data_path = paste0(proj_dir,'/_data/01/res/138/sim.txt')
+sim_data_path = paste0(proj_dir,'/_data/02/res/138/sim.txt')
 data_138 = read.table(sim_data_path, sep=',', col.names=c('i', 't', 'y', 'x', 'e', 'a'))
 data_138$kpid=138
 

@@ -1,0 +1,359 @@
+# Learning Through Practices {#model}
+## The General Model
+### Event Sequence
+
+(1) The learner is presented with a practice.
+
+(2) The learner decides the effort level.
+
+(3) The response is produced and the learning gain is materialized
+
+(4) The learner decides whether to continue the practice If yes, then continues from (1)
+
+
+### The Learning Process
+
+The practice item id is noted as $j\in\{1,\dots,J\}$. The thesis focuses on the pedagogical method of practice that produces an observable and objectively measurable response. Not all learning task is a practice. For example, reading a textbook is certainly a learning task but it is hard to grade the reading as correct or incorrect in a meaningful way. In the following analysis, "learning task"" and "practice"" are used interchangeably, but the reader shall be aware of the difference.
+
+The practice sequence id is noted as $t \in \{1,\dots, T\}$. In this model, the learning is not progressing by calendar time, but by the number of practices done. The model is designed to describe the learning process of intense training within a short time interval. The assignment of item to the practice sequence is defined as $A(t)$. In the following analysis, "time" and "sequence" are used interchangeably.
+
+The learner's knowledge space is latent and noted as $X$.
+
+**Assumption 1**:  $X$ is unidimenstional.
+
+The unidimensionality assumption avoids the complexity of mapping of knowledge components to the practice items. This thesis justifies Assumption 1 by limiting the data analysis to practices where the knowledge space is credibly unidimensional.
+
+**Assumption 2**: $X$ is a binary variable with value 0 and 1.
+
+Assumption 2 offers a  parsimonious way to model the level of mastery. The binary assumption is not an innocuous technical detail because of its role in the parameter identification.
+
+Let $e_{j,t}$ denote the learner's effort level on item $j$ at sequence $t$. Assume it is a binary variable with value 0 and 1.
+
+
+Let $X_t$ describes the learner's state of the latent knowledge mastery at practice $No.t$.  Define the pedagogical efficacy $\ell_{j,t}$ as the probability of question $j$ raising the learner's knowledge mastery status from 0 to 1.
+
+**Assumption 4**: The item pedagogical efficacy is independent of its sequence position.
+
+Assumption 4 is not a strong assumption in conjuncture with the stop decision that captures the time dynamics, such as increasing boredom or frustration. The rest of the model parameters share this position(time)-independence property.
+
+**Assumption 5**: There is no complimentarity or substitution effect between items
+
+An example of the substitution is the decreasing marginal return to the repeated practices. An example of the complementarirty is a scaffolding item sequence. Both are ruled out by Assumption 5. 
+
+
+Under Assumption 4 and 5, the pedagogical efficacy is simplified to:
+$$
+\ell_j = P(X_t=1|X_{t-1}=0, A(t)=j)
+$$ 
+
+
+The pedagogical efficacy of any question is non-negative. Additional practices do not make the learner forget what they already knew. 
+
+**Assumption 6**: $p(X_t=0|X_{t-1}=1, A(t)=j) = 0 \quad \forall t,j$
+
+
+### The Effort Decision
+
+Let the effort level be determined by a Heckman style [@heckman2007econometric] Roy model[@roy1951some]:
+
+$$
+E_{A(t)=j,t} = I(\beta_j P(Y_{j,t}=1) - \epsilon_{j,t})
+$$
+where $\beta_j$ is expected return of a correct response and $\epsilon_{j,t}$ is the cost of making the learning effort. The expected cost of a wrong response is standardized to 0.
+
+**Assumption 7**: The $\epsilon_{j,t}$ is I.I.D.
+
+Conditioning on $X_t$, $P(Y_{j,y})$ is a function of the item parameter. Because the item parameter, most importantly $\ell_j$, is invariant to sequence and item combinations, the effort choice is thus also position independent and combination independent. It rules out behavior such as losing patients after a long streak of exercises or giving up the second chance to try because the learner is frustrated with the previous failure. Under Assumption 7, the learner's latent mastery status is the only argument for the effort choice. Without loss of generality, under the assumption of binary mastery status[A2], the effort decision can be characterized as a contingent probability table. 
+$$
+P(E_{j,t}=1) = 
+\begin{cases}
+   e_j^1,& \text{if } X_t = 1\\
+   e_j^0,  & \text{if } X_t = 0
+\end{cases}
+$$
+
+The effort level is important because it shapes the learning gain and the observed response. Motivated by the intuition of "no pain no gain", if the learner does not exert effort, they do not enjoy the learning gain. 
+
+**Assumption 8**: $P(X_t=1|X_{t-1}=0, A(t)=j,E_{j,t}=0) = 0$
+
+Furthermore, assume that if the learner does not exert effort, the response is generated as if the learner has not mastered the knowledge point. This assumption reduces the number of parameters the model.
+
+**Assumption 9**: $P(Y_{j,t}=1|E_{j,t}=0) = P(Y_{j,t}=1|X_t=0)$
+
+As a final note, if the expected benefit is positive and is identical across item($\beta_j=\beta>0$), the Roy model implies that the learner is more likely to make a positive effort if the pedagogical efficacy is greater, because $\frac{\partial P(E_t)}{P(P_t)}>0$ and $\frac{\partial P(P_t)}{P(\ell_t)}>0$. This observation can serve as a sanity check on the estimated parameters if there is good reason to believe that the benefits are identical.
+
+### The Observed Response
+
+Because the effort decision and the hazard decision are intended to capture the non-cognitive factor, assume the response is only a function of the cognitive factor: the knowledge mastery.
+
+**Assumption 10**: $Y_{j,t}=f_j(X_t)$
+
+Under Assumption 2 and Assumption 10, the data generating process of $Y_{t,j}$ can be described as. 
+$$
+P(Y_{t,j}=1) = 
+\begin{cases}
+   1-s_j,& \text{if } X_t = 1\\
+   g_j,  & \text{if } X_t = 0
+\end{cases}
+$$ 
+where $s_j=P(Y_j=0|X_t=1)$ is usually called slip rate and $g_j=P(Y_j=1|X_t=0)$ the guess rate. 
+
+
+### The Stop Decision
+Let $H_t$ be the stop decision. $H_t=1$ if the learner stops praticing at sequence $t$. The $Y_{A(t+1)}$ is observed only if the learner does not stop at $t$. The hazard rate at sequence $t$ is the probability of exit conditioning on continue at sequence $t-1$. 
+
+$$
+h_t^{x}=P(H_t=1|H_{t-1}=0,X_t=x)
+$$
+
+The stop decision intends to capture two stylized facts of the real data:
+
+(1) The hazard rate is duration dependent. Usually, longer practice leads to a higher hazard rate.
+
+(2) The hazard rates varies with the status of the response. Usually, a wrong response leads to a higher hazard rate.
+
+Under the current setup, it is difficult to generate duration dependence because the pedagogical efficacy is assumed to be time invariant[A4]. As a substitute for dynamic pedagogical efficacy, the alternative explanation is that the exit decision captures the influence of the non-cogtive factor: If the learner has already mastered the knowledge point, further practices produce no learning gain and they are bored. If the learner hasn't mastered the knowledge point after a few exercises, they don't believe further practices would help and they are frustrated. Both boring practices and frustrating practices lead to the exit, but the frustration hurts the learner more than the boredom.  
+
+
+
+## Identification Assumption For One Item Model
+
+Not all parameters of the general learning model are uniquely identified. This section discusses the assumptions needed to identify them. Start with the special case of the general model with one item.
+
+**TODO: Do a proper GMM identificatio proof.**
+
+### Moment Conditions
+
+The previous section describes a learning model for an individual. The identification must be performed on the repeated observation because the latent state transition is not reversible and a single observation may not exhaust all states and state transitions[@rabiner1989tutorial]. The critical identification assumption that rationalizes applying a model of individual learner to the population data is:
+
+**Identification Assumption 1:** Users are homogeneous.
+
+Under homogeneity, when the number of users grows, by the law of large numbers, the sample mean converges to the population moment. There are three observable data: the response($\mathbf{Y}$), the effort($\mathbf{E}$), and the exit($\mathbf{H}$). 
+
+Let $\pi_t=P(X_t=1)$. The moments of the observed data are generated by
+
+$$
+\begin{aligned}
+P(Y_t) &= (1-s)e^1\pi_t + g(\pi_t(1-e^0)+1-\pi_t)\\
+P(E_t) &= e^1\pi_t + (1-e^0)(1-\pi_t)\\
+P(H_t) &= h_t^1\pi_t+h_t^0(1-\pi_t)
+\end{aligned}
+$$
+
+The dynamics of $\pi_t$ is characterized by a recursive function:
+$$
+\pi_t = e^0\ell(1-h_t^0)+ [(1-h_t^1)-e^0\ell(1-h_t^0)]\pi_{t-1}
+$$
+The recursion gives 
+
+$$
+\pi_T  = e^0\ell(1-h_T^0) + \sum_{t=2}^{T-1}\prod_{k=t}^{T}[(1-h_t^1)-e^0\ell(1-h_t^0)] + [\prod_{k=1}^{T}[(1-h_t^1)-e^0\ell(1-h_t^0)]]\pi_1
+$$
+
+### Identification under No Effort Decision and No Stop Decision
+Assume $e^0=e^1=1$, $h_t^x=0$. This special case is the famous Bayesian Knowledge Tracing (BKT) Model[@corbett1994knowledge;@atkinson1972approach].
+
+In BKT model, the moments can be greatly simplified[@van2013properties].
+
+$$
+\begin{aligned}
+\pi_t &= 1-(1-\ell)^t(1-\pi_1)\\
+P(Y_t=1) &= (1-s) - (1-s-g)(1-\pi_1)(1-\ell)^T
+\end{aligned}
+$$
+The exponential curve suggests the following two identification assumptions.
+
+**Identification Assumption 2:** $s+g<1$
+
+**Identification Assumption 3:** $\pi_t\rightarrow 1$
+
+The pedagogical efficacy is uniquely identified by the shape of the learning curve. IA2 guarantees that the pedagogical efficacy is positive.
+
+IA3 pins down $s$ at the asymptote because $\lim_{\pi_t\rightarrow 1}P(Y_t) \rightarrow 1-s$. However, $g$ and $\pi_1$ are jointly identified because constant the y-intercept of the learning curve identifies $(1-s-g)(1-\pi_1)$. The lack of identifiability of the BKT model is first documented by  Beck et al[-@beck2007identifiability]. Their notice that the model is not uniquly identified because the exponential curve is governed by three parameters but the model specifies four parameters.
+
+### Identifcation under No Stop Decision
+
+Assume $h_t^x=0$, $\pi_t$ can be expressed as 
+
+$$
+\pi_t = 1-(1-e^0\ell)^t(1-\pi_1)
+$$
+The moments of response and effort is 
+
+$$
+\begin{aligned}
+P(Y_t=1) &= (1-s)e^1-(1-\pi_1)[(1-s)-g(1-e^0)][1-e^0\ell]^T\\
+P(E_t=1) &= e^1+(e^0-e^1)(1-\pi_1)(1-e^0\ell)^T
+\end{aligned}
+$$
+IA3 identifies $s$ and $e_1$. The identical exponential term of the two curves jointly identifies $e^0$ and $\ell$. The y-intercepts of the two curves jointly identify $e^0$, $\pi$, and $g$. The effort curve adds one more condition (y-intercept) but also one more variable($e^0$). Thus the model remain not uniquely identified.
+
+**Identification Assumption 4:** $g$ is known.
+
+Under IA4, the two intercepts identifies $\pi_1$ and $e^0$, which in turn identifies $\ell$. Other than the multiple choice, the guess rate of most question type is in deed close to zero for a binary response. IA 4 may be too strong if the response allows for partial grade. Alternatively, one can assume $\pi_1$ is known and identify the rest of the parameters. However, $\pi_1$ is usually a wild guess.
+
+### Identifcation under No Effort Decision
+
+**Identification Assumption 5:** The hazard rate follows proportional hazard function with the form of $h^x_t = h e^{\gamma_1 t+ \gamma_2 x}$
+
+**TODO** formal proof. 
+
+With IA 1 - IA 5, all parameters are uniquely identified. Intuition. The intercept identifies $h$,$\gamma_2$, and $\pi$. The slope of the learning curve and hazard rate curve are different, thus identifies $\ell$ and $\gamma_1$. 
+
+
+### General Identification
+**TODO: Probably not identified**
+
+## Identification Assumption for Multiple Items Model
+
+**TODO**
+
+### Identification in Multiple Items Under no exit
+IA 6: $Pr(A(T)=j|\pi_T \rightarrow 1)!=0 \quad \forall j$. All items is observed at the asympotote to identify $s_j$, $e^1_j$.
+Under IA4 and IA6, $e^0_j$ is identified. $\ell_j$ then should be identified by the curvature.
+
+
+## Parameter Estimation 
+
+This section discusses the statistical method to identify the parameters. 
+
+### Likelihood Function
+Let $\mathbf{Y^{(i)}} = \{Y^{(i)}_{A(1),1}, \dots, Y^{(i)}_{A(t),t}\}$,  $\mathbf{E^{(i)}} = \{E^{(i)}_{A(1),1}, \dots, E^{(i)}_{A(1),1}\}$, and $\mathbf{X^{(i)}} = \{X^{(i)}_1, \dots, X^{(i)}_t\}$ where $i$ is the learner id. The likelihood of observing the data $\{\mathbf{Y^{(i)}},\mathbf{E^{(i)}},H_t\}$ is 
+
+$$
+P(\mathbf{Y^{(i)}},\mathbf{E^{(i)}},H^(i)_T) = \sum_{X^{(i)=0}}^1\dots\sum_{X^{(i)}_T=0}^1 P(H^{(i)}_T|\mathbf{X^{(i)}})P(\mathbf{Y^{(i)}}|\mathbf{E^{(i)}},\mathbf{X^{(i)}})P(\mathbf{E^{(i)}},\mathbf{X^{(i)}})
+$$
+
+Since the start of the practice sequence is usually logged, the issue of left-censor can be ignored. The probability of observing event $H^{(i)}_T$ is 
+
+$$
+P(H^{(i)}_T|\mathbf{X^{(i)}}) = [\prod_{t=1}^{T-1} (1-h_t^{X^{(i)}_t}))] [(h_T^{X^{(i)}_T})^{H^{(i)}_T}(1-h_T^{X^{(i)}_T})^{1-H^{(i)}_T}]
+$$
+
+The likelihood of the observed response is
+
+$$
+\begin{aligned}
+P(mathbf{Y^{(i)}}|\mathbf{X^{(i)}},mathbf{E^{(i)}}) &= \prod_{t=1}^T [1-s_{(A^{(i)}(t))}]^{I(Y^{(i)}_t=1,X^{(i)}_tE^{(i)}_t=1)}[s_{(A^{(i)}(t))}]^{I(Y^{(i)}_t=0,X^{(i)}_tE^{(i)}_t=1)}\\
+&\quad[1-g_{(A^{(i)}(t))}]^{I(Y^{(i)}_t=0,X^{(i)}_tE^{(i)}_t=0)}[g_{(A^{(i)}(t))}]^{I(Y^{(i)}_t=1,X^{(i)}_tE^{(i)}_t=0)})]
+\end{aligned}
+$$
+
+The joint likelihood of the effort and latent state variable is 
+
+$$
+\begin{aligned}
+P(\mathbf{E^{i}},\mathbf{X^{i}}) &= (\pi_1)^{I(X^{(i)}_1=1)}(1-\pi_1)^{I(X^{(i)}_1=0)}\\
+&\quad\prod_{t=2}^T(\ell_A^{(i)}(t))^{I(X^{(1)}_t=1,X^{(i)}_{t-1}=0,E^{(i)}_{t-1}=1)}(1-\ell_{A^{(i)}(t)})^{I(X^{(i)}_t=0,X^{(1)}_{t-1}=0,E^{(i)}_{t-1}=1)}\\
+&\quad(e^0_{A^{(i)}_t})^{I(X^{(1)}_{t}=0,E^{(i)}_{t}=1))}(1-e^0_{A^{(i)}_t})^{I(X^{(1)}_{t}=0,E^{(i)}_{t}=0))}(e^1_{A^{(i)}(t)})^{I(X^{(1)}_{t}=1,E^{(i)}_{t}=1))}(1-e^1_{A^{(i)}(t)})^{I(X^{(1)}_{t}=1,E^{(i)}_{t}=0))}
+\end{aligned}
+$$
+
+
+
+### The MCMC Estimator
+
+It is not a new idea to use MCMC in estimating HMM[@scott2002bayesian]. The general idea of MCMC estimation for HMM model is to first augment the hidden state then update the model parameter with Gibbs sampler.
+
+#### Why not Expectation-Maximization(EM)
+In principle, the parameters can be estimated by Expectation-Maximization(EM) method because the likelihood function is known. The disadvantage of EM algorithm is its difficulty in implementation. Although modern constrained optimization technique only requires gradient to converge efficiently, it is still a daunting task to write down the gradient of the likelihood function. In addition, EM algorithm also requires specifying the prior distribution for the parameter, which puts it on an equal footing with the MCMC algorithm.
+
+The major advantage of the Em algorithm is its computation speed, which make it feasible in large data set. However, the computation power is getting cheaper. The most expensive part of the MCMC algorithm is augmenting the latent state, which can be parallelized. Therefore the MCMC algorithm is not  prohibitively computational expensive for large dataset. Another important benefit of the MCMC algorithm is it recovers the distribution of the parameter, thus it allows for fast online computation of the credible interval of the learner's knowledge mastery.
+
+In addition, if the model is correctly specified, the MCMC algorithm in theory converges to the true parameter distribution and a consistent point estimator with probability 1. The same convergence property does not hold for the EM algorithm. That said, for the general model specified in the thesis, under sufficient identification assumptions, simulations show that the MCMC algorithm and EM algorithm estimate the parameter with similar precision.
+
+In short, the MCMC algorithm and the EM algorithm behave quite similarly but the MCMC algorithm is favored for its extensibility 
+
+#### The Forward Recursion and Backward Sampling Algorithm
+
+Various latent state sampling schemes have been proposed, on which Scott[-@scott2002bayesian] provides an extensive survey. This chapter uses forward recursion and backward sampling scheme.
+
+Let $\tilde{\pi}_t(i)$ denote the posterior marginal state density. $\tilde{\pi}_t(i) = P(X_t=i|Y_1,\dots,Y_t, E_1,\dots,E_t,H_t, \Theta)$. Let $P_t$ denote the posterior state transition matrix and $P_{t}(i,j)$ be the $(i,j)$th element of transit matrix. $P_{t}(i,j) = P(X_{t-1}=i,X_t=j|Y_1,\dots,Y_t, E_1,\dots,E_t,H_t,\Theta)$
+
+The forward recursion calcualte the posterior state density and state transition matrix by the following algorithm.
+
+(1) Initialize the marginal state density by $\tilde{\pi}_t(i) = \frac{P(X_1=i)P(E_1|X_1=i)P(H_1|X_1=i)P(Y_1|X_1=i,E_1)}{\sum_{j=0}^1P(X_1=j)P(E_1|X_1=j)P(H_1|X_1=j)P(Y_1|X_1=j,E_1)}$
+
+(2) Calculate $P_t(i,j)=\tilde{\pi}_{t-1}(i)P(X_t=j|X_{t-1}=i,E_{t-1})P(Y_t|X_t,E_t)P(E_t|X_t)\prod_{k=1}^T(1-h_k^{X_k})$
+
+(3) Calculate $\tilde{\pi}_t(j)=\sum_{i}P_t(i,j)$
+
+
+
+After the forward recursion recovers the posterior marginal state density and posterior state transition matrix. Augment the data with latent state by backward sampling:
+
+(1) Initialize the state from last sequence position $T$ by drawing from a Bernoulli distribution with $p=\tilde{\pi}_T(1)$
+
+(2) Give the $X_{t+1}=j$, draw $X_t$ from a Bernoulli distribution with $p=\frac{P_t(1,j)}{\sum_{i=0}^TP_t(i,j)}$
+
+The second step shall permutate the state by $P(X_t|X_{t+1}=j,\mathbf{Y},\mathbf{E},H_T,\Theta)$. By the assumption of first-order Markov chain $X_t\perp\!\!\!\perp Y_{t+2},\dots,Y_T,E_{t+2},\dots,E_T|X_{t+1}=j$, it is equivalent to $P(X_t|X_{t+1}=j,Y_1,\dots,Y_{t+1},E_1,\dots,E_{t+1},H_T|\Theta)$. The last quantity is just $\frac{P_t(i,j)}{\sum_{i=0}^TP_t(i,j)}$. 
+
+
+Readers familiar with the HMM literature may ask why the backward recursion and forward sampling scheme[@chib1996calculating] is not considered. The recursion trick cannot be used to estimate the hybrid model because the event of observing $H_t$ depends on the survival probability as a function of ${X_1,\dots,X_{t-1}}$ and the backward smoothing factor $P(X_t|X_{t+1},Y_{t+1},\dots,Y_{T})$ cannot be calculated recursively. One could still calculate the likelihood by brute force but it is quite expensive when the chain is long. 
+
+
+#### Gibbs Sampler for Parameter Update
+**TODO: add in the j notation**
+Once the state of knowledge mastery $X_t$ is sampled, the parameter is updated by Gibbs sampler(derived in Appendix 1). All parameters have a conjugate Beta prior.
+
+(1) The prior density distribution is sampled from Beta($\beta^{\pi}_1+n^{\pi}_{1}$,$\beta^{\pi}_0+n^{\pi}_{0}$) where $\beta^{\pi}_0$, $\beta^{\pi}_1$ are prior parameters, $n^{\pi}_1 = \sum_i(X^i_1=1)$ and  $n^{\pi}_{0} = \sum_i(X^i_1=0)$
+
+(2) The learn rate is sampled from Beta($\beta^l_1+n^l_{0,1}$,$\beta^l_0+n^l_{0,0}$) where $\beta^l_0$, $\beta^l_1$ are prior parameters, $n^l_{0,1} = \sum_i\sum_{t=2}^{T_i}(X^i_t=1,X^i_{t-1}=0,E^i_{t-1}=1)$ and  $n^l_{0,0} = \sum_i\sum_{t=2}^{T_i}(X^i_t=0,X^i_{t-1}=0,E^i_{t-1}=1)$
+
+(3) The slip rate is sampled  from Beta($\beta^s_1+n^s_{0,1}$,$\beta^s_0+n^s_{1,1}$) where $\beta^s_0$, $\beta^s_1$ are prior parameters, $n^s_{0,1} = \sum_i\sum_t(Y^i_t=1,X^i_t=1,E^i_t=1)$ and  $n^s_{0,0} = \sum_i\sum_t(Y^i_t=0,X^i_t=1,E^i_t=1)$
+
+(4) The guess rate is sampled from Beta($\beta^g_1+n^g_{0,0}$,$\beta^g_0+n^g_{1,0}$) where $\beta^g_0$, $\beta^g_1$ are prior parameters, $n^g_{1,0} = \sum_i\sum_t(Y^i_t=1,X^i_tE^i_t=0)$ and  $n^s_{1,0} = \sum_i\sum_t(Y^i_t=1,X^i_tE^i_t=0)$
+
+(5) The effort rate is sample from
+Beta($\beta^e_1+n^e_{1,t,j}$,$\beta^e_0+n^e_{0,t,j}$) where $\beta^e_0$, $\beta^e_1$ are prior parameters and $n^e_{k,j} = \sum_i\sum_t(E^i_t=k,X^i_t=j)$ 
+
+(6) The hazard rateof $h_{t,j}$ is sample from
+Beta($\beta^h_1+n^h_{1,t,j}$,$\beta^h_0+n^h_{0,t,j}$) where $\beta^h_0$, $\beta^h_1$ are prior parameters and $n^h_{k,t,j} = \sum_i(H^i_t=k,X^i_t=j)$ 
+**TODO: Update to proportional hazard model**
+
+
+
+#### Data Dependent prior
+
+A well-known characteristic of the BKT model is its multimodality[@beck2007identifiability]. A random initial guess may increase the number of simulations because the chain is trapped in a local optimum walled off to the global optimum. Given the strong model structure, much can be learned about the parameter by examing various moments of the observed data. Therefore, the prior is informed by data so as to speed up the convergence. 
+
+The mean of the beta prior for each parameter follows these heuristics:
+
+(1) The initial distribution of state: the success rate at the first attempt
+
+(2) Learn rate: the difference of success rate between the first and the second attempt. The initial guess learning rate is greater than 0.1.
+
+(3) Slip rate: One minus the success rate at the last observed attempt. To fend off inference from small data, one may add a condition of at least 100 data points are observed at that sequence position.
+
+(4) Guess rate: set to 0.3
+
+(5) Hazard rate: The observed hazard rate curve condition on right and wrong responses. The hazard rate is smaller than 0.5.
+
+For Beta($\alpha,\beta$), $\alpha$ is always set as 2 and the beta is set as the ceiling integer of $\frac{2(\mu_0+1)}{\mu_0}$. 
+
+Appendix 2 demonstrated the MCMC algorithm converges under a more traditional uniform prior.  
+
+
+
+
+## Appendix
+
+### 1. Derivation of the Gibbs Sampler
+**To be modified**
+Given the latent state $X$ and parameter $\theta$, the likelihood function for the observed data is
+
+$$
+\begin{aligned}
+P(D|\theta,X) &=  \prod_{i=1}^N \\
+&= \prod_{i=1}^N \prod_{t=1}^{T_i} [h_{t,0}^{(E^i_t=1,Y^i_t=0)}(1-h_{t,0})^{(E^i_t=0,Y^i_t=0)}h_{t,1}^{(E^i_t=1,Y^i_t=1)}(1-h_{t,1})^{(E^i_t=0,Y^i_t=1)}]\\
+&\hspace{1.8cm}[(1-s)^{(X^i_t=1,Y^i_t=1)}s^{(X^i_t=1,Y^i_t=0)}(1-g)^{(X^i_t=0,Y^i_t=0)}g^{(X^i_t=0,Y^i_t=1)}]\\ &\hspace{1.8cm}\{[\ell^{(X^i_{t-1}=0,X^i_t=1)}(1-\ell)^{(X^i_{t-1}=0,X^i_t=0})]^{t!=1}[\pi^{X^i_1=1}(1-pi)^{X^i_1=0}]^{t=1}\}\\
+&= [h_{t,0}^{\sum_i\sum_t(E^i_t=1,Y^i_t=0)}(1-h_{t,0})^{\sum_i\sum_t(E^i_t=0,Y^i_t=0)}h_{t,1}^{\sum_i\sum_t(E^i_t=1,Y^i_t=1)}(1-h_{t,1})^{\sum_i\sum_t(E^i_t=0,Y^i_t=1)}]\\
+&\hspace{1.8cm}[(1-s)^{\sum_i\sum_t(X^i_t=1,Y^i_t=1)}s^{\sum_i\sum_t(X^i_t=1,Y^i_t=0)}(1-g)^{\sum_i\sum_t(X^i_t=0,Y^i_t=0)}g^{\sum_i\sum_t(X^i_t=0,Y^i_t=1)}]\\ 
+&\hspace{1.8cm}\{[\ell^{\sum_i\sum_{t=2}^{T_i}(X^i_{t-1}=0,X^i_t=1)}(1-\ell)^{\sum_i\sum_{t=2}^{T_i}(X^i_{t-1}=0,X^i_t=0})]^{t!=1}[\pi^{\sum_iX^i_1=1}(1-pi)^{\sum_iX^i_1=0}]^{t=1}\}
+\end{aligned}
+$$
+
+Notice that since all parameters have a beta prior, it is easy to derive the Gibbs Sampler scheme from the here.
+
+### 2. Convergence of the MCMC
+**To be added**
