@@ -1,607 +1,597 @@
 
-Pedagogical Research with High Resolution Data
+Learning Through Practices
 ========================================================
 author: Junhen Feng
 autosize: true
 
 
 
-Navigation
-========================================================
-
-- Chapter 1: Introduction
-- [Chapter 2](#/chp2): Practice Performance and Practice Persistencelc
-- [Chapter 3](#/chp3): Evaluate Pedagogical Efficacy in Low Stake Test
-- [Chapter 4](#/chp4)：Continuous Improvement with Multi-armed Bandit Algorithm
-
-
-
-
-
-Chapter I: Big Data and Pedagogical Research
+Motivation
 ========================================================
 type: section
 
-Education Technology is not Working
+Practice Makes Perfect
 ========================================================
-- The majority experimental finds are Null Effect
-- Few strongly positive or negative result
-- Mixed at best(Taylor, 2015)
+- Merriam Webster: To do repeated exercises for proficiency
 
-But...
+- Very effective for K-12 STEM learning
+
+- Repetition is necessary but not sufficient nor efficient
+
+
+The Inefficiency of non-personalized Practices
 ========================================================
-- More education data than ever
-    + Quantity explodes
-    + Quality improves
 
-- Better Algorithm than ever
-    + Collaborative filtering
-    + Parallel computing
+- 2.41-meter high practice exams in 1 year to prepare for the Chinese SAT
 
-- More money than ever
-    + More than 3 billion dollars in VC funding in 2015
-    + 500% Growth since 2010
+![plot of chunk unnamed-chunk-1](fig/mot.jpg)
 
-Why...
+- How to Improve Efficiency
+
+    + Optimal Stopping (Assessment)
+
+    + Optimal Recommendation (Instruction)
+
+
+Pedagogical Efficacy
 ========================================================
 type: prompt
-incremental: true
-- Why can't we just build an Amazon or Netflix for Learning
 
-- An Allegory: Teach a teenage "*Twilight*" fan "*Romeo and Juliet*"
+- pedagogical efficacy = What makes practices effective
 
-- A Few Educated Guesses
-    + Engagement and Grit
-    + Change Preference rather than Exploit it
-    + *Teacher Human Capital Deficit
-    + *Organizational Structure misfit
-    + Slow iteration and dissemination
+    + A hard question without a clear answer
 
-What is High Solution Data and How it Helps?
+    + Key to a successful recommendation system
+
+- The thesis aims to measure, not to explain, the pedagogical efficacy
+
+
+Navigation
 ========================================================
-- Resolutions of education data
-    + Aggregate Performance statistics
-    + Response Log
-    + Behavioral Data
 
-- Understand the Engagement
+- [Chapter 1](#/chp1): A General Model
+- [Chapter 2](#/chp2): Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
+- [Chapter 3](#/chp3)：Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
 
-- Understand the Learning Process
+Chapter I: A General Model of Learning Through Practices
+========================================================
+id: chp1
+type: section
+
+- [The Model](#/model)
+
+- [Identification] (#/identify)
+
+- [Estimation](#/mcmc)
+
+
+Event Sequence
+========================================================
+id: model
+
++ The learner is presented with a practice item
+
++ The learner decides the effort level
+
+    * With effort, (probabilistic) learning happens depending on the item efficacy
+    * Without effort, no learning
+
++ The learner produces a response and receives grading on the response
+
+    * Assume feedback is not important to learning. Only exposure to item matters
+
++ The learner choose to stop
+
+    * No: start from the first step
+
+
+Notation
+========================================================
+- $j$: The item id
+- $t$: The sequence id. [*Not calendar time*]
+- $X$: The latent state of knowledge mastery
+- $Y$: The observed response grade
+- $E$: The observed effort
+- $A()$: The assignment function.
+    + $A(t)=j$: The item $j$ is at $t^{th}$ practice sequence
 
 
 
+The Learning Process (1)
+========================================================
+- **Assumption 1**: $X_t$ is unidimensional
+
+    + Avoid mapping knowledge space to item
+
+- **Assumption 2**: $X_t$ is discrete with $M_x$ number of states
 
 
-Chapter II: Practice Performance and Practice Persistence
+The Learning Process (2)
+========================================================
+
+- Learning is moving from a lower state to a higher state.
+
+$$P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j)$$
+
+- **Assumption 3**: Pedagogical efficacy is independent of the sequence order
+- **Assumption 4**: No substitution or complementarity in sequence composition
+- **Assumption 5**: Learning is gradual. Transit one state at a time.
+
+$$p(X_t=m|X_{t-1}=n, j) =0 \quad \forall t,j \quad\text{where} \quad m-n>1$$
+
+- **Assumption 6**: No forgetting.
+
+$$p(X_t=m|X_{t-1}=n, j) = 0 \quad \forall t,j \quad\text{where} \quad m < n$$
+
+The Learning Process (3)
+========================================================
+Define the **pedagogical efficacy**  as
+$$\ell^k_j =P(X_t=k+1|X_{t-1}=k,j)$$
+
+Define the **initial mastery distribution** as
+$$\pi^k = P(X_1=k)$$
+
+
+The Observed Response (Without Effort Decision)
+========================================================
+
+- **Assumption 7**: The response is only a function of the latent knowledge mastery
+- **Assumption 8**: The response is discrete with $M_y$ number of state
+
+Define the **correct rate** as
+$$
+c^{k,m}_j = P(Y_{j,t}=m|X_t=k)
+$$
+
+
+
+Learning Process as A Hidden Markov Process
+========================================================
+id: hmm1
+- $\{\pi^k\}, \{\ell^k_j\}, \{c^{k,m}_j\}$ describes a hidden markove process
+
+***
+
+![plot of chunk unnamed-chunk-2](fig/hmm_1.png)
+
+Examples
+========================================================
+- [Bayesian Knowledge Tracing Model](#/bkt):
+- [Zone of Proximal Development](#/zpd)
+
+The Effort Decision(1)
+========================================================
+**Assumption 9**: Effort is a binary choice.
+
+- Let the effort be determined by a Roy model of choice where:
+    + $\beta_j$ is expected return of a correct response
+    + $\epsilon_{j,t}$ is the cost of making the learning effort
+    + The expected cost of a wrong response is standardized to 0
+
+$$
+E_{j,t} = I(\beta_j P(Y_{j,t}=1) - \epsilon_{j,t}>0)
+$$
+
+The Effort Decision(2)
+========================================================
+**Assumption 10**: The $\epsilon_{j,t}$ is I.I.D.
+
+- It implies that conditions on latent ability, effort choice is
+    + independent of sequence position and sequence composition
+    + dependent on the item characteristic
+$$
+P(E_{j,t}=1|X_t=k) = e_j^k
+$$
+
+The Effort Decision(3)
+========================================================
+**Assumption 11**: No pain no gain.
+
+$P(X_t=k+1|X_{t-1}=k, j, E_{j,t}=0) = 0$
+
+
+**Assumption 12**: No educated guess
+
+$P(Y_{j,t}=0|E_{j,t}=0) = 1$
+
+[to Chapter 3](#/chp3)
+
+The Stop Decision
+========================================================
+*To be continued...*
+
+
+Identification
+========================================================
+id: identify
+*To be continued...*
+
+Estimation
+========================================================
+id: mcmc
+*To be continued...*
+
+Chapter II: Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
 ========================================================
 id: chp2
 type: section
 
-Routine Task
-========================================================
-- Routine Task:
-    + Muscle Memeory **OVER** Knowledge Transfer
-    + Wide Applications
-        * Sports
-        * Mathematics
-        * Language Learning
+- [Motivation](#/chp2mot)
 
-- Known recipe for success: Practice Makes Perfect
+- [Characterize the Bias](#/chp2theory)
 
-- Most suitable for digital learning
+- [Case Study](#/chp2case)
 
-The Dilemma
-========================================================
-- Routine task:
-    + boring if easy
-    + frustrating if hard
+Motivation
+=======================================================
+id: chp2mot
 
-- practice makes perfect, but the learner stops before reaching perfect!
+Characterize the Bias
+=======================================================
+id: chp2mot
 
-Key Insight
-========================================================
-type: prompt
-- Differential attrition leads to dynamic selection bias
-- Correct the bias by modeling the survival process
+Case Study
+=======================================================
+id: chp2case
 
-Bayesian Knowledge Tracing
-========================================================
-- Latent Knowledge Mastery State: $X_t\in{0,1}$
-- Dynamics of the Latent State
-    + Initial Mastery: $\pi = P(X_1=1)$
-    + Learning rate: $\ell = P(X_t=1|X_{t-1}=0)$
-    + No forgetting: $P(X_t=1|X_{t-1}=0)$
-- Observed Response: $O_t \in {0,1}$
-- Emission of the Observed Response
-    + Slip: $s=P(O_t=0|X_t=1)$
-    + Guess: $g=P(O_t=1|X_t=0)$
-
-The Learning Curve
-========================================================
-- $P(O_t=1) = f(t)$
-
-***
-
-![plot of chunk compute_lc](thesis-figure/compute_lc-1.png)
-
-BKT-Survival Hybrid Model
-========================================================
-id: hybrid
-- Learner observes the response status and decide if stops $E_t=1$
-- The hazard rate can be expressed as $h_{t,O_t} = P(E_t=1|O_t)$
-    + First Order Markov Chain: No X strike rule
-    + Capture duration dependence
-    + Does not explicitly depend on the latent state ($X_t$) for agility in extension
-- [Full Likelihood](#/hybridllk)
-
-
-
-Revisit the Learning Curve
-========================================================
-![plot of chunk two_lc](thesis-figure/two_lc-1.png)
-
-
-Dynamic Selection Bias
-========================================================
-- $P(X_t = 1| E_{t-1} = 0, X_{t-1}) \neq P(X_t=1|X_{t-1})$
-- The Paradox is
-    + Learning Curve rises higher
-    + The learning rate is biased downward
-        * A feature of the EM algorithm
-
-
-
-MCMC Algorithm
-========================================================
-- Overall Scheme:
-    + Data Augmentation(Forward Recursion Backward Sampling)
-        1. The forward state transition $p_{t,i,j} = P(X_t=j|X_{t-1}=i,O_1,\dots,O_{t},\theta) \propto \pi_{t-1}(i)P(X_t=j|X_{t-1}=i)P(O_t|X_t)$
-        2. Draw the last state $X_t$ from $P(X_T|O_1,\dots,O_T|\theta)$
-        3. Permuate the sate by $P(X_t|X_{t+1},O_1,\dots,O_{t+1}|\theta)$
-    + Gibbs Sampler: Given full data $X,O.E$, the Beta-Bernoulli has closed form posterior
-
-
-Simulation Data : Parameter Learning
-========================================================
-![plot of chunk unnamed-chunk-1](thesis-figure/unnamed-chunk-1-1.png)
-
-Simulation Data : The Learning Curve
-========================================================
-![plot of chunk unnamed-chunk-2](thesis-figure/unnamed-chunk-2-1.png)
-
-Real Data : The Learning Curve
-========================================================
-<img src="thesis-figure/unnamed-chunk-3-1.png" title="Empirical and Fitted Learning Curves" alt="Empirical and Fitted Learning Curves" style="display: block; margin: auto;" />
-
-Future Work
-========================================================
-- Study the discrepancy between learning curve fitness and AUC fitness
-- Restrict the range of slip and guess between 0 and 0.5 (New Prior)
-- Allow for X-strike Rule
-- Allow for user heterogeneity
-
-
-
-
-Chapter III: Evaluate Pedagogical Efficacy in Low Stake Environment
+Chapter III: Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
 ========================================================
 id: chp3
 type: section
 
+- [Motivation](#/chp3mot)
 
-Comprehension Task
-========================================================
-- Knowledge Transfer **OVER** Muscle Memory
-- Repetition is not enough
-- Improving pedagogical efficacy is the key
+- [Characterize the Bias](#/chp3theory)
 
-Pedagogical Efficacy
-========================================================
-- A narrow definition
-- Learning Gain: before-after design
-    + Assume equal measurement error before and after
-- Relative Learning Gain: DID design
-    + Assume equal trend in measurement error
-- benchmark against naive repetition (routine task training)
+- [Case Study](#/chp3case)
 
-Two Methodological Problems
-========================================================
-type: prompt
-- Attrition Rate
-    + require **TWO** observations to make an inference
-    + Online service suffers from a large natural attrition
-    + The differential attrition is observationally equivalent to the random attrition
-- Measurement Error
-    + Student does not exert full effort in low stake learning environment
-    + Effort-induced measurement error is equivalent to selection bias
-    + The sign of the bias is unknown
+Motivation
+=======================================================
+id: chp3mot
 
-Assessment
-========================================================
-- Original
+- Consider an RCT that compares pedagogical efficacies of two items
+    + Random assignment of the items
+    + Balanced random attrition
+    + standard DID design
 
-![plot of chunk unnamed-chunk-4](fig/f1.png)
+$$
+Y_{i,T} = \beta_d D_i + \beta_t T + \gamma D_i T + \epsilon_{i,T}
+$$
+
+- If items induce differential efforts and the effort influences the performance
+    + The observed performance has non-zero mean measurement error
+    + The DID estimator may not even have the right sign
+
+Task Engagement (or Lack Thereof)
+=======================================================
+- The lack of effort is a salient feature in the low stake learning environment
+    + Baker et al(2004) and Wixon et al(2012) report the lack of student engagement in digital learning
+    + Pardos et al(2013) documents the lack of student engagement in classroom learning
+
+- Effort is largely absent from other literature because it is hard to monitor
+
+
+Characterize the Bias(1)
+=======================================================
+id: chp3theory
+
+- To show the intuition, assume a very simple structure
+    + $M_x=M_y=2$, $j=1$
+    + $c^{11}=1$, $c^{01}=0$. No slip and no guess
+    + $e^1=1$. Mastered student always exerts effort
+    + $0< e^0 <1$. Unmastered student slacks some of the time
+
+- It can be proved that the estimated pedagogical efficacy is biased downwards
+
+$$
+E(\hat{\ell}- \ell)  =  \ell(e^0-1) <0
+$$
+
+
+
+
+Characterize the Bias(2)
+=======================================================
+- In the motivating RCT example, the ATE is
+
+$$
+E(\hat{\gamma}) = \ell_1e^0_1-\ell_0e^0_0
+$$
+- For the sign to be correct: $(\ell_1-\ell_0)(\frac{l_1}{l_0}-\frac{e_0}{e_1})>0$
+
+    + It implies more pedagogical effective item also induces more effort
+    + Not true in general
+
+
+
+Case Study
+=======================================================
+id: chp3case
+
+- [The Learning Environment] (#/learningenv)
+
+- [The Experiment Design] (#/expdesign)
+
+- [The Identification of Effort] (#/effortident)
+
+- [Result] (#/chp3res)
+
+
+"Gamified" Learning
+=======================================================
+id: learningenv
+
+<img src="fig/initial.png" title="Level Initiation" alt="Level Initiation" style="display: block; margin: auto;" />
+Practice Interface
+=======================================================
+<img src="fig/practice.png" title="Practice Interface" alt="Practice Interface" style="display: block; margin: auto;" />
+
+Low Stake Incentive
+=======================================================
+<img src="fig/completion.png" title="Level Completion" alt="Level Completion" style="display: block; margin: auto;" />
+
+
+The Experiment Design (1)
+=======================================================
+id: expdesign
+
+- The learning task / pre-test
+- Calculate the circumference and area of the large rectangle
+- Student fills in the blanks
 
 ***
 
-- Routine Assessment
-
-![plot of chunk unnamed-chunk-5](fig/f3.png)
-
-***
-
-- Transfer Assessment
-    + Small rectangle is a square
-    + Difference in total circumference is X
-
-![plot of chunk unnamed-chunk-6](fig/f4.png)
-
-Pedagogical Interventions
-========================================================
-
-- Control
-
-![plot of chunk unnamed-chunk-7](fig/f2.png)
-
-***
-
-- Treatment
-    + Scaffolding
-        * New length and width
-        * New Circumference
-        * New Area
-    + Delivery
-        * Vocabulary instruction as sub-question
-        * 50 second animation
-
-
-Missing At Random
-========================================================
+<img src="fig/f1.png" title="Pre-test" alt="Pre-test" style="display: block; margin: auto;" />
 
 
 
+The Experiment Design (2)
+=======================================================
 
-|Group|Attrition Rate(%)|
-|:-------------| -------------------:|
-|Control|22.33|
-|Vocabulary Treatment|29.22|
-|Video Treatment|27.61|
+
+- Post-test
+<img src="fig/f3.png" title="Post-test" alt="Post-test" style="display: block; margin: auto;" />
+
+The Experiment Design (3)
+=======================================================
+
+- Same Training Question
+
+![plot of chunk unnamed-chunk-8](fig/f2.png)
 
 ***
 
-![plot of chunk unnamed-chunk-10](thesis-figure/unnamed-chunk-10-1.png)
+
+- Different Delivery Methods
+    + No Scaffolding
+    + Vocabulary Scaffolding
+        * What is the new length and width
+        * What is the circumference
+        * What is the area
+    + Video Scaffolding [not compulsory] that reveals the post-test question
+    [(link)](http://my.polyv.net/front/video/preview?vid=36488cc9164c53d6616869d83fbfd1b3_3)
+
+The Experiment Design (4)
+=======================================================
+- Group Status
+    + Group 1: pre-test + no-scaffolding + post-test
+    + Group 2: no-scaffolding + post-test
+    + Group 3: pre-test + vocabulary-scaffolding + post-test
+    + Group 4: vocabulary-scaffolding + post-test
+    + Group 5: pre-test + video-scaffolding + post-test
+
+- Group Assignment
+    + Assign learners to the group based on the remainder of their user id divided by 5
 
 
-Measurement Error Identification
-========================================================
-id:mei
+Summary Statistics(1)
+=======================================================
+- Total learners recruited: 13939
+- Average retention rate is 84%. Pre-test hurts retention.
 
-- The knowledge of text response and response time helps to identify the measurement error
-- [The Identification Stategy](#/giveupdef)
+***
 
-<img src="thesis-figure/unnamed-chunk-11-1.png" title="Distribution of Time Spent on Item by Error Types" alt="Distribution of Time Spent on Item by Error Types" style="display: block; margin: auto;" />
+![plot of chunk unnamed-chunk-9](fig/exp_attrition.png)
 
+Summary Statistics(2)
+=======================================================
+- The no scaffolding and video scaffolding group has almost no difference
+- The vocabulary scaffolding has worse efficacy than the no scaffolding
 
-Identification Strategy
-========================================================
-- The DID design when all response in the first period is failure
+***
 
-$$
-Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
-$$
+![plot of chunk unnamed-chunk-10](fig/exp_stat.png)
 
-- Alternative configuration to compare the relative gain between two treatments
+The Identification of Effort: Identification
+=======================================================
+id: effortident
 
-$$
-Y_{i,T} = \gamma T +\delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T + \epsilon_{i,T} 
-$$
-
-where $\delta_{level} = \delta_1$ and $\delta_{difference} = \delta_2 - \delta_1$
-
-
-- Binary result: Correctly compute both circumference and area
-
-Baseline Result
-========================================================
+- [effort classification](#/ans_class)
+  + Slack/Give up: blank answer, non-blank wrong answer
+  + Valid Effort: Slip, partial right and all right
 
 
+Validity(1)
+=======================================================
+- The learner spent significantly less time to submit a blank answer in repeated exercises
+  + Compare no scaffolding with and without pre-test
+- [Not Shown] Submitting a blank answer is highly serial correlated
 
+***
 
-<table style="text-align:center"><tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="4"><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td colspan="4">Response</td></tr>
-<tr><td style="text-align:left"></td><td>Routine</td><td>Transfer</td><td>Routine</td><td>Transfer</td></tr>
-<tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">vocabulary</td><td>0.006</td><td>-0.010</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.013)</td><td>(0.008)</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">video</td><td>0.009</td><td>-0.00000</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.013)</td><td>(0.008)</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">level</td><td></td><td></td><td>0.006</td><td>-0.010</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.013)</td><td>(0.008)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">difference</td><td></td><td></td><td>0.002</td><td>0.010</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.013)</td><td>(0.009)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>6,638</td><td>6,638</td><td>6,638</td><td>6,638</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.141</td><td>0.044</td><td>0.141</td><td>0.044</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-          
-Differential Measurement Error in Placebo Group
-========================================================
+![plot of chunk unnamed-chunk-11](fig/blank_ans_time_dist.png)
 
+Validity(2)
+=======================================================
+- Non-blank answer is also likely to be slacking:
+  + In repeated exercises, skewed toward left, similar to the blank answer
+  + Has lower mean compare to the other two
 
-<table style="text-align:center"><tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="4"><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>Response</td><td>Giveup</td><td>Response</td><td>Giveup</td></tr>
-<tr><td style="text-align:left"></td><td>Routine</td><td>Routine</td><td>Transfer</td><td>Transfer</td></tr>
-<tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">vocabulary</td><td>-0.079<sup>***</sup></td><td>0.050<sup>***</sup></td><td>-0.011</td><td>0.028<sup>*</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.015)</td><td>(0.009)</td><td>(0.014)</td><td>(0.016)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">video</td><td>-0.011</td><td>0.004</td><td>0.012</td><td>-0.001</td></tr>
-<tr><td style="text-align:left"></td><td>(0.015)</td><td>(0.009)</td><td>(0.014)</td><td>(0.016)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>5,862</td><td>5,862</td><td>5,862</td><td>5,862</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.201</td><td>0.056</td><td>0.582</td><td>0.371</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
+- Valid Error and Correct has no position shift and similar distribution
 
-Effective Exposure to Treatment
-========================================================
+***
 
-<table style="text-align:center"><tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="4"><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="4" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td colspan="4">Response</td></tr>
-<tr><td style="text-align:left"></td><td>Routine</td><td>Transfer</td><td>Routine</td><td>Transfer</td></tr>
-<tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td><td>(3)</td><td>(4)</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">vocabulary</td><td>0.020</td><td>-0.005</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.022)</td><td>(0.015)</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">video</td><td>0.061<sup>***</sup></td><td>0.033<sup>**</sup></td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td>(0.022)</td><td>(0.015)</td><td></td><td></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">level</td><td></td><td></td><td>0.020</td><td>-0.005</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.022)</td><td>(0.015)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td style="text-align:left">difference</td><td></td><td></td><td>0.041<sup>*</sup></td><td>0.038<sup>**</sup></td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td>(0.023)</td><td>(0.016)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td><td></td><td></td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>3,018</td><td>3,018</td><td>3,018</td><td>3,018</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.278</td><td>0.074</td><td>0.278</td><td>0.074</td></tr>
-<tr><td colspan="5" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="4" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-
-Robust Check
-========================================================
-- Alternative measurement error identification
-    + 10-second rule
-    + Blank response
-- Alternative performance measurement
-    + Allow for partial grade
-    
-- The pattern holds:
-    + Differential measurement error
-    + the magnitude of point estimation jumps after conditions on effective exposure
-
-- The significance goes away
-
-
-Future Work
-========================================================
-- Understand the mechanism
-    + Check if error persists
-    + Check how the response in the vocabulary scaffolding affects the response in routine assessment
-- *Try Adaptive instructional material as vocabulary scaffolding
-- *Better data for measurement error identification 
+![plot of chunk unnamed-chunk-12](fig/non_blank_ans_time_dist.png)
 
 
 
-Chapter IV: Continuous Improvement with Multi-armed Bandit Algorithm
-========================================================
-id: chp4
+Pattern(1)
+=======================================================
+- Increase by sequence
+- Higher for the vocabulary scaffolding
+
+***
+
+![plot of chunk unnamed-chunk-13](fig/exp_giveup.png)
+
+Pattern(2)
+=======================================================
+- Highly serial correlated
+- [Left panel] All-giveup has higher probability mass than a binomal model would predict.
+
+***
+
+![plot of chunk unnamed-chunk-14](fig/exp_giveup_seq.png)
+
+The Result
+=======================================================
+id: chp3res
+
+- The model is estimated with MCMC algorithm
+  + The learning parameter has a beta prior B(1,1)
+  + Chain length 1000. First 30% is burn-in sample.
+  + Sample every 10 iterations
+- Only groups with both pre-test and post-test are included in the sample
+- Two-state model, binary grade; Three-state model, partial grade
+
+The Result (Two-state model)
+=======================================================
+id: chp3res
+- Position shifts (correct for downward bias)
+- Weakly separate out video scaffolding
+
+***
+
+![plot of chunk unnamed-chunk-15](fig/mcmc_2_param.png)
+
+The Result (Three-state model: 0->1)
+=======================================================
+- The pedagogical efficacy with effort is not well estimated
+  + Because low effort rate and low initial density, too few observations
+
+***
+
+![plot of chunk unnamed-chunk-16](fig/mcmc_3_param_01.png)
+
+
+
+The Result (Three-state model: 1->2)
+=======================================================
+
+- More robust to effort decision
+- Clear separation of item characteristic
+
+***
+
+![plot of chunk unnamed-chunk-17](fig/mcmc_3_param_12.png)
+
+Q&A
+=======================================================
 type: section
 
-
-
-Continuous Improvement
+Special Case 1: Bayesian Knowledge Tracing Model
 =======================================================
-- Tech startup has the philosophy of rapid product iteration
-    - fail quickly
-    - A/B Test everything
-- Very successful in online service sector
-    - Google
-    - Amazon
-    - Duolingo/Khan Academy
+id: bkt
+
+- Developed by Corbert and Anderson(1996)
+- The equivalent of Rasch model in the literature of the learning analytics
+- $M_x=2$, $M_y=2$, $j=1$
+- The guess rate is $c^{0,1}$, The slip rate is $c^{1,0}$.
+
+[return](#/hmm1)
 
 
-Fixed Balanace Sample T-test may not be a Good Idea 
+Special Case 2: Zone of Proximal Development
 =======================================================
-- Sample arrive sequentially
-    + allow early termination
-- If there is a difference, balance sample is not the optimal design
-    + the option with higher mean shall have more sample to minimize total sample
-    + the option with higher mean shall have more sample to maximize the experiment return
+id: zpd
+
+- Developed by Vygosky(1976)
+    + Development lags task requirement and fail the task no matter what
+    + Development lags task requirement but may succeed in the task with guidance or collaboration [**The zone**]
+    + Development leads task requirement and succeed on their own
+
+- $M_x=3$, $M_y=3$, $j=1$
+    + $X=0$ is the unprepared. $X=1$ is the zone. $X=2$ is the mastered
+    + $Y=0$ is failure. $Y=1$ is partial success. $Y=2$ is complete success
+    + $c^{0,2}=0$, the unprepared never fully succeed
+    + $c^{2,0}=0$, the mastered never fully fail
+
+- Allow for **learning reinforcement** where positive performance leads to better performance
+
+[return](#/hmm1)
 
 
-The Relative Cost of Type I and Type II error
+Answer Classification (1)
 =======================================================
-type:prompt
-- The opportunity cost of wait outweighs the opportunity cost of action
-    - If the null hypothesis of null effect is true, there is no cost to service receiver, although there may be cost to service provider
-    - If the null hypothesis of null effect is false, cumulative loss to service receiver over time is considerable
-    
-- Prefer high power to low significance level
+id: ans_class
+The answers are initially classified into six categories:
 
+(1) Blank answer: The learner submits nothing on the circumference and the area
 
-Multi-arm Bandit Problem
-=======================================================
-- $n$ experimental options (arm), each with a constant but unknown return parameter $\mu^i$
-- A policy describes the choice of the option over time
-- Regret is defined as the cumulative expected difference between the policy and the true optimal arm $\sum_t m^*-m^{i_t}$
-- The goal is to minimize the regret
+(2) Non-blank wrong answer: Neither circumference nor area is correctly calculated and not includes in the slip or the wrong shape category
 
-Thompson Sampling
-=======================================================
-- Stratified sampling proportion to estimated return
-$$
-w_{at} = Pr(\mu_a = max\{\mu_1, \dots, \mu_n\}|y_1,\dots,y_t)
-$$
-- A good heuristic that balances between exploration and exploitation
-    - With uninformative prior, the initial stage is dominated by exploration
-    - As evidence strongly favors a subset of options, exploration takes over
+(3) Slip: The answer is correctly calculated but the learner inputs in a wrong way
 
-- Complete learning: best arm wins for sure as time goes by
-    - Optimal arm plays exponentially more times than inferior alternatives
-
-Potential Value Remaining Stop Condition
-=======================================================
-- There is no need to make a decision if the thompson sampling algorithm can run forever
-- Practically it is used as a substitude to statistical test therefore needs a decision rule
-- Potential Value Remaining
-
-$$
-VR(m) = \frac{\theta^*(m)}{\theta_{i^*}(m)} - 1 
-$$
-
-- Stop if $\Pr(VR > 1+\epsilon) < \delta$
-
-Imbalanced Sample
-=======================================================
-type:prompt
-
-- the more sample assigned to the option
-    + the faster variance of the posterior distribution shrinks
-        * $VR$ can have high kurtosis
-    + the higher the return generated by the experiment if chosen the right arm
-
-Simulation Setup
-=======================================================
-- Base Rate
-
-|Type | Values|
-|--- | ---|
-|Low | 0.05,0.09|
-|medium| 0.15, 0.25|
-|high| 0.4, 0.5|
-
-- Effect size: 10%, 20%, 50%, 100%
-
-- Null Hypothesis
-    + $H_0: \quad p_0 \geq p_1$
-    + maximum sample size is calculated by 5% significance level and 95% power
-
-
-Modified Sequential Likelihood Ratio Test
-=======================================================
-- Separate early termination from imbalance sample design
-    - sequential likelihood ratio test uses pair sample from the control and the treatment
-- Define Reject time as $T = \inf\{n:n \geq m_0, W(t)\geq \alpha\}$
-- Reject the null hypothesis if $T \leq m$ or $T>m, mH(\frac{\sum_{j}Y_j}{m}) \geq d$
-
-Power
-=======================================================
-<img src="thesis-figure/unnamed-chunk-17-1.png" title="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" alt="Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data" style="display: block; margin: auto;" />
-Significance Level
-=======================================================
-- If using balanced sample and potential value remaining stop condition, on average, the type I error rate decreases to 40%
-
-<img src="thesis-figure/unnamed-chunk-18-1.png" title="Significance leve of Bandit Test on Simulation Data" alt="Significance leve of Bandit Test on Simulation Data" style="display: block; margin: auto;" />
-
-Regret: Simulation
-=======================================================
-- regret for the fixed sample t-test is a fixed number $r_{welch} = N*p*\triangle$
-- Measure the saving in regret by 
-$$
-R_{method}(T) = \frac{E(r_{method}|t\leq T)}{r_{welch}}
-$$
-
-Regret: Simulation
+Answer Classification (2)
 =======================================================
 
-<img src="thesis-figure/unnamed-chunk-19-1.png" title="Relative Regret Saving compared to t-test" alt="Relative Regret Saving compared to t-test" style="display: block; margin: auto;" />
+(4) Wrong Shape: The learner calculates correctly either the circumference or the area of the small rectangle
 
-Regret: Simulated Experiment
-=======================================================
+(5) right circumference: The learner correctly calculates the circumference of the large rectangle
 
-- Calculate the percentage of execessive of learning gain over the experiments result
+(6) right area: The learner correctly calculates the area of the large rectangle
 
+(7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
 
-
-Assessment | treamtnet   | Full Data            | Filtered Data (Automatic) | Filtered Data (Manual) |
----        | ---         | ---                          | ---                                         | ---                                         |
-Routine    | Vocabulary  | -12.3%  | 0.2%          | -4.7%         |
-Routine    | Video       | 13.2%  | 3.3%          | 6.8%         |
-Transfer   | Vocabulary  | 52.8%  | 6.2%          | -1.4%         |
-Transfer   | Video       | 22.6%  | 1.5%          | 5.8%         |
-
-
-
-Sample Saving: Simulation
-=======================================================
-$$
-saving_ratio_{method} = 100 - \frac{\bar{N_{method}}}{N_{t-test}}
-$$
-
-
-Sample Saving: Simulation
-=======================================================
-<img src="thesis-figure/unnamed-chunk-21-1.png" title="Relative Sample Saving compared to t-test" alt="Relative Sample Saving compared to t-test" style="display: block; margin: auto;" />
-
-
-Sample Saving: Simulated Experiment
+Answer Classification (3)
 =======================================================
 
 
-Assessment | treamtnet   | Full Data            | Filtered Data (Automatic) | Filtered Data (Manual) |
----        | ---         | ---                          | ---                                         | ---                                         |
-Routine    | Vocabulary  | 87%  | 1%          | 80%         |
-Routine    | Video       | 92%  | 43%          | 80%         |
-Transfer   | Vocabulary  | 41%  | 0%          | 0%         |
-Transfer   | Video       | 44%  | 0%          | 45%         |
+|    Group     | Task  | Blank Ans(%) | Non Blank Wrong Ans (%) | Slip(%) |
+|:------------:|:-----:|:------------:|:-----------------------:|:-------:|
+|     No-3     |  pre  |     10.8     |           14            |  1.09   |
+| Vocabulary-3 |  pre  |     10.4     |           15            |  0.82   |
+|    Video     |  pre  |     11.4     |           15            |  0.73   |
+|     No-3     | train |     14.6     |           16            |  0.32   |
+|     No-2     | train |     9.8      |           13            |  0.48   |
+| Vocabulary-3 | train |     18.2     |           15            |  0.27   |
+| Vocabulary-2 | train |     13.1     |           24            |  0.32   |
+|    Video     | train |     16.3     |           18            |  0.37   |
+|     No-3     | post  |     18.4     |           17            |  0.81   |
+|     No-2     | post  |     16.7     |           18            |  0.52   |
+| Vocabulary-3 | post  |     21.4     |           16            |  0.73   |
+| Vocabulary-2 | post  |     24.2     |           18            |  0.61   |
+|    Video     | post  |     18.2     |           17            |  0.69   |
 
-
-Future Work
-=======================================================
-- Stop Conditions
-    + Explore the properties of potential value remaining condition
-    + Explore other stop conditions that are robust to measurement error
-- Performance in multiple comparisons
-
-Appendix I.2 Derivation of the Gibbs Sampling Scheme
-=======================================================
-id: hybridllk
-
-![plot of chunk unnamed-chunk-23](fig/appI2-1.png)
-
-[return](#/hybrid)
-
-
-Appendix II.2 Identifcation of Give-up(1)
-=======================================================
-id: giveupdef
-
-1. Add or omit trailing zeros. 
-    - If the right answer is 120, both 12, 120 and 1200 are admitted as valid attempts.
-
-2. Add when shall multiply or vice versa. 
-    - When calculating area with length 6 and width 4, 10 is admitted as a valid attempt.
-
-3. Apply the wrong formula. 
-    - When calculating the circumferences of the rectangle with length 6 and width 4, 10(forget to double) or 24(formula of the area) are admitted as valid attempts. 
-
-Appendix II.2 Identifcation of Give-up(2)
+Answer Classification (4)
 =======================================================
 
-4. Calculation mistakes. 
-    - 13*4 = 42
 
-5. Fail to understand the question. 
-    - Calculate the circumference and the area of the small rectangle
+|    Group     | Task  | Wrong Shape(%) | Right Circ(%) | Right Area(%) | Correct(%) |
+|:------------:|:-----:|:--------------:|:-------------:|:-------------:|:----------:|
+|     No-3     |  pre  |      8.8       |      8.8      |     11.2      |     46     |
+| Vocabulary-3 |  pre  |      7.4       |      8.0      |     11.9      |     47     |
+|    Video     |  pre  |      7.7       |      8.9      |     11.0      |     45     |
+|     No-3     | train |      5.1       |      5.3      |     12.2      |     47     |
+|     No-2     | train |      10.2      |      8.3      |     14.8      |     44     |
+| Vocabulary-3 | train |      10.6      |      9.7      |     17.7      |     28     |
+| Vocabulary-2 | train |      20.7      |      6.3      |     18.4      |     17     |
+|    Video     | train |      3.5       |      4.9      |     12.5      |     45     |
+|     No-3     | post  |      1.9       |     10.0      |      7.6      |     44     |
+|     No-2     | post  |      3.5       |     11.8      |      8.0      |     42     |
+| Vocabulary-3 | post  |      2.5       |     10.5      |      7.0      |     41     |
+| Vocabulary-2 | post  |      5.3       |     11.7      |      6.1      |     34     |
+|    Video     | post  |      1.6       |     10.1      |      8.6      |     43     |
 
-6. Typo
-    - 36 as 35
-    
-[return](#/mei)
+
+[Back](#\effortident)

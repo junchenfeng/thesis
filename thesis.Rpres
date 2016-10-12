@@ -1,883 +1,633 @@
 
-Pedagogical Research with High Resolution Data
+Learning Through Practices
 ========================================================
 author: Junhen Feng
 autosize: true
 
 ```{r env, echo=FALSE}
 library(ggplot2)
+library(gridExtra)
 library(dplyr)
 library(tidyr)
-library(gridExtra)
 library(knitr)
 library(stargazer)
 proj_dir = getwd()
-load(paste0(proj_dir,'/_data/01/production_data.RData'))
+load(paste0(proj_dir,'/_data/03/paper_data.RData'))
+options(digits=2)
 ```
+
+Motivation
+========================================================
+type: section
+
+Practice Makes Perfect
+========================================================
+- Merriam Webster: To do repeated exercises for proficiency
+
+- Very effective for K-12 STEM learning
+
+- Repetition is necessary but not sufficient nor efficient
+
+
+The Inefficiency of non-personalized Practices
+========================================================
+
+- 2.41-meter high practice exams in 1 year to prepare for the Chinese SAT
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+include_graphics('fig/mot.jpg')
+```
+
+- How to Improve Efficiency
+
+    + Optimal Stopping (Assessment)
+
+    + Optimal Recommendation (Instruction)
+
+
+Pedagogical Efficacy
+========================================================
+type: prompt
+
+- pedagogical efficacy = What makes practices effective
+
+    + A hard question without a clear answer
+
+    + Key to a successful recommendation system
+
+- The thesis aims to measure, not to explain, the pedagogical efficacy
+
 
 Navigation
 ========================================================
 
-- Chapter 1: Introduction
-- [Chapter 2](#/chp2): Practice Performance and Practice Persistencelc
-- [Chapter 3](#/chp3): Evaluate Pedagogical Efficacy in Low Stake Test
-- [Chapter 4](#/chp4)：Continuous Improvement with Multi-armed Bandit Algorithm
+- [Chapter 1](#/chp1): A General Model
+- [Chapter 2](#/chp2): Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
+- [Chapter 3](#/chp3)：Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
 
-
-
-
-
-Chapter I: Big Data and Pedagogical Research
+Chapter I: A General Model of Learning Through Practices
 ========================================================
+id: chp1
 type: section
 
-Education Technology is not Working
+- [The Model](#/model)
+
+- [Identification] (#/identify)
+
+- [Estimation](#/mcmc)
+
+
+Event Sequence
 ========================================================
-- The majority experimental finds are Null Effect
-- Few strongly positive or negative result
-- Mixed at best(Taylor, 2015)
+id: model
 
-But...
++ The learner is presented with a practice item
+
++ The learner decides the effort level
+
+    * With effort, (probabilistic) learning happens depending on the item efficacy
+    * Without effort, no learning
+
++ The learner produces a response and receives grading on the response
+
+    * Assume feedback is not important to learning. Only exposure to item matters
+
++ The learner choose to stop
+
+    * No: start from the first step
+
+
+Notation
 ========================================================
-- More education data than ever
-    + Quantity explodes
-    + Quality improves
+- $j$: The item id
+- $t$: The sequence id. [*Not calendar time*]
+- $X$: The latent state of knowledge mastery
+- $Y$: The observed response grade
+- $E$: The observed effort
+- $A()$: The assignment function.
+    + $A(t)=j$: The item $j$ is at $t^{th}$ practice sequence
 
-- Better Algorithm than ever
-    + Collaborative filtering
-    + Parallel computing
 
-- More money than ever
-    + More than 3 billion dollars in VC funding in 2015
-    + 500% Growth since 2010
 
-Why...
+The Learning Process (1)
 ========================================================
-type: prompt
-incremental: true
-- Why can't we just build an Amazon or Netflix for Learning
+- **Assumption 1**: $X_t$ is unidimensional
 
-- An Allegory: Teach a teenage "*Twilight*" fan "*Romeo and Juliet*"
+    + Avoid mapping knowledge space to item
 
-- A Few Educated Guesses
-    + Engagement and Grit
-    + Change Preference rather than Exploit it
-    + *Teacher Human Capital Deficit
-    + *Organizational Structure misfit
-    + Slow iteration and dissemination
+- **Assumption 2**: $X_t$ is discrete with $M_x$ number of states
 
-What is High Solution Data and How it Helps?
+
+The Learning Process (2)
 ========================================================
-- Resolutions of education data
-    + Aggregate Performance statistics
-    + Response Log
-    + Behavioral Data
 
-- Understand the Engagement
+- Learning is moving from a lower state to a higher state.
 
-- Understand the Learning Process
+$$P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j)$$
+
+- **Assumption 3**: Pedagogical efficacy is independent of the sequence order
+- **Assumption 4**: No substitution or complementarity in sequence composition
+- **Assumption 5**: Learning is gradual. Transit one state at a time.
+
+$$p(X_t=m|X_{t-1}=n, j) =0 \quad \forall t,j \quad\text{where} \quad m-n>1$$
+
+- **Assumption 6**: No forgetting.
+
+$$p(X_t=m|X_{t-1}=n, j) = 0 \quad \forall t,j \quad\text{where} \quad m < n$$
+
+The Learning Process (3)
+========================================================
+Define the **pedagogical efficacy**  as
+$$\ell^k_j =P(X_t=k+1|X_{t-1}=k,j)$$
+
+Define the **initial mastery distribution** as
+$$\pi^k = P(X_1=k)$$
+
+
+The Observed Response (Without Effort Decision)
+========================================================
+
+- **Assumption 7**: The response is only a function of the latent knowledge mastery
+- **Assumption 8**: The response is discrete with $M_y$ number of state
+
+Define the **correct rate** as
+$$
+c^{k,m}_j = P(Y_{j,t}=m|X_t=k)
+$$
 
 
 
+Learning Process as A Hidden Markov Process
+========================================================
+id: hmm1
+- $\{\pi^k\}, \{\ell^k_j\}, \{c^{k,m}_j\}$ describes a hidden markove process
+
+***
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+include_graphics('fig/hmm_1.png')
+```
+
+Examples
+========================================================
+- [Bayesian Knowledge Tracing Model](#/bkt):
+- [Zone of Proximal Development](#/zpd)
+
+The Effort Decision(1)
+========================================================
+**Assumption 9**: Effort is a binary choice.
+
+- Let the effort be determined by a Roy model of choice where:
+    + $\beta_j$ is expected return of a correct response
+    + $\epsilon_{j,t}$ is the cost of making the learning effort
+    + The expected cost of a wrong response is standardized to 0
+
+$$
+E_{j,t} = I(\beta_j P(Y_{j,t}=1) - \epsilon_{j,t}>0)
+$$
+
+The Effort Decision(2)
+========================================================
+**Assumption 10**: The $\epsilon_{j,t}$ is I.I.D.
+
+- It implies that conditions on latent ability, effort choice is
+    + independent of sequence position and sequence composition
+    + dependent on the item characteristic
+$$
+P(E_{j,t}=1|X_t=k) = e_j^k
+$$
+
+The Effort Decision(3)
+========================================================
+**Assumption 11**: No pain no gain.
+
+$P(X_t=k+1|X_{t-1}=k, j, E_{j,t}=0) = 0$
 
 
-Chapter II: Practice Performance and Practice Persistence
+**Assumption 12**: No educated guess
+
+$P(Y_{j,t}=0|E_{j,t}=0) = 1$
+
+[to Chapter 3](#/chp3)
+
+The Stop Decision
+========================================================
+*To be continued...*
+
+
+Identification
+========================================================
+id: identify
+*To be continued...*
+
+Estimation
+========================================================
+id: mcmc
+*To be continued...*
+
+Chapter II: Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
 ========================================================
 id: chp2
 type: section
 
-Routine Task
-========================================================
-- Routine Task:
-    + Muscle Memeory **OVER** Knowledge Transfer
-    + Wide Applications
-        * Sports
-        * Mathematics
-        * Language Learning
+- [Motivation](#/chp2mot)
 
-- Known recipe for success: Practice Makes Perfect
+- [Characterize the Bias](#/chp2theory)
 
-- Most suitable for digital learning
+- [Case Study](#/chp2case)
 
-The Dilemma
-========================================================
-- Routine task:
-    + boring if easy
-    + frustrating if hard
+Motivation
+=======================================================
+id: chp2mot
 
-- practice makes perfect, but the learner stops before reaching perfect!
+Characterize the Bias
+=======================================================
+id: chp2mot
 
-Key Insight
-========================================================
-type: prompt
-- Differential attrition leads to dynamic selection bias
-- Correct the bias by modeling the survival process
+Case Study
+=======================================================
+id: chp2case
 
-Bayesian Knowledge Tracing
-========================================================
-- Latent Knowledge Mastery State: $X_t\in{0,1}$
-- Dynamics of the Latent State
-    + Initial Mastery: $\pi = P(X_1=1)$
-    + Learning rate: $\ell = P(X_t=1|X_{t-1}=0)$
-    + No forgetting: $P(X_t=1|X_{t-1}=0)$
-- Observed Response: $O_t \in {0,1}$
-- Emission of the Observed Response
-    + Slip: $s=P(O_t=0|X_t=1)$
-    + Guess: $g=P(O_t=1|X_t=0)$
-
-The Learning Curve
-========================================================
-- $P(O_t=1) = f(t)$
-
-***
-
-```{r compute_lc, echo=FALSE, warning=FALSE, message=FALSE}
-update_mastery <- function(mastery, learn_rate){
-  return (mastery + (1-mastery)*learn_rate)
-}
-
-compute_success_rate <- function(slip, guess, mastery){
-  return ( guess*(1-mastery) + (1-slip)*mastery )
-}
-
-generate_learning_curve <- function(slip, guess, init_mastery, learn_rate, Tl){
-  p = init_mastery
-  lc = data.frame(t= seq(1,Tl), ypct = as.numeric(0), xpct=as.numeric(0) )
-
-    lc$ypct[1] = compute_success_rate(slip, guess, p)
-    lc$xpct[1] = p
-
-    for (t in seq(2,Tl)){
-        p = update_mastery(p,learn_rate)
-        lc$ypct[t] = compute_success_rate(slip, guess, p)
-        lc$xpct[t] = p
-    }
-    return(lc)
-}
-
-true_lc = generate_learning_curve(0.05, 0.2, 0.7, 0.3, 5)
-qplot(data=true_lc, x=t,y=ypct, geom='line') + ggtitle('Learning Curves') + ylab('Success Rate') + xlab('Number of Practice Opportunity')
-
-```
-
-BKT-Survival Hybrid Model
-========================================================
-id: hybrid
-- Learner observes the response status and decide if stops $E_t=1$
-- The hazard rate can be expressed as $h_{t,O_t} = P(E_t=1|O_t)$
-    + First Order Markov Chain: No X strike rule
-    + Capture duration dependence
-    + Does not explicitly depend on the latent state ($X_t$) for agility in extension
-- [Full Likelihood](#/hybridllk)
-
-
-
-Revisit the Learning Curve
-========================================================
-```{r two_lc, echo=FALSE, warning=FALSE, message=FALSE}
-hazard_rate = data.frame(t=seq(5), correct=c(0.3, 0.3, 0.4, 0.4, 0.5), incorrect=c(0.4, 0.5, 0.6, 0.6, 0.6))
-long_hazard_rate = hazard_rate %>% gather(response, harzard_rate,-t)
-long_hazard_rate$response = factor(long_hazard_rate$response)
-m1 = qplot(data=long_hazard_rate, x=t, y = harzard_rate, geom='line', col=response) + ylab('Hazard Rate') + xlab('Number of Practice Opportunity')
-
-
-file_path = paste0(proj_dir,'/_data/01/single_sim.txt')
-sim_data = read.table(file_path, sep=',', col.names=c('i','t','y','x','e','a'))
-obs_stat = sim_data %>% filter(a==1) %>% group_by(t) %>% summarize(ypct=mean(y),xpct=mean(x))
-
-lc_data = data.frame(t=seq(5))
-lc_data$True = true_lc$ypct
-lc_data$Observed = obs_stat$ypct
-long_lc_data = lc_data %>% gather(type,prob,-t)
-long_lc_data$type = factor(long_lc_data$type)
-m2=qplot(data=long_lc_data, x=t,y=prob,col=type, geom='line') + ggtitle('Learning Curves') + ylab('Success Rate') + xlab('Number of Practice Opportunity')
-
-grid.arrange(m1,m2,ncol=2)
-```
-
-
-Dynamic Selection Bias
-========================================================
-- $P(X_t = 1| E_{t-1} = 0, X_{t-1}) \neq P(X_t=1|X_{t-1})$
-- The Paradox is
-    + Learning Curve rises higher
-    + The learning rate is biased downward
-        * A feature of the EM algorithm
-
-
-
-MCMC Algorithm
-========================================================
-- Overall Scheme:
-    + Data Augmentation(Forward Recursion Backward Sampling)
-        1. The forward state transition $p_{t,i,j} = P(X_t=j|X_{t-1}=i,O_1,\dots,O_{t},\theta) \propto \pi_{t-1}(i)P(X_t=j|X_{t-1}=i)P(O_t|X_t)$
-        2. Draw the last state $X_t$ from $P(X_T|O_1,\dots,O_T|\theta)$
-        3. Permuate the sate by $P(X_t|X_{t+1},O_1,\dots,O_{t+1}|\theta)$
-    + Gibbs Sampler: Given full data $X,O.E$, the Beta-Bernoulli has closed form posterior
-
-
-Simulation Data : Parameter Learning
-========================================================
-```{r,echo=FALSE, warning=FALSE, message=FALSE}
-# read in the point estimation
-file_path = paste0(proj_dir,'/_data/01/res/sim/incomplete_point_estimation.txt')
-point_est = read.table(file_path, sep=',', col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
-file_path = paste0(proj_dir,'/_data/01/res/sim/true_param.txt')
-true_param = read.table(file_path, sep=',', col.names=c('s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
-
-
-
-file_path = paste0(proj_dir,'/_data/01/res/sim/incomplete_mcmc_survival_parameter_chain.txt')
-mcmc_survive_chains = read.table(file_path, sep=',', col.names=c('s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
-mcmc_survive_chains$t = seq(10000)
-mcmc_survive_sample_chains = mcmc_survive_chains %>% filter(t>5000) %>% filter(t%%10==0)
-
-
-
-m21 = qplot(data=mcmc_survive_sample_chains,x=s,geom='density') +
-    geom_vline(xintercept = point_est$s[point_est$algo=='em'], colour="blue", linetype = "longdash") +
-    geom_vline(xintercept = point_est$s[point_est$algo=='mcmc_s'], colour="red", linetype = "dotted") +
-    geom_vline(xintercept=true_param$s) + ggtitle('slip')
-
-m22 = qplot(data=mcmc_survive_sample_chains,x=g,geom='density') +
-    geom_vline(xintercept = point_est$g[point_est$algo=='em'], colour="blue", linetype = "longdash") +
-    geom_vline(xintercept = point_est$g[point_est$algo=='mcmc_s'], colour="red", linetype = "dotted") +
-    geom_vline(xintercept=true_param$g) + ggtitle('guess')
-
-m23 = qplot(data=mcmc_survive_sample_chains,x=pi,geom='density') +
-    geom_vline(xintercept = point_est$pi[point_est$algo=='em'], colour="blue", linetype = "longdash") +
-    geom_vline(xintercept = point_est$pi[point_est$algo=='mcmc_s'], colour="red", linetype = "dotted") +
-    geom_vline(xintercept=true_param$pi) + ggtitle('Initial Probability of Mastery')
-
-m24 = qplot(data=mcmc_survive_sample_chains,x=l,geom='density') +
-    geom_vline(xintercept = point_est$l[point_est$algo=='em'], colour="blue", linetype = "longdash") +
-    geom_vline(xintercept = point_est$l[point_est$algo=='mcmc_s'], colour="red", linetype = "dotted") +
-    geom_vline(xintercept=true_param$l) + ggtitle('learning rate')
-
-
-grid.arrange(m21, m22, m23, m24, ncol=2)
-
-```
-
-Simulation Data : The Learning Curve
-========================================================
-```{r,echo=FALSE, warning=FALSE, message=FALSE}
-fit_lc_em = generate_learning_curve(point_est[1,2], point_est[1,3], point_est[1,4], point_est[1,5], 5)
-fit_lc_hybrid = generate_learning_curve(point_est[3,2], point_est[3,3], point_est[3,4], point_est[3,5], 5)
-
-true_lc$type = 'true'
-fit_lc_em$type= 'EM Fit'
-fit_lc_hybrid$type = 'Hybrid Fit'
-
-lc_data = rbind(true_lc, fit_lc_em, fit_lc_hybrid)
-lc_data$type = factor(lc_data$type)
-
-qplot(data=lc_data, x=t,y=ypct, geom='line', col=type ) + ggtitle('Learning Curves') + ylab('Success Rate') + xlab('Number of Practice Opportunity')
-```
-
-Real Data : The Learning Curve
-========================================================
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical and Fitted Learning Curves", fig.align='center'}
-
-load(paste0(proj_dir,'/_data/01/fit_lc_data.RData'))
-kpids =  c('2','87','138')
-kp_names = c('Sequential Order','Two Digit Subtraction','Vertical Division')
-
-for (i in seq(3)){
-    file_path = paste0(proj_dir,'/_data/01/spell_data_',kpids[i],'.csv')
-    tmp_data = read.csv(file_path, col.names=c('spell_id','t','atag','idx'),header=F)  
-    tmp_data$kpid = kpids[i]
-    if (i==1){
-        spell_data = tmp_data
-    }else{
-        spell_data = rbind(spell_data, tmp_data)
-    }
-}
-
-spell_data$knowlege_point = factor(spell_data$kpid, labels=c('Vertical Division', 'Sequential Order','Two Digit Subtraction'))
-lc_plot = spell_data %>% group_by(knowlege_point, t) %>% summarize(pct=mean(atag)) %>% filter(t<=5)
-
-for (i in seq(3)){
-    file_path = paste0(proj_dir,'/_data/01/res/',kpids[i],'/full_point_estimation.txt')
-    param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'), header=F,sep=',')
-
-    em_lc = generate_learning_curve(param_data[1,2], param_data[1,3], param_data[1,4], param_data[1,5], 5)
-    mcmc_s_lc = lc %>% filter(kpid==kpids[i]&type=='Obs') %>% select(t,pct) %>% rename(ypct=pct)
-    mcmc_s_lc$xpct = 0.0
-
-    tmp_data = data.frame(t=seq(5))
-    tmp_data$BKT = em_lc$ypct
-    tmp_data$Hybrid = mcmc_s_lc$ypct
-    tmp_data$Empirical = lc_plot$pct[lc_plot$knowlege_point==kp_names[i]]
-    tmp_data = tmp_data %>% gather(algo, pct, -t)
-    tmp_data$kpname =kp_names[i]
-
-    if(i==1){
-      lc_data = tmp_data
-    }else{
-      lc_data = rbind(tmp_data, lc_data)
-    }
-}
-lc_data$algo=factor(lc_data$algo)
-qplot(data=lc_data, x=t, y=pct, geom='line', col=algo, linetype=algo, facets=.~kpname) + ylab('Success Rate') + xlab('Number of Practice Opportunities')
-```
-
-Future Work
-========================================================
-- Study the discrepancy between learning curve fitness and AUC fitness
-- Restrict the range of slip and guess between 0 and 0.5 (New Prior)
-- Allow for X-strike Rule
-- Allow for user heterogeneity
-
-
-
-
-Chapter III: Evaluate Pedagogical Efficacy in Low Stake Environment
+Chapter III: Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
 ========================================================
 id: chp3
 type: section
 
+- [Motivation](#/chp3mot)
 
-Comprehension Task
-========================================================
-- Knowledge Transfer **OVER** Muscle Memory
-- Repetition is not enough
-- Improving pedagogical efficacy is the key
+- [Characterize the Bias](#/chp3theory)
 
-Pedagogical Efficacy
-========================================================
-- A narrow definition
-- Learning Gain: before-after design
-    + Assume equal measurement error before and after
-- Relative Learning Gain: DID design
-    + Assume equal trend in measurement error
-- benchmark against naive repetition (routine task training)
+- [Case Study](#/chp3case)
 
-Two Methodological Problems
-========================================================
-type: prompt
-- Attrition Rate
-    + require **TWO** observations to make an inference
-    + Online service suffers from a large natural attrition
-    + The differential attrition is observationally equivalent to the random attrition
-- Measurement Error
-    + Student does not exert full effort in low stake learning environment
-    + Effort-induced measurement error is equivalent to selection bias
-    + The sign of the bias is unknown
+Motivation
+=======================================================
+id: chp3mot
 
-Assessment
-========================================================
-- Original
+- Consider an RCT that compares pedagogical efficacies of two items
+    + Random assignment of the items
+    + Balanced random attrition
+    + standard DID design
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-include_graphics('fig/f1.png')
+$$
+Y_{i,T} = \beta_d D_i + \beta_t T + \gamma D_i T + \epsilon_{i,T}
+$$
+
+- If items induce differential efforts and the effort influences the performance
+    + The observed performance has non-zero mean measurement error
+    + The DID estimator may not even have the right sign
+
+Task Engagement (or Lack Thereof)
+=======================================================
+- The lack of effort is a salient feature in the low stake learning environment
+    + Baker et al(2004) and Wixon et al(2012) report the lack of student engagement in digital learning
+    + Pardos et al(2013) documents the lack of student engagement in classroom learning
+
+- Effort is largely absent from other literature because it is hard to monitor
+
+
+Characterize the Bias(1)
+=======================================================
+id: chp3theory
+
+- To show the intuition, assume a very simple structure
+    + $M_x=M_y=2$, $j=1$
+    + $c^{11}=1$, $c^{01}=0$. No slip and no guess
+    + $e^1=1$. Mastered student always exerts effort
+    + $0< e^0 <1$. Unmastered student slacks some of the time
+
+- It can be proved that the estimated pedagogical efficacy is biased downwards
+
+$$
+E(\hat{\ell}- \ell)  =  \ell(e^0-1) <0
+$$
+
+
+
+
+Characterize the Bias(2)
+=======================================================
+- In the motivating RCT example, the ATE is
+
+$$
+E(\hat{\gamma}) = \ell_1e^0_1-\ell_0e^0_0
+$$
+- For the sign to be correct: $(\ell_1-\ell_0)(\frac{l_1}{l_0}-\frac{e_0}{e_1})>0$
+
+    + It implies more pedagogical effective item also induces more effort
+    + Not true in general
+
+
+
+Case Study
+=======================================================
+id: chp3case
+
+- [The Learning Environment] (#/learningenv)
+
+- [The Experiment Design] (#/expdesign)
+
+- [The Identification of Effort] (#/effortident)
+
+- [Result] (#/chp3res)
+
+
+"Gamified" Learning
+=======================================================
+id: learningenv
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Level Initiation", fig.align='center'}
+include_graphics("fig/initial.png")
+```
+Practice Interface
+=======================================================
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Practice Interface", fig.align='center'}
+include_graphics("fig/practice.png")
+```
+
+Low Stake Incentive
+=======================================================
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "Level Completion", fig.align='center'}
+include_graphics("fig/completion.png")
+```
+
+
+The Experiment Design (1)
+=======================================================
+id: expdesign
+
+- The learning task / pre-test
+- Calculate the circumference and area of the large rectangle
+- Student fills in the blanks
+
+***
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "Pre-test", fig.align='center'}
+include_graphics("fig/f1.png")
+```
+
+
+
+The Experiment Design (2)
+=======================================================
+
+
+- Post-test
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "Post-test", fig.align='center'}
+include_graphics("fig/f3.png")
+```
+
+The Experiment Design (3)
+=======================================================
+
+- Same Training Question
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics("fig/f2.png")
 ```
 
 ***
 
-- Routine Assessment
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-include_graphics('fig/f3.png')
-```
+- Different Delivery Methods
+    + No Scaffolding
+    + Vocabulary Scaffolding
+        * What is the new length and width
+        * What is the circumference
+        * What is the area
+    + Video Scaffolding [not compulsory] that reveals the post-test question
+    [(link)](http://my.polyv.net/front/video/preview?vid=36488cc9164c53d6616869d83fbfd1b3_3)
 
-***
+The Experiment Design (4)
+=======================================================
+- Group Status
+    + Group 1: pre-test + no-scaffolding + post-test
+    + Group 2: no-scaffolding + post-test
+    + Group 3: pre-test + vocabulary-scaffolding + post-test
+    + Group 4: vocabulary-scaffolding + post-test
+    + Group 5: pre-test + video-scaffolding + post-test
 
-- Transfer Assessment
-    + Small rectangle is a square
-    + Difference in total circumference is X
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-include_graphics('fig/f4.png')
-```
-
-Pedagogical Interventions
-========================================================
-
-- Control
-
-```{r,echo=FALSE, warning=FALSE, message=FALSE}
-include_graphics('fig/f2.png')
-```
-
-***
-
-- Treatment
-    + Scaffolding
-        * New length and width
-        * New Circumference
-        * New Area
-    + Delivery
-        * Vocabulary instruction as sub-question
-        * 50 second animation
+- Group Assignment
+    + Assign learners to the group based on the remainder of their user id divided by 5
 
 
-Missing At Random
-========================================================
-```{r, echo=FALSE,message=FALSE,warning=FALSE}
-rm(list=ls())
-proj_dir = getwd()
-input_file_path = paste0(proj_dir,'/_data/02/production_data.RData')
-load(input_file_path)
-```
-
-```{r, echo=FALSE,message=FALSE,warning=FALSE}
-final_retention = user_retention_stat %>% filter(k==4)
-
-tot_retention_rate = round(sum(final_retention$n)/sum(final_retention$N)*100,2)
-ctrl_retention_rate = round(final_retention$pct[final_retention$gid==0]*100,2)
-tr1_retention_rate = round(final_retention$pct[final_retention$gid==2]*100,2)
-tr2_retention_rate = round(final_retention$pct[final_retention$gid==4]*100,2)
-
-ctr_ret = user_retention_stat %>% ungroup(gid) %>% filter(gid==0) %>% select(k,pct) %>% rename(ctr_pct=pct)
-tr_ret = user_retention_stat %>% filter(gid!=0) %>% select(k,pct)
-ret_dif_composition = merge(tr_ret,ctr_ret,by='k') %>% mutate(ret_dif = ctr_pct-pct)
-
-```
-
-|Group|Attrition Rate(%)|
-|:-------------| -------------------:|
-|Control|`r 100-ctrl_retention_rate`|
-|Vocabulary Treatment|`r 100-tr1_retention_rate`|
-|Video Treatment|`r 100-tr2_retention_rate`|
+Summary Statistics(1)
+=======================================================
+- Total learners recruited: 13939
+- Average retention rate is 84%. Pre-test hurts retention.
 
 ***
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-ret_dif_composition$group = factor(ret_dif_composition$gid, labels=c('Vocabulary','video'))
-
-ggplot(data=ret_dif_composition,aes(x=k,y=-ret_dif,fill=group)) +
-  geom_bar(stat='identity',position = "dodge") +
-  ggtitle('Relative Attrition Rate Compared to the Control Group') +
-  ylab('Attrition Rate Difference') + 
-  scale_x_discrete(name ="Item Sequence", 
-                    limits=c("Original","Remedial","Routine","Transfer"))
-
+include_graphics('fig/exp_attrition.png')
 ```
 
+Summary Statistics(2)
+=======================================================
+- The no scaffolding and video scaffolding group has almost no difference
+- The vocabulary scaffolding has worse efficacy than the no scaffolding
 
-Measurement Error Identification
-========================================================
-id:mei
-
-- The knowledge of text response and response time helps to identify the measurement error
-- [The Identification Stategy](#/giveupdef)
-
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item by Error Types", fig.align='center'}
-# create new error type
-c2a2f1_data$type = c2a2f1_data$giveup
-c2a2f1_data$type[c2a2f1_data$is_blank_ans==1] = 2
-c2a2f1_data$type = factor(c2a2f1_data$type, labels=c('A lack of Mastery','A lack of Effort-Non blank', 'A lack of Effort-Blank'))
-
-qplot(data=c2a2f1_data %>% filter(cmt_timelen<=60), x=cmt_timelen, geom='density',col=type) +
-  ggtitle('Distribution of Time Spent on Item by Error Types(<= 60s)') +
-  xlab('Seconds')
-```
-
-
-Identification Strategy
-========================================================
-- The DID design when all response in the first period is failure
-
-$$
-Y_{i,T} = \gamma T + \delta_1 D^1_i T + \delta_2 D^2_i T + \epsilon_{i,T} 
-$$
-
-- Alternative configuration to compare the relative gain between two treatments
-
-$$
-Y_{i,T} = \gamma T +\delta_{level}\tilde{D}_i T + \delta_{difference} D^2_i T + \epsilon_{i,T} 
-$$
-
-where $\delta_{level} = \delta_1$ and $\delta_{difference} = \delta_2 - \delta_1$
-
-
-- Binary result: Correctly compute both circumference and area
-
-Baseline Result
-========================================================
+***
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-y0data = workdata %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
-y1pdata = workdata %>% filter(eid=='Q_10201056666357') %>% mutate(t=1)
-y1sdata = workdata %>% filter(eid=='Q_10200351208705') %>% mutate(t=1)
-
-ydata_p = rbind(y0data,y1pdata)
-ydata_p = ydata_p %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
-
-ydata_s = rbind(y0data,y1sdata)
-ydata_s = ydata_s %>% transform(d1=as.numeric(gid==2),d2=as.numeric(gid==4),d=as.numeric(gid!=0))
-
-ydata_p = ydata_p %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
-ydata_s = ydata_s %>% transform(dt=d*t,ddt =d2*t, d2t=d2*t,d1t=d1*t)
-
-ydata_p$y = as.numeric(ydata_p$y==1)
-ydata_s$y = as.numeric(ydata_s$y==1)
-
+include_graphics('fig/exp_stat.png')
 ```
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+The Identification of Effort: Identification
+=======================================================
+id: effortident
 
-mod_7d = lm(data=ydata_p%>% filter(is_placebo==0),y~t+dt+ddt)
-mod_8d = lm(data=ydata_s%>% filter(is_placebo==0),y~t+dt+ddt)
+- [effort classification](#/ans_class)
+  + Slack/Give up: blank answer, non-blank wrong answer
+  + Valid Effort: Slip, partial right and all right
 
-mod_7 = lm(data=ydata_p%>% filter(is_placebo==0),y~t+d1t+d2t)
-mod_8 = lm(data=ydata_s%>% filter(is_placebo==0),y~t+d1t+d2t)
 
-stargazer(mod_7, mod_8, mod_7d,mod_8d,
-          header=FALSE,type='html',
-          dep.var.labels = 'Response',
-          keep=c('d1t','d2t','dt','ddt'),
-          covariate.labels=c('vocabulary','video','level','difference'), 
-          column.labels=c('Routine','Transfer','Routine','Transfer'), 
-          keep.stat=c("adj.rsq","n")
-          )
-```         
-          
-Differential Measurement Error in Placebo Group
-========================================================
+Validity(1)
+=======================================================
+- The learner spent significantly less time to submit a blank answer in repeated exercises
+  + Compare no scaffolding with and without pre-test
+- [Not Shown] Submitting a blank answer is highly serial correlated
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_3 = lm(data=ydata_p %>% filter(is_placebo==1),y~t+d1t+d2t)
-mod_4 = lm(data=ydata_p %>% filter(is_placebo==1),giveup~t+d1t+d2t)
+***
 
-mod_5 = lm(data=ydata_s %>% filter(is_placebo==1),y~t+d1t+d2t)
-mod_6 = lm(data=ydata_s %>% filter(is_placebo==1),giveup~t+d1t+d2t)
-
-stargazer(mod_3, mod_4,mod_5,mod_6, 
-          header=FALSE,type='html', 
-          dep.var.labels = c('Response','Giveup','Response','Giveup'),
-          keep=c('d1t','d2t'), 
-          covariate.labels=c('vocabulary','video'), 
-          column.labels=c('Routine','Routine','Transfer','Transfer'), 
-          keep.stat=c("adj.rsq","n")
-          )
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/blank_ans_time_dist.png')
 ```
 
-Effective Exposure to Treatment
-========================================================
-```{r, echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
-mod_9d = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
-mod_10d = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+dt+ddt)
+Validity(2)
+=======================================================
+- Non-blank answer is also likely to be slacking:
+  + In repeated exercises, skewed toward left, similar to the blank answer
+  + Has lower mean compare to the other two
 
-mod_9 = lm(data=ydata_p%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
-mod_10 = lm(data=ydata_s%>% filter(is_placebo==0&is_retain==1),y~t+d1t+d2t)
+- Valid Error and Correct has no position shift and similar distribution
 
-stargazer(mod_9, mod_10, mod_9d,mod_10d,
-          header=FALSE,type='html',
-          dep.var.labels = 'Response',
-          keep=c('d1t','d2t','dt','ddt'),
-          covariate.labels=c('vocabulary','video','level','difference'), 
-          column.labels=c('Routine','Transfer','Routine','Transfer'), 
-          keep.stat=c("adj.rsq","n")
-          )
+***
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/non_blank_ans_time_dist.png')
 ```
 
-Robust Check
-========================================================
-- Alternative measurement error identification
-    + 10-second rule
-    + Blank response
-- Alternative performance measurement
-    + Allow for partial grade
-    
-- The pattern holds:
-    + Differential measurement error
-    + the magnitude of point estimation jumps after conditions on effective exposure
-
-- The significance goes away
 
 
-Future Work
-========================================================
-- Understand the mechanism
-    + Check if error persists
-    + Check how the response in the vocabulary scaffolding affects the response in routine assessment
-- *Try Adaptive instructional material as vocabulary scaffolding
-- *Better data for measurement error identification 
+Pattern(1)
+=======================================================
+- Increase by sequence
+- Higher for the vocabulary scaffolding
+
+***
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/exp_giveup.png')
+```
+
+Pattern(2)
+=======================================================
+- Highly serial correlated
+- [Left panel] All-giveup has higher probability mass than a binomal model would predict.
+
+***
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/exp_giveup_seq.png')
+```
+
+The Result
+=======================================================
+id: chp3res
+
+- The model is estimated with MCMC algorithm
+  + The learning parameter has a beta prior B(1,1)
+  + Chain length 1000. First 30% is burn-in sample.
+  + Sample every 10 iterations
+- Only groups with both pre-test and post-test are included in the sample
+- Two-state model, binary grade; Three-state model, partial grade
+
+The Result (Two-state model)
+=======================================================
+id: chp3res
+- Position shifts (correct for downward bias)
+- Weakly separate out video scaffolding
+
+***
+
+```{r,  echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/mcmc_2_param.png')
+```
+
+The Result (Three-state model: 0->1)
+=======================================================
+- The pedagogical efficacy with effort is not well estimated
+  + Because low effort rate and low initial density, too few observations
+
+***
+
+```{r,  echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/mcmc_3_param_01.png')
+```
 
 
 
-Chapter IV: Continuous Improvement with Multi-armed Bandit Algorithm
-========================================================
-id: chp4
+The Result (Three-state model: 1->2)
+=======================================================
+
+- More robust to effort decision
+- Clear separation of item characteristic
+
+***
+
+```{r,  echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics('fig/mcmc_3_param_12.png')
+```
+
+Q&A
+=======================================================
 type: section
 
+Special Case 1: Bayesian Knowledge Tracing Model
+=======================================================
+id: bkt
+
+- Developed by Corbert and Anderson(1996)
+- The equivalent of Rasch model in the literature of the learning analytics
+- $M_x=2$, $M_y=2$, $j=1$
+- The guess rate is $c^{0,1}$, The slip rate is $c^{1,0}$.
+
+[return](#/hmm1)
+
+
+Special Case 2: Zone of Proximal Development
+=======================================================
+id: zpd
+
+- Developed by Vygosky(1976)
+    + Development lags task requirement and fail the task no matter what
+    + Development lags task requirement but may succeed in the task with guidance or collaboration [**The zone**]
+    + Development leads task requirement and succeed on their own
+
+- $M_x=3$, $M_y=3$, $j=1$
+    + $X=0$ is the unprepared. $X=1$ is the zone. $X=2$ is the mastered
+    + $Y=0$ is failure. $Y=1$ is partial success. $Y=2$ is complete success
+    + $c^{0,2}=0$, the unprepared never fully succeed
+    + $c^{2,0}=0$, the mastered never fully fail
+
+- Allow for **learning reinforcement** where positive performance leads to better performance
+
+[return](#/hmm1)
+
+
+Answer Classification (1)
+=======================================================
+id: ans_class
+The answers are initially classified into six categories:
+
+(1) Blank answer: The learner submits nothing on the circumference and the area
+
+(2) Non-blank wrong answer: Neither circumference nor area is correctly calculated and not includes in the slip or the wrong shape category
+
+(3) Slip: The answer is correctly calculated but the learner inputs in a wrong way
+
+Answer Classification (2)
+=======================================================
+
+(4) Wrong Shape: The learner calculates correctly either the circumference or the area of the small rectangle
+
+(5) right circumference: The learner correctly calculates the circumference of the large rectangle
+
+(6) right area: The learner correctly calculates the area of the large rectangle
+
+(7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
+
+Answer Classification (3)
+=======================================================
+
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-rm(list=ls())
-proj_dir = getwd()
-
-output_file_path = paste0(proj_dir,'/_data/03/production_data.RData')
-load(output_file_path)
+ans_composition = data %>% group_by(group, qtype) %>%
+  summarize(blank = mean(blank_ans)*100,
+            nonblank=mean(nonblank)*100,
+            wrongshape=mean(wrong_shape)*100,
+            rightcirc=mean(circ_right)*100,
+            rightarea=mean(area_right)*100,
+            slip=mean(is_slip)*100,
+            correct=mean(score==1)*100)
+kable(
+  ans_composition %>% arrange(qtype,group)%>% select(-rightcirc,-rightarea,-wrongshape,-correct), booktabs = TRUE,
+  col.names=c('Group','Task','Blank Ans(%)','Non Blank Wrong Ans (%)', 'Slip(%)'),
+  align='c',
+  caption = 'Answer Composition - All Wrong'
+)
 ```
 
-Continuous Improvement
-=======================================================
-- Tech startup has the philosophy of rapid product iteration
-    - fail quickly
-    - A/B Test everything
-- Very successful in online service sector
-    - Google
-    - Amazon
-    - Duolingo/Khan Academy
-
-
-Fixed Balanace Sample T-test may not be a Good Idea 
-=======================================================
-- Sample arrive sequentially
-    + allow early termination
-- If there is a difference, balance sample is not the optimal design
-    + the option with higher mean shall have more sample to minimize total sample
-    + the option with higher mean shall have more sample to maximize the experiment return
-
-
-The Relative Cost of Type I and Type II error
-=======================================================
-type:prompt
-- The opportunity cost of wait outweighs the opportunity cost of action
-    - If the null hypothesis of null effect is true, there is no cost to service receiver, although there may be cost to service provider
-    - If the null hypothesis of null effect is false, cumulative loss to service receiver over time is considerable
-    
-- Prefer high power to low significance level
-
-
-Multi-arm Bandit Problem
-=======================================================
-- $n$ experimental options (arm), each with a constant but unknown return parameter $\mu^i$
-- A policy describes the choice of the option over time
-- Regret is defined as the cumulative expected difference between the policy and the true optimal arm $\sum_t m^*-m^{i_t}$
-- The goal is to minimize the regret
-
-Thompson Sampling
-=======================================================
-- Stratified sampling proportion to estimated return
-$$
-w_{at} = Pr(\mu_a = max\{\mu_1, \dots, \mu_n\}|y_1,\dots,y_t)
-$$
-- A good heuristic that balances between exploration and exploitation
-    - With uninformative prior, the initial stage is dominated by exploration
-    - As evidence strongly favors a subset of options, exploration takes over
-
-- Complete learning: best arm wins for sure as time goes by
-    - Optimal arm plays exponentially more times than inferior alternatives
-
-Potential Value Remaining Stop Condition
-=======================================================
-- There is no need to make a decision if the thompson sampling algorithm can run forever
-- Practically it is used as a substitude to statistical test therefore needs a decision rule
-- Potential Value Remaining
-
-$$
-VR(m) = \frac{\theta^*(m)}{\theta_{i^*}(m)} - 1 
-$$
-
-- Stop if $\Pr(VR > 1+\epsilon) < \delta$
-
-Imbalanced Sample
-=======================================================
-type:prompt
-
-- the more sample assigned to the option
-    + the faster variance of the posterior distribution shrinks
-        * $VR$ can have high kurtosis
-    + the higher the return generated by the experiment if chosen the right arm
-
-Simulation Setup
-=======================================================
-- Base Rate
-
-|Type | Values|
-|--- | ---|
-|Low | 0.05,0.09|
-|medium| 0.15, 0.25|
-|high| 0.4, 0.5|
-
-- Effect size: 10%, 20%, 50%, 100%
-
-- Null Hypothesis
-    + $H_0: \quad p_0 \geq p_1$
-    + maximum sample size is calculated by 5% significance level and 95% power
-
-
-Modified Sequential Likelihood Ratio Test
-=======================================================
-- Separate early termination from imbalance sample design
-    - sequential likelihood ratio test uses pair sample from the control and the treatment
-- Define Reject time as $T = \inf\{n:n \geq m_0, W(t)\geq \alpha\}$
-- Reject the null hypothesis if $T \leq m$ or $T>m, mH(\frac{\sum_{j}Y_j}{m}) \geq d$
-
-Power
-=======================================================
-```{r, echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Power of T-test, Sequential Likelihood Ratio Test and Bandit Test on Simulation Data", fig.align='center'}
-power_result = read.table(paste0(proj_dir,'/_data/03/power_result.txt'), sep=',', col.names = c('p','ratio','method','i','power'))
-
-# t test is used as guideline
-power_result$power[power_result$method==' ttest'] = 0.95
-power_result$method[power_result$method==' ttest'] = '95%'
-
-power_result = power_result %>% filter(p %in% c(0.03,0.07,0.15,0.25,0.4,0.5))
-
-qplot(data=power_result,x=i,y=power,col=method,geom='line', facets = p~ratio)
-
-```
-Significance Level
-=======================================================
-- If using balanced sample and potential value remaining stop condition, on average, the type I error rate decreases to 40%
-
-```{r,message=FALSE,warning=FALSE,echo=FALSE,fig.cap = "Significance leve of Bandit Test on Simulation Data", fig.align='center'}
-sig_Thompson = read.table(paste0(proj_dir, '/_data/03/sig_thompson.txt'), sep=',', col.names=c('p','k','sig'))
-sig_Thompson = sig_Thompson %>% filter(p %in% c(0.03,0.07,0.15,0.25,0.4,0.5))
-
-sig_Thompson$p = factor(sig_Thompson$p)
-
-qplot(data=sig_Thompson, x=k, y=sig, col=p, geom='line', linetype=p)
-```
-
-Regret: Simulation
-=======================================================
-- regret for the fixed sample t-test is a fixed number $r_{welch} = N*p*\triangle$
-- Measure the saving in regret by 
-$$
-R_{method}(T) = \frac{E(r_{method}|t\leq T)}{r_{welch}}
-$$
-
-Regret: Simulation
+Answer Classification (4)
 =======================================================
 
-```{r,message=FALSE,warning=FALSE,echo=FALSE, fig.cap = "Relative Regret Saving compared to t-test", fig.align='center'}
-# calculate the cumulative regrets
-regret_result = read.table(paste0(proj_dir,'/_data/03/regret_result.txt'), sep=',', col.names = c('p','ratio','method','i','avg_reg','pdf'))
-
-regret_result = regret_result  %>% filter(p %in% c(0.03,0.07,0.15,0.25,0.4,0.5))
-
-for (k in seq(2,25)){
-    regret_stat = regret_result %>% filter(i<=k) %>%
-                    group_by(p, ratio, method) %>%
-                    mutate(cond_pdf = pdf/sum(pdf)) %>%
-                    mutate(cum_reg = cumsum(avg_reg*cond_pdf)) %>% 
-                    select(p, ratio, method, i, cum_reg)
-    
-    
-    ttest_stat = regret_stat %>% filter(method == 'ttest') %>% rename(benchmark_reg=cum_reg) %>% select(p, ratio, i, benchmark_reg) 
-    tmp = merge(regret_stat, ttest_stat, by=c('p','ratio','i'))  %>%
-        transform(regret_ratio = cum_reg/benchmark_reg) %>%
-        filter(method.x!='ttest') %>% select(-method.y) %>%
-        filter(i==k)
-    if (k==2){
-        regret_res = tmp
-    }else{
-        regret_res = rbind(regret_res, tmp)
-    }
-}
-
-
-qplot(data=regret_res,x=i,y=regret_ratio,col=method.x,geom='line', facets = p~ratio) + xlab('Time') + ylab('Regret Ratio')
-
-```
-
-Regret: Simulated Experiment
-=======================================================
-
-- Calculate the percentage of execessive of learning gain over the experiments result
-
-```{r, message=FALSE,warning=FALSE,echo=FALSE}
-
-wk_save_data = stat_wk %>% filter(type=='ret') %>% mutate(delta=round((simexp/origin-1)*100,1)) %>% select(q,g,delta)
-bkp_retain_save_data = stat_bkp_retain %>% filter(type=='ret') %>% mutate(delta=round((simexp/origin-1)*100,1)) %>% select(q,g,delta)
-wk_retain_save_data = stat_wk_retain %>% filter(type=='ret') %>% mutate(delta=round((simexp/origin-1)*100,1)) %>% select(q,g,delta)
-
-```
-
-Assessment | treamtnet   | Full Data            | Filtered Data (Automatic) | Filtered Data (Manual) |
----        | ---         | ---                          | ---                                         | ---                                         |
-Routine    | Vocabulary  | `r wk_save_data$delta[1]`%  | `r bkp_retain_save_data$delta[1]`%          | `r wk_retain_save_data$delta[1]`%         |
-Routine    | Video       | `r wk_save_data$delta[2]`%  | `r bkp_retain_save_data$delta[2]`%          | `r wk_retain_save_data$delta[2]`%         |
-Transfer   | Vocabulary  | `r wk_save_data$delta[3]`%  | `r bkp_retain_save_data$delta[3]`%          | `r wk_retain_save_data$delta[3]`%         |
-Transfer   | Video       | `r wk_save_data$delta[4]`%  | `r bkp_retain_save_data$delta[4]`%          | `r wk_retain_save_data$delta[4]`%         |
-
-
-
-Sample Saving: Simulation
-=======================================================
-$$
-saving_ratio_{method} = 100 - \frac{\bar{N_{method}}}{N_{t-test}}
-$$
-
-
-Sample Saving: Simulation
-=======================================================
-```{r,message=FALSE,warning=FALSE,echo=FALSE, fig.cap = "Relative Sample Saving compared to t-test", fig.align='center'}
-# calculate the cumulative regrets
-sample_result = read.table(paste0(proj_dir,'/_data/03/sample_result.txt'), sep=',', col.names = c('p','ratio','method','pct'))
-
-sample_result = sample_result  %>% filter(p %in% c(0.03,0.07,0.15,0.25,0.4,0.5))
-
-
-
-qplot(data=sample_result,x=pct,col=method, linetype=method, geom='density', facets = p~ratio) + xlab('Sample Saving Pct')
-
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+kable(
+  ans_composition %>% arrange(qtype,group) %>% select(-blank,-nonblank,-slip), booktabs = TRUE,
+  col.names=c('Group','Task','Wrong Shape(%)', 'Right Circ(%)', 'Right Area(%)','Correct(%)'),
+  align='c',
+  caption = 'Answer Composition - Other'
+)
 ```
 
 
-Sample Saving: Simulated Experiment
-=======================================================
-```{r, message=FALSE,warning=FALSE,echo=FALSE}
-
-wk_save_ratio = stat_wk %>% filter(type=='runs') %>% mutate(ratio=100-round(simexp/origin*100,0)) %>% select(q,g,ratio)
-wk_retain_save_ratio = stat_wk_retain %>% filter(type=='runs') %>% mutate(ratio=100-round(simexp/origin*100,0)) %>% select(q,g,ratio)
-bkp_retain_save_ratio = stat_bkp_retain %>% filter(type=='runs') %>% mutate(ratio=100-round(simexp/origin*100,0)) %>% select(q,g,ratio)
-
-```
-
-Assessment | treamtnet   | Full Data            | Filtered Data (Automatic) | Filtered Data (Manual) |
----        | ---         | ---                          | ---                                         | ---                                         |
-Routine    | Vocabulary  | `r wk_save_ratio$ratio[1]`%  | `r bkp_retain_save_ratio$ratio[1]`%          | `r wk_retain_save_ratio$ratio[1]`%         |
-Routine    | Video       | `r wk_save_ratio$ratio[2]`%  | `r bkp_retain_save_ratio$ratio[2]`%          | `r wk_retain_save_ratio$ratio[2]`%         |
-Transfer   | Vocabulary  | `r wk_save_ratio$ratio[3]`%  | `r bkp_retain_save_ratio$ratio[3]`%          | `r wk_retain_save_ratio$ratio[3]`%         |
-Transfer   | Video       | `r wk_save_ratio$ratio[4]`%  | `r bkp_retain_save_ratio$ratio[4]`%          | `r wk_retain_save_ratio$ratio[4]`%         |
-
-
-Future Work
-=======================================================
-- Stop Conditions
-    + Explore the properties of potential value remaining condition
-    + Explore other stop conditions that are robust to measurement error
-- Performance in multiple comparisons
-
-Appendix I.2 Derivation of the Gibbs Sampling Scheme
-=======================================================
-id: hybridllk
-
-```{r,echo=FALSE, warning=FALSE, message=FALSE}
-include_graphics('fig/appI2-1.png')
-```
-
-[return](#/hybrid)
-
-
-Appendix II.2 Identifcation of Give-up(1)
-=======================================================
-id: giveupdef
-
-1. Add or omit trailing zeros. 
-    - If the right answer is 120, both 12, 120 and 1200 are admitted as valid attempts.
-
-2. Add when shall multiply or vice versa. 
-    - When calculating area with length 6 and width 4, 10 is admitted as a valid attempt.
-
-3. Apply the wrong formula. 
-    - When calculating the circumferences of the rectangle with length 6 and width 4, 10(forget to double) or 24(formula of the area) are admitted as valid attempts. 
-
-Appendix II.2 Identifcation of Give-up(2)
-=======================================================
-
-4. Calculation mistakes. 
-    - 13*4 = 42
-
-5. Fail to understand the question. 
-    - Calculate the circumference and the area of the small rectangle
-
-6. Typo
-    - 36 as 35
-    
-[return](#/mei)
+[Back](#\effortident)
