@@ -26,23 +26,54 @@ Practice Makes Perfect
 
 - Very effective for K-12 STEM learning
 
-- Repetition is necessary but not sufficient nor efficient
+- Effective practice requires more than simple repetition
 
 
-The Inefficiency of non-personalized Practices
+
+A Motivating Example (1)
 ========================================================
 
-- 2.41-meter high practice exams in 1 year to prepare for the Chinese SAT
+- The Learner tries to learn two-digit multiplication
+- What content?
+  + 14*20
+  + 14*21
+  + 14*23
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-include_graphics('fig/mot.jpg')
-```
+- What format?
+  + 14*23 = ___
 
-- How to Improve Efficiency
+  + Vertical format
 
-    + Optimal Stopping (Assessment)
+  $$
+  \begin{aligned}
+  &\quad 14\\
+  &\times 23\\
+  &---\\
+  \end{aligned}
+  $$
 
-    + Optimal Recommendation (Instruction)
+***
+
+- When to stop?
+  + Winning streak
+  + Losing streak
+  + Mixture
+
+
+A Motivating Example (2)
+========================================================
+- Practice as Assessment -> Optimal Stopping
+
+  + The user's latent ability has to be inferred from the observed response
+
+- Practice as Instruction -> Optiomal Recommendation
+
+  + What matters is how the item helps the learner to elevate the latent mastery
+  + What we usually observe is how difficult the item given the current latent mastery
+  + The relationship between the item efficacy and item and item difficulty is unclear
+  + Folk wisdom is inverse U
+
+
 
 
 Pedagogical Efficacy
@@ -58,28 +89,31 @@ type: prompt
 - The thesis aims to measure, not to explain, the pedagogical efficacy
 
 
+
 Navigation
 ========================================================
 
 - [Chapter 1](#/chp1): A General Model
-- [Chapter 2](#/chp2): Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
-- [Chapter 3](#/chp3)：Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
+- [Chapter 2](#/chp2): Identification and Estimation
+- [Chapter 3](#/chp3): Selection Bias of the Exit Decision
+- [Chapter 4](#/chp4)：Effort Induced Measurement Error
+
 
 Chapter I: A General Model of Learning Through Practices
 ========================================================
 id: chp1
 type: section
 
-- [The Model](#/model)
+- [The Learning Process](#/lp)
 
-- [Identification] (#/identify)
+- [The Effort Decision] (#/ed)
 
-- [Estimation](#/mcmc)
+- [The Stop Decision](#/sd)
+
 
 
 Event Sequence
 ========================================================
-id: model
 
 + The learner is presented with a practice item
 
@@ -97,20 +131,34 @@ id: model
     * No: start from the first step
 
 
+Why Modelling Effort and Stop
+========================================================
+- In Theory
+  + Reveal information about the user if the decision depends on the state
+  + Capture some noncognitive skills, like grit
+
+- In practice
+  + Engagement is usually managed by the product manager
+
+
+
 Notation
 ========================================================
 - $j$: The item id
 - $t$: The sequence id. [*Not calendar time*]
-- $X$: The latent state of knowledge mastery
-- $Y$: The observed response grade
-- $E$: The observed effort
+- $X_t$: The latent state of knowledge mastery
+- $Y_t$: The observed response grade
+- $E_t$: The observed effort
+- $H_t$: If the learner stops at sequence $t$
 - $A()$: The assignment function.
     + $A(t)=j$: The item $j$ is at $t^{th}$ practice sequence
 
 
 
+
 The Learning Process (1)
 ========================================================
+id: lp
 - **Assumption 1**: $X_t$ is unidimensional
 
     + Avoid mapping knowledge space to item
@@ -160,9 +208,7 @@ $$
 Learning Process as A Hidden Markov Process
 ========================================================
 id: hmm1
-- $\{\pi^k\}, \{\ell^k_j\}, \{c^{k,m}_j\}$ describes a hidden markove process
 
-***
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 include_graphics('fig/hmm_1.png')
@@ -170,32 +216,26 @@ include_graphics('fig/hmm_1.png')
 
 Examples
 ========================================================
-- [Bayesian Knowledge Tracing Model](#/bkt):
+id: hmm_example
+- [Bayesian Knowledge Tracing Model](#/bkt)
 - [Zone of Proximal Development](#/zpd)
+
 
 The Effort Decision(1)
 ========================================================
+id: ed
 **Assumption 9**: Effort is a binary choice.
 
-- Let the effort be determined by a Roy model of choice where:
-    + $\beta_j$ is expected return of a correct response
-    + $\epsilon_{j,t}$ is the cost of making the learning effort
-    + The expected cost of a wrong response is standardized to 0
+**Assumption 10**: Effort choice is independent, conditioning on the latent ability and item
 
-$$
-E_{j,t} = I(\beta_j P(Y_{j,t}=1) - \epsilon_{j,t}>0)
-$$
 
-The Effort Decision(2)
-========================================================
-**Assumption 10**: The $\epsilon_{j,t}$ is I.I.D.
 
-- It implies that conditions on latent ability, effort choice is
-    + independent of sequence position and sequence composition
-    + dependent on the item characteristic
 $$
 P(E_{j,t}=1|X_t=k) = e_j^k
 $$
+
+- It implies that the learner does not learn about the cost of effort
+
 
 The Effort Decision(3)
 ========================================================
@@ -208,47 +248,233 @@ $P(X_t=k+1|X_{t-1}=k, j, E_{j,t}=0) = 0$
 
 $P(Y_{j,t}=0|E_{j,t}=0) = 1$
 
-[to Chapter 3](#/chp3)
+[to Chapter 4](#/chp4)
+
 
 The Stop Decision
 ========================================================
-*To be continued...*
+id: sd
+- The hazard rate is duration dependent
+- The hazard rate varies with the latent state
+  + Not depends on response. An error due to slip and an error due to lack of understanding have different implications
+  + A plausible story: boredom V.s. Frustration
+
+$$
+h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
+$$
 
 
-Identification
+
+The General Model as A Hidden Markov Process
 ========================================================
-id: identify
-*To be continued...*
+id: hmm2
 
-Estimation
-========================================================
-id: mcmc
-*To be continued...*
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+include_graphics('fig/hmm_2.png')
+```
 
-Chapter II: Selection Bias of the Exit Decision in the Pedagogical Efficacy Estimation
+Chapter II: Identification and Estimation
 ========================================================
 id: chp2
 type: section
 
-- [Motivation](#/chp2mot)
+Notation
+========================================================
+  + $i$: the the learner id
+  + $N$： the number of learners
+  + $T_i$:the sequence length of learner $i$.
+  + $\mathbf{X}^i$: The latent state sequence, $X^i_1,\dots,X^i_{T_i}$
+  + $\mathbf{Y}^i$: The answer sequence, $Y^i_1,\dots,Y^i_{T_i}$
+  + $\mathbf{A}^i$: The item sequence,   $A^i(1),\dots,A^i(T_i)$
+  + $\mathbf{E}^i$: The effort sequence, $E^i_1,\dots,E^i_{T_i}$
+  + $\mathbf{H}^i$: The stop sequence,   $H^i_1,\dots,H^i_{T_i}$
 
-- [Characterize the Bias](#/chp2theory)
 
-- [Case Study](#/chp2case)
+The Sufficient Statistics
+========================================================
+**Identifcation Assumption 1**: Learners are homogeneous and independent
 
-Motivation
-=======================================================
-id: chp2mot
+Let $G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$ maps the observed variable to a one dimension set $\Omega$ with size $Z$.
 
-Characterize the Bias
-=======================================================
-id: chp2mot
+Let $G^{-1}(z)$ denote the $z$ element of mapping set.
 
-Case Study
-=======================================================
-id: chp2case
+$$
+L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod_{z=1}^ZP(G^{-1}(z))^{\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)}
+$$
+It is easy to see that $\{n1,\dots,n_Z\}$ are sufficient statistics where $n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)$
 
-Chapter III: Effort Induced Measurement Error in the Pedagogical Efficacy Estimation
+The Sufficient Statistics (Cont)
+========================================================
+- Example:
+  + Response only, binary $Y_t$, $t$=2, $j=1$
+  + $\Omega=\{\{Y_1=1,Y_2=1\},\{Y_1=0,Y_2=1\},\{Y_1=1,Y_2=0\},\{Y_1=0,Y_2=0\}\}$
+  + $G(\{Y_1=1,Y_2=1\})=1$, $G^{-1}(1) = \{Y_1=1,Y_2=1\}$
+
+
+The Augmented Likelihood(1)
+========================================================
+Let $G^{-1}(z) = \mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}$ and $T_z$ be the length of the practice sequence.
+
+$$
+P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}, \mathbf{X})
+$$
+
+Assume $\mathbf{X}$ is known(augmented). Assume that item sequences are exogeneously determined, Thus $\mathbf{a}$ is independent of all other variables.
+
+$$
+\begin{aligned}
+P(G^{-1}(z)) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
+&= P(\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{e})P(\mathbf{h}|\mathbf{X})P(\mathbf{e},\mathbf{X}|\mathbf{a})
+\end{aligned}
+
+$$
+
+The Augmented Likelihood(2)
+========================================================
+$$
+\begin{aligned}
+P(\mathbf{y}|\mathbf{X},\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^K\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
+&\prod_{m=1}^{M-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
+\end{aligned}
+$$
+
+The Augmented Likelihood(3)
+========================================================
+$$
+\begin{aligned}
+P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
+&= \prod_{t=1}^{T_z}\prod_{k=1}^K[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
+\end{aligned}
+$$
+
+The Augmented Likelihood(4)
+========================================================
+$$
+\begin{aligned}
+&P(\mathbf{X},\mathbf{e}|\mathbf{a})\\
+&= P(X_1)P(E_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
+&= \prod_{k=1}^K(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
+& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{A(t)=j,1(X_{t-1}=k,E_t=0)}]\\
+&[1^{1(X_{t-1}=K,X_t=K)}\prod_{k=1}^{K-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
+&1^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}\\
+&0^{1-1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}]\}
+\end{aligned}
+$$
+Identification (1)
+========================================================
+- Need to prevent label switching
+  + **Identifcation Assumption 2(a)**: $X_t,Y_t$ binary, $c_j^{0,1} < c_j^{1,1}$
+  + **Identifcation Assumption 2(b)**: $X_t,Y_t$ tetiary, $c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j)$, $c^{1,2}_j < c^{2,2}_j$
+
+- The state density is non-degenerate
+  + **Identifcation Assumption 3** $\pi^k \neq 0$
+
+Identification (2)
+========================================================
+
+- For MLE:
+  + Unique identification matters
+
+- For MCMC:
+  + Only requires proper posterior distribution
+  + MAP point estimator is meaningless
+  + Convergence is problematic
+
+Identification for MLE
+========================================================
+- Recall sufficient statistics $\{n_1,\dots,n_Z\}$. It implies Z moment conditions.
+- Let the size of the parameter set $\Theta$ to be W.
+- Necessary Condition: $Z\geq W$
+- Sufficient Condition: Nonlinear system makes it difficult to prove
+
+- Example($j=1$, $t=2$,$E_t=1$,$H_t=0$):
+
+  + $X_t$,$Y_t$ binary, Z=4, W=4
+
+  + $X_t$ tertiary, $Y_t$ binary, Z=4, W=6
+
+  + $X_t$,$Y_t$ tertiary,  Z=9, W=11
+
+**Identifcation Assumption 4**:$c^{0,2}_j=c^{2,0}_j=0$
+
+
+Estimation
+========================================================
+id: mcmc
+- Why not EM:
+  + Lack of Unique Identification
+  + Hard to incorporate the hazard model
+  + Hard to incorporate user heterogeneity(Future)
+
+- General Stategy of MCMC
+  + Given parameters, augment the latent states
+  + Given latent states, update the parameters with Gibbs Sampling
+
+- [Future] Hamiltonian Markov Chain Monte Carlo for better mixture in high dimensional parameter space
+
+
+Data Augmentation(1)
+========================================================
+- Brute Force
+  + $P(X_1|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
+  + $P(X_t|X_{t-1},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
+  + Sample forward
+
+- Forward recursion, backward sampling[Scott, 2002]
+  + $\tilde{\pi}^k_t=P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,H_t, \Theta)$
+  + $P_{t}(i,j) = P(X_t=i,X_{t+1}=j|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta)$
+  + reduce the computation cost
+
+Data Augmentation: FRBS recursion
+========================================================
+
+
+  1. Initialize the marginal state density by
+
+  $$
+  \tilde{\pi}^k_1 = \frac{P(X_1=k)P(E_1|X_1=k)P(H_1|X_1=k)P(Y_1|X_1=k,E_1)}{\sum_{n=1}^K P(X_1=n)P(E_1|X_1=n)P(H_1|X_1=n)P(Y_1|X_1=n,E_1)}
+  $$
+
+  2. Calculate $P_t(n,k)=\tilde{\pi}_{t-1}^n P(X_t=k|X_{t-1}=n,E_{t-1})P(Y_t|X_t,E_t)P(E_t|X_t)\prod_{k=1}^T(1-h_k^{X_k})$
+
+  3. Calculate $\tilde{\pi}_t^k=\sum_{n}P_t(n,k)$
+
+Data Augmentation: FRBS sampling
+========================================================
+- Why backward sampling legit
+
+  + By the assumption of first-order Markov chain $X_t\perp\!\!\!\perp \mathbf{Y}_{t+2,T},\mathbf{E}_{t+2,T},\mathbf{H}_{t+2,T}|X_{t+1}$
+  + $P(X_t|X_{t+1}=j,\mathbf{Y},\mathbf{E},H_T,\Theta) = P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)$, which is $\frac{P(i,j)}{\sum_i P(i,j)}$
+
+- Scheme
+ + Sample by $\tilde{\pi}^k_T$
+ + Backward sample by $\frac{P(k,j)}{\sum_i P(i,j)}$ given $X_{t+1}=j$
+
+
+Gibbs Sampling: Conjugate Posterior
+========================================================
+
+- Except for the hazard model, all parameters are either binomial or multinomial
+  + The conjugate prior is either Beta(1,1) or Dirchelet(1,$\dots$,1)
+  + The posterior is Beta(1+$n_0$,1+$n_1$)  or Dirchelet(1+$n_1$, $\dots$, 1+$n_N$)
+
+- Prior effectively assigns zero probability mass to parameter being 0 or 1, which satisfied **identification assumption 3**
+
+- To satisfy  **identification assumption 2**, draw new set of parameters until the inequality is met
+
+Gibbs Sampling: Non-conjugate Posterior
+========================================================
+- The parameters of the hazard model can still be drew by full conditional distribution
+- No conjugate prior -> draw new parameter is expensive
+- Adaptive Rejection Sampler uses the log concavity to speed up
+  + Key is to reduce the number of the expensive evaluations of the target likelihood function
+  + Use upper hull and lower hull to sandwich the target likelihood function by splines
+  + draw from the area between the upper hull and lower hull
+- The conditional distribution of $\lambda$ and $\beta$ are log concave
+  + $\lambda e^{\beta T}<1$ contrains the initial sampling point
+
+
+Chapter III: Selection Bias of the Exit Decision
 ========================================================
 id: chp3
 type: section
@@ -262,6 +488,135 @@ type: section
 Motivation
 =======================================================
 id: chp3mot
+
+- Dynamic Selection Bias
+  + If the learner is allowed to drop out
+  + Low mastery students drop out first
+  + Higher success rate reflect both learning and survival bias
+
+
+Characterize the Bias
+=======================================================
+id: chp3theory
+
+$$
+\begin{aligned}
+E(\hat{\ell^k}) &= \frac{\sum_{t=1}^TP(X_t=k+1|X_{t-1}=k,H_t=0|\mathbf{Y},\mathbf{E})P(H_t=0,X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0,X_{t-1}=k,\mathbf{Y},\mathbf{E})}\\
+&= \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
+\end{aligned}
+$$
+- Unbiase if and only if $P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k)$, which means the hazard rate is independent of latent state
+
+- If $h_t^1 < h_t^0$, Then $P(H_t=0|X_t=1,X_{t-1}=0) > P(H_t=0|X_{t-1}=0)$, and the pedagogical efficacy is **biased upwards**
+
+
+Case Study
+=======================================================
+id: chp3case
+
+- [The Learning Environment] (#/chp3env)
+
+- [The Learning Task] (#/chp3task)
+
+- [Result] (#/chp3res)
+
+
+The Learning Environment(1)
+=======================================================
+id: chp3env
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Level Initiation", fig.align='center'}
+include_graphics("fig/app.png")
+```
+
+
+The Learning Environment(2)
+=======================================================
+- Mechanically built in selection bias
+  + Correct, damage the enenmy
+  + Incorrect, damaged by the enemy
+  + Maximum take 3 hits
+  + Longest streak is 10
+- Basic algorithmatic training
+  + Quasi-homogeneous items
+  + identical latent skill
+
+
+
+The Learning Task
+=======================================================
+id: chp3task
+
+- Sequential Order: Grade 1
+  + 1,4,2. Which is the 2nd largest number?
+
+- Vertical Division: Grade 2
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics("fig/vertical_division.png")
+```
+
+
+Observed Learning Curve
+=======================================================
+id: chp3res
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics("fig/chp3_obs_res_rate.png")
+```
+
+Differential Attrition
+=======================================================
+id: chp3res
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics("fig/hazardrate.png")
+```
+
+Estimated Pedagogical Efficacy
+=======================================================
+- Baseline(BKT):
+
+  + $E_t=1$
+  + $X_t$,$Y_t$ binary
+  + $j=1$
+  + $H_t=0$
+
+- General model:
+  + Allow $H_t$
+
+***
+
+|Knowledge Point | BKT | BKT+Hazard|
+|----------------|-----|-------|
+|Sequential Order| 0.213|0.097 |
+|Vertical Division|0.077 |0.004 |
+
+Estimated Pedagogical Efficacy
+=======================================================
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+include_graphics("fig/chp3_lc_fit.png")
+```
+
+
+Chapter IV: Effort Induced Measurement Error
+========================================================
+id: chp4
+type: section
+
+- [Motivation](#/chp4mot)
+
+- [Characterize the Bias](#/chp4theory)
+
+- [Case Study](#/chp4case)
+
+
+
+
+Motivation
+=======================================================
+id: chp4mot
 
 - Consider an RCT that compares pedagogical efficacies of two items
     + Random assignment of the items
@@ -287,7 +642,7 @@ Task Engagement (or Lack Thereof)
 
 Characterize the Bias(1)
 =======================================================
-id: chp3theory
+id: chp4theory
 
 - To show the intuition, assume a very simple structure
     + $M_x=M_y=2$, $j=1$
@@ -320,20 +675,20 @@ $$
 
 Case Study
 =======================================================
-id: chp3case
+id: chp4case
 
-- [The Learning Environment] (#/learningenv)
+- [The Learning Environment] (#/chp4env)
 
-- [The Experiment Design] (#/expdesign)
+- [The Experiment Design] (#/chp4design)
 
 - [The Identification of Effort] (#/effortident)
 
-- [Result] (#/chp3res)
+- [Result] (#/chp4res)
 
 
 "Gamified" Learning
 =======================================================
-id: learningenv
+id: chp4env
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Level Initiation", fig.align='center'}
 include_graphics("fig/initial.png")
@@ -353,7 +708,7 @@ include_graphics("fig/completion.png")
 
 The Experiment Design (1)
 =======================================================
-id: expdesign
+id: chp4design
 
 - The learning task / pre-test
 - Calculate the circumference and area of the large rectangle
@@ -493,7 +848,7 @@ include_graphics('fig/exp_giveup_seq.png')
 
 The Result
 =======================================================
-id: chp3res
+id: chp4res
 
 - The model is estimated with MCMC algorithm
   + The learning parameter has a beta prior B(1,1)
@@ -504,7 +859,6 @@ id: chp3res
 
 The Result (Two-state model)
 =======================================================
-id: chp3res
 - Position shifts (correct for downward bias)
 - Weakly separate out video scaffolding
 
@@ -552,7 +906,7 @@ id: bkt
 - $M_x=2$, $M_y=2$, $j=1$
 - The guess rate is $c^{0,1}$, The slip rate is $c^{1,0}$.
 
-[return](#/hmm1)
+[return](#/hmm_example)
 
 
 Special Case 2: Zone of Proximal Development
@@ -564,15 +918,15 @@ id: zpd
     + Development lags task requirement but may succeed in the task with guidance or collaboration [**The zone**]
     + Development leads task requirement and succeed on their own
 
+Special Case 2: Zone of Proximal Development (Cont)
+=======================================================
 - $M_x=3$, $M_y=3$, $j=1$
     + $X=0$ is the unprepared. $X=1$ is the zone. $X=2$ is the mastered
     + $Y=0$ is failure. $Y=1$ is partial success. $Y=2$ is complete success
-    + $c^{0,2}=0$, the unprepared never fully succeed
-    + $c^{2,0}=0$, the mastered never fully fail
 
 - Allow for **learning reinforcement** where positive performance leads to better performance
 
-[return](#/hmm1)
+[return](#/hmm_example)
 
 
 Answer Classification (1)
