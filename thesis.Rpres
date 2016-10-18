@@ -66,11 +66,11 @@ A Motivating Example (2)
 
   + The user's latent ability has to be inferred from the observed response
 
-- Practice as Instruction -> Optiomal Recommendation
+- Practice as Instruction -> **Optiomal Recommendation**
 
-  + What matters is how the item helps the learner to elevate the latent mastery
-  + What we usually observe is how difficult the item given the current latent mastery
-  + The relationship between the item efficacy and item and item difficulty is unclear
+  + What matters is how the item helps the learner to elevate future mastery
+  + What we usually observe is how difficult the item given the current mastery
+  + The relationship between the item efficacy and item difficulty is unclear
   + Folk wisdom is inverse U
 
 
@@ -80,13 +80,15 @@ Pedagogical Efficacy
 ========================================================
 type: prompt
 
-- pedagogical efficacy = What makes practices effective
+- Practice: Any learning task that produces a measurable outcome
+  + Listening to lecture per se is not a practice [not measurable]
+  + Batting exercise is a practice
+
+- Pedagogical efficacy = What makes practices effective
 
     + A hard question without a clear answer
 
-    + Key to a successful recommendation system
-
-- The thesis aims to measure, not to explain, the pedagogical efficacy
+- To measure, not to explain, the pedagogical efficacy
 
 
 
@@ -122,9 +124,9 @@ Event Sequence
     * With effort, (probabilistic) learning happens depending on the item efficacy
     * Without effort, no learning
 
-+ The learner produces a response and receives grading on the response
++ The learner produces a response and is graded
 
-    * Assume feedback is not important to learning. Only exposure to item matters
+    * Assume no learning from the feedback after the response
 
 + The learner choose to stop
 
@@ -133,11 +135,11 @@ Event Sequence
 
 Why Modelling Effort and Stop
 ========================================================
-- In Theory
-  + Reveal information about the user if the decision depends on the state
+- Theorectically
   + Capture some noncognitive skills, like grit
+  + Prevalent in low stake learning environment
 
-- In practice
+- Practically
   + Engagement is usually managed by the product manager
 
 
@@ -161,7 +163,7 @@ The Learning Process (1)
 id: lp
 - **Assumption 1**: $X_t$ is unidimensional
 
-    + Avoid mapping knowledge space to item
+    + Avoid mapping the knowledge space to item
 
 - **Assumption 2**: $X_t$ is discrete with $M_x$ number of states
 
@@ -174,7 +176,15 @@ The Learning Process (2)
 $$P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j)$$
 
 - **Assumption 3**: Pedagogical efficacy is independent of the sequence order
+  + Rule out training fatigue
+
 - **Assumption 4**: No substitution or complementarity in sequence composition
+  + Rule out scaffolding items
+
+
+The Learning Process (3)
+========================================================
+
 - **Assumption 5**: Learning is gradual. Transit one state at a time.
 
 $$p(X_t=m|X_{t-1}=n, j) =0 \quad \forall t,j \quad\text{where} \quad m-n>1$$
@@ -183,7 +193,9 @@ $$p(X_t=m|X_{t-1}=n, j) =0 \quad \forall t,j \quad\text{where} \quad m-n>1$$
 
 $$p(X_t=m|X_{t-1}=n, j) = 0 \quad \forall t,j \quad\text{where} \quad m < n$$
 
-The Learning Process (3)
+- This is called left-to-right transition
+
+The Learning Process (4)
 ========================================================
 Define the **pedagogical efficacy**  as
 $$\ell^k_j =P(X_t=k+1|X_{t-1}=k,j)$$
@@ -226,27 +238,27 @@ The Effort Decision(1)
 id: ed
 **Assumption 9**: Effort is a binary choice.
 
-**Assumption 10**: Effort choice is independent, conditioning on the latent ability and item
+**Assumption 10**: Effort choice is independent, conditioning on the latent mastery and the item
 
 
 
 $$
-P(E_{j,t}=1|X_t=k) = e_j^k
+P(E_t=1|X_t=k,A(t)=j) = e_j^k
 $$
 
-- It implies that the learner does not learn about the cost of effort
+- The learner does not learn about the cost of effort
 
 
-The Effort Decision(3)
+The Effort Decision(2)
 ========================================================
 **Assumption 11**: No pain no gain.
 
-$P(X_t=k+1|X_{t-1}=k, j, E_{j,t}=0) = 0$
+$P(X_t=k+1|X_{t-1}=k, A(t)=j, E_t=0) = 0$
 
 
 **Assumption 12**: No educated guess
 
-$P(Y_{j,t}=0|E_{j,t}=0) = 1$
+$P(Y_t=0|E_t=0,A(t)=j) = 1$
 
 [to Chapter 4](#/chp4)
 
@@ -254,18 +266,21 @@ $P(Y_{j,t}=0|E_{j,t}=0) = 1$
 The Stop Decision
 ========================================================
 id: sd
-- The hazard rate is duration dependent
-- The hazard rate varies with the latent state
-  + Not depends on response. An error due to slip and an error due to lack of understanding have different implications
-  + A plausible story: boredom V.s. Frustration
-
+- The hazard rate
 $$
 h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 $$
 
+- The hazard rate is duration dependent
+- The hazard rate varies with the latent state
+  + Not depends on response.
+  + An error due to slip and an error due to lack of mastery should have different implications
+  + A plausible story: boredom V.s. Frustration
 
 
-The General Model as A Hidden Markov Process
+
+
+The General Model
 ========================================================
 id: hmm2
 
@@ -283,58 +298,62 @@ Notation
   + $i$: the the learner id
   + $N$： the number of learners
   + $T_i$:the sequence length of learner $i$.
-  + $\mathbf{X}^i$: The latent state sequence, $X^i_1,\dots,X^i_{T_i}$
-  + $\mathbf{Y}^i$: The answer sequence, $Y^i_1,\dots,Y^i_{T_i}$
-  + $\mathbf{A}^i$: The item sequence,   $A^i(1),\dots,A^i(T_i)$
-  + $\mathbf{E}^i$: The effort sequence, $E^i_1,\dots,E^i_{T_i}$
-  + $\mathbf{H}^i$: The stop sequence,   $H^i_1,\dots,H^i_{T_i}$
-
+  + $\mathbf{X}_{1,T_i}^i$: The latent state sequence. $(X^i_1,\dots,X^i_{T_i})$
+  + $\mathbf{Y}_{1,T_i}^i$: The answer sequence. $(Y^i_1,\dots,Y^i_{T_i})$
+  + $\mathbf{A}_{1,T_i}^i$: The item sequence.   $(A^i(1),\dots,A^i(T_i))$
+  + $\mathbf{E}_{1,T_i}^i$: The effort sequence. $(E^i_1,\dots,E^i_{T_i})$
+  + $\mathbf{H}_{1,T_i}^i$: The stop sequence.   $(H^i_1,\dots,H^i_{T_i})$
+  + For simplicity, omit the lower index when refering to the full sequence
 
 The Sufficient Statistics
 ========================================================
 **Identifcation Assumption 1**: Learners are homogeneous and independent
 
-Let $G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$ maps the observed variable to a one dimension set $\Omega$ with size $Z$.
+Let $G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$ maps the observed variable to a set $\Omega$ with size $Z$.
 
-Let $G^{-1}(z)$ denote the $z$ element of mapping set.
+Let $G^{-1}(z)$ denote the $z^{th}$ element of mapping set.
 
 $$
 L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod_{z=1}^ZP(G^{-1}(z))^{\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)}
 $$
-It is easy to see that $\{n1,\dots,n_Z\}$ are sufficient statistics where $n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)$
+
+- Let $n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)$
+
+-It is easy to see that $\{n1,\dots,n_Z\}$ are sufficient statistics
 
 The Sufficient Statistics (Cont)
 ========================================================
 - Example:
   + Response only, binary $Y_t$, $t$=2, $j=1$
-  + $\Omega=\{\{Y_1=1,Y_2=1\},\{Y_1=0,Y_2=1\},\{Y_1=1,Y_2=0\},\{Y_1=0,Y_2=0\}\}$
-  + $G(\{Y_1=1,Y_2=1\})=1$, $G^{-1}(1) = \{Y_1=1,Y_2=1\}$
+  + $\Omega=\{(1,1),(0,1),(1,0),(0,0)\}$
+  + $G((1,0))=3$, $G^{-1}(3) = (1,0)$
 
 
 The Augmented Likelihood(1)
 ========================================================
-Let $G^{-1}(z) = \mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}$ and $T_z$ be the length of the practice sequence.
+Assume that item sequences are exogeneously determined, Thus $\mathbf{a}$ is independent of all other variables.
+
+Let $G^{-1}(z) = (\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h})$ and $T_z$ be the length of the practice sequence.
 
 $$
-P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}, \mathbf{X})
+P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
 $$
 
-Assume $\mathbf{X}$ is known(augmented). Assume that item sequences are exogeneously determined, Thus $\mathbf{a}$ is independent of all other variables.
+For a particular state augmentation $\mathbf{X}$
 
 $$
 \begin{aligned}
-P(G^{-1}(z)) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
-&= P(\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{e})P(\mathbf{h}|\mathbf{X})P(\mathbf{e},\mathbf{X}|\mathbf{a})
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a}) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
+&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X})P(\mathbf{E}=\mathbf{e},\mathbf{X}|\mathbf{a})
 \end{aligned}
-
 $$
 
 The Augmented Likelihood(2)
 ========================================================
 $$
 \begin{aligned}
-P(\mathbf{y}|\mathbf{X},\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^K\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
-&\prod_{m=1}^{M-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
+P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
+&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
 \end{aligned}
 $$
 
@@ -342,8 +361,8 @@ The Augmented Likelihood(3)
 ========================================================
 $$
 \begin{aligned}
-P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
-&= \prod_{t=1}^{T_z}\prod_{k=1}^K[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
+P(\mathbf{H}=\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}h(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
+&= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
 \end{aligned}
 $$
 
@@ -351,11 +370,11 @@ The Augmented Likelihood(4)
 ========================================================
 $$
 \begin{aligned}
-&P(\mathbf{X},\mathbf{e}|\mathbf{a})\\
-&= P(X_1)P(E_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
-&= \prod_{k=1}^K(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
-& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{A(t)=j,1(X_{t-1}=k,E_t=0)}]\\
-&[1^{1(X_{t-1}=K,X_t=K)}\prod_{k=1}^{K-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
+&P(\mathbf{X},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
+&= P(X_1)P(E_1|X_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
+&= \prod_{k=1}^{M_x}(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
+& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=0)}]\\
+&[1^{1(X_{t-1}=M_x,X_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
 &1^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}\\
 &0^{1-1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}]\}
 \end{aligned}
@@ -363,6 +382,7 @@ $$
 Identification (1)
 ========================================================
 - Need to prevent label switching
+  + E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.
   + **Identifcation Assumption 2(a)**: $X_t,Y_t$ binary, $c_j^{0,1} < c_j^{1,1}$
   + **Identifcation Assumption 2(b)**: $X_t,Y_t$ tetiary, $c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j)$, $c^{1,2}_j < c^{2,2}_j$
 
@@ -385,7 +405,7 @@ Identification for MLE
 - Recall sufficient statistics $\{n_1,\dots,n_Z\}$. It implies Z moment conditions.
 - Let the size of the parameter set $\Theta$ to be W.
 - Necessary Condition: $Z\geq W$
-- Sufficient Condition: Nonlinear system makes it difficult to prove
+- Sufficient Condition: difficult for nonlinear system
 
 - Example($j=1$, $t=2$,$E_t=1$,$H_t=0$):
 
@@ -404,7 +424,7 @@ id: mcmc
 - Why not EM:
   + Lack of Unique Identification
   + Hard to incorporate the hazard model
-  + Hard to incorporate user heterogeneity(Future)
+  + [Future] Hard to incorporate user heterogeneity
 
 - General Stategy of MCMC
   + Given parameters, augment the latent states
@@ -413,21 +433,26 @@ id: mcmc
 - [Future] Hamiltonian Markov Chain Monte Carlo for better mixture in high dimensional parameter space
 
 
-Data Augmentation(1)
+Data Augmentation(1): Brute Force
 ========================================================
-- Brute Force
-  + $P(X_1|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
-  + $P(X_t|X_{t-1},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
-  + Sample forward
+- Calculate the initial density and conditional probability explicitly
+  + $P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{(X_t=n\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
+  + $P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{((X_{t-1}=m,X_t=n)\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
+  + $P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=  \frac{P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{\sum_{k=1}^{M_x}P(X_t=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}$
+  + $P(X_{t-1}=m|X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}$
+
+- Sampling Scheme
+  + Draw the last state by $P(X_{T}|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
+  + Draw backward by $P(X_{t-1}|X_t=k)$ conditional on the last draw $X_t=k$
+
+Data Augmentation(2): FRBS
+========================================================
 
 - Forward recursion, backward sampling[Scott, 2002]
   + $\tilde{\pi}^k_t=P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,H_t, \Theta)$
-  + $P_{t}(i,j) = P(X_t=i,X_{t+1}=j|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta)$
-  + reduce the computation cost
+  + $P_{t}(m,n) = P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta)$
 
-Data Augmentation: FRBS recursion
-========================================================
-
+- Recursion
 
   1. Initialize the marginal state density by
 
@@ -500,15 +525,13 @@ Characterize the Bias
 id: chp3theory
 
 $$
-\begin{aligned}
-E(\hat{\ell^k}) &= \frac{\sum_{t=1}^TP(X_t=k+1|X_{t-1}=k,H_t=0|\mathbf{Y},\mathbf{E})P(H_t=0,X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0,X_{t-1}=k,\mathbf{Y},\mathbf{E})}\\
-&= \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
-\end{aligned}
+E(\hat{\ell^k}) = \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
 $$
-- Unbiase if and only if $P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k)$, which means the hazard rate is independent of latent state
+- Unbiased if and only if $P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k)$, which means the stop decision is independent of latent state
 
 - If $h_t^1 < h_t^0$, Then $P(H_t=0|X_t=1,X_{t-1}=0) > P(H_t=0|X_{t-1}=0)$, and the pedagogical efficacy is **biased upwards**
 
+- Notice that if the hazard rate only depends on response but not state, the pedagogical efficacy is unbiased
 
 Case Study
 =======================================================
@@ -536,10 +559,10 @@ The Learning Environment(2)
   + Correct, damage the enenmy
   + Incorrect, damaged by the enemy
   + Maximum take 3 hits
-  + Longest streak is 10
+  + Longest streak is 10. Data collected at the first 5.
 - Basic algorithmatic training
+  + identical unidimensional latent skill
   + Quasi-homogeneous items
-  + identical latent skill
 
 
 
@@ -548,7 +571,7 @@ The Learning Task
 id: chp3task
 
 - Sequential Order: Grade 1
-  + 1,4,2. Which is the 2nd largest number?
+  + 1,4,2. What is the 2nd largest number?
 
 - Vertical Division: Grade 2
 

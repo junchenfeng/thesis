@@ -876,12 +876,12 @@ hljs.initHighlightingOnLoad();
 <ul>
 <li>The user&#39;s latent ability has to be inferred from the observed response</li>
 </ul></li>
-<li><p>Practice as Instruction -&gt; Optiomal Recommendation</p>
+<li><p>Practice as Instruction -&gt; <strong>Optiomal Recommendation</strong></p>
 
 <ul>
-<li>What matters is how the item helps the learner to elevate the latent mastery</li>
-<li>What we usually observe is how difficult the item given the current latent mastery</li>
-<li>The relationship between the item efficacy and item and item difficulty is unclear</li>
+<li>What matters is how the item helps the learner to elevate future mastery</li>
+<li>What we usually observe is how difficult the item given the current mastery</li>
+<li>The relationship between the item efficacy and item difficulty is unclear</li>
 <li>Folk wisdom is inverse U</li>
 </ul></li>
 </ul>
@@ -893,13 +893,18 @@ hljs.initHighlightingOnLoad();
 <h3>Pedagogical Efficacy</h3>
 <div class="slideContent" >
 <ul>
-<li><p>pedagogical efficacy = What makes practices effective</p>
+<li><p>Practice: Any learning task that produces a measurable outcome</p>
+
+<ul>
+<li>Listening to lecture per se is not a practice [not measurable]</li>
+<li>Batting exercise is a practice</li>
+</ul></li>
+<li><p>Pedagogical efficacy = What makes practices effective</p>
 
 <ul>
 <li>A hard question without a clear answer</li>
-<li>Key to a successful recommendation system</li>
 </ul></li>
-<li><p>The thesis aims to measure, not to explain, the pedagogical efficacy</p></li>
+<li><p>To measure, not to explain, the pedagogical efficacy</p></li>
 </ul>
 
 </div>
@@ -941,10 +946,10 @@ hljs.initHighlightingOnLoad();
 <li>With effort, (probabilistic) learning happens depending on the item efficacy</li>
 <li>Without effort, no learning</li>
 </ul></li>
-<li><p>The learner produces a response and receives grading on the response</p>
+<li><p>The learner produces a response and is graded</p>
 
 <ul>
-<li>Assume feedback is not important to learning. Only exposure to item matters</li>
+<li>Assume no learning from the feedback after the response</li>
 </ul></li>
 <li><p>The learner choose to stop</p>
 
@@ -960,13 +965,13 @@ hljs.initHighlightingOnLoad();
 <h3>Why Modelling Effort and Stop</h3>
 <div class="slideContent" >
 <ul>
-<li><p>In Theory</p>
+<li><p>Theorectically</p>
 
 <ul>
-<li>Reveal information about the user if the decision depends on the state</li>
 <li>Capture some noncognitive skills, like grit</li>
+<li>Prevalent in low stake learning environment</li>
 </ul></li>
-<li><p>In practice</p>
+<li><p>Practically</p>
 
 <ul>
 <li>Engagement is usually managed by the product manager</li>
@@ -1003,7 +1008,7 @@ hljs.initHighlightingOnLoad();
 <li><p><strong>Assumption 1</strong>: \( X_t \) is unidimensional</p>
 
 <ul>
-<li>Avoid mapping knowledge space to item</li>
+<li>Avoid mapping the knowledge space to item</li>
 </ul></li>
 <li><p><strong>Assumption 2</strong>: \( X_t \) is discrete with \( M_x \) number of states</p></li>
 </ul>
@@ -1021,8 +1026,25 @@ hljs.initHighlightingOnLoad();
 <p>\[ P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j) \]</p>
 
 <ul>
-<li><strong>Assumption 3</strong>: Pedagogical efficacy is independent of the sequence order</li>
-<li><strong>Assumption 4</strong>: No substitution or complementarity in sequence composition</li>
+<li><p><strong>Assumption 3</strong>: Pedagogical efficacy is independent of the sequence order</p>
+
+<ul>
+<li>Rule out training fatigue</li>
+</ul></li>
+<li><p><strong>Assumption 4</strong>: No substitution or complementarity in sequence composition</p>
+
+<ul>
+<li>Rule out scaffolding items</li>
+</ul></li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>The Learning Process (3)</h3>
+<div class="slideContent" >
+<ul>
 <li><strong>Assumption 5</strong>: Learning is gradual. Transit one state at a time.</li>
 </ul>
 
@@ -1034,11 +1056,15 @@ hljs.initHighlightingOnLoad();
 
 <p>\[ p(X_t=m|X_{t-1}=n, j) = 0 \quad \forall t,j \quad\text{where} \quad m < n \]</p>
 
+<ul>
+<li>This is called left-to-right transition</li>
+</ul>
+
 </div>
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>The Learning Process (3)</h3>
+<h3>The Learning Process (4)</h3>
 <div class="slideContent" >
 <p>Define the <strong>pedagogical efficacy</strong>  as
 \[ \ell^k_j =P(X_t=k+1|X_{t-1}=k,j) \]</p>
@@ -1089,29 +1115,29 @@ c^{k,m}_j = P(Y_{j,t}=m|X_t=k)
 <div class="slideContent" >
 <p><strong>Assumption 9</strong>: Effort is a binary choice.</p>
 
-<p><strong>Assumption 10</strong>: Effort choice is independent, conditioning on the latent ability and item</p>
+<p><strong>Assumption 10</strong>: Effort choice is independent, conditioning on the latent mastery and the item</p>
 
 <p>\[ 
-P(E_{j,t}=1|X_t=k) = e_j^k
+P(E_t=1|X_t=k,A(t)=j) = e_j^k
  \]</p>
 
 <ul>
-<li>It implies that the learner does not learn about the cost of effort</li>
+<li>The learner does not learn about the cost of effort</li>
 </ul>
 
 </div>
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>The Effort Decision(3)</h3>
+<h3>The Effort Decision(2)</h3>
 <div class="slideContent" >
 <p><strong>Assumption 11</strong>: No pain no gain.</p>
 
-<p>\( P(X_t=k+1|X_{t-1}=k, j, E_{j,t}=0) = 0 \)</p>
+<p>\( P(X_t=k+1|X_{t-1}=k, A(t)=j, E_t=0) = 0 \)</p>
 
 <p><strong>Assumption 12</strong>: No educated guess</p>
 
-<p>\( P(Y_{j,t}=0|E_{j,t}=0) = 1 \)</p>
+<p>\( P(Y_t=0|E_t=0,A(t)=j) = 1 \)</p>
 
 <p><a href="#/chp4">to Chapter 4</a></p>
 
@@ -1122,24 +1148,25 @@ P(E_{j,t}=1|X_t=k) = e_j^k
 <h3>The Stop Decision</h3>
 <div class="slideContent" >
 <ul>
-<li>The hazard rate is duration dependent</li>
-<li>The hazard rate varies with the latent state
+<li><p>The hazard rate
+\[ 
+h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
+ \]</p></li>
+<li><p>The hazard rate is duration dependent</p></li>
+<li><p>The hazard rate varies with the latent state</p>
 
 <ul>
-<li>Not depends on response. An error due to slip and an error due to lack of understanding have different implications</li>
+<li>Not depends on response.</li>
+<li>An error due to slip and an error due to lack of mastery should have different implications</li>
 <li>A plausible story: boredom V.s. Frustration</li>
 </ul></li>
 </ul>
-
-<p>\[ 
-h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
- \]</p>
 
 </div>
 
 </section>
 <section id="hmm2" data-transition="linear" data-transition-speed="default">
-<h3>The General Model as A Hidden Markov Process</h3>
+<h3>The General Model</h3>
 <div class="mediaOnly slideContent" >
 <p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-2"/></p>
 
@@ -1160,11 +1187,12 @@ h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 <li>\( i \): the the learner id</li>
 <li>\( N \)： the number of learners</li>
 <li>\( T_i \):the sequence length of learner \( i \).</li>
-<li>\( \mathbf{X}^i \): The latent state sequence, \( X^i_1,\dots,X^i_{T_i} \)</li>
-<li>\( \mathbf{Y}^i \): The answer sequence, \( Y^i_1,\dots,Y^i_{T_i} \)</li>
-<li>\( \mathbf{A}^i \): The item sequence,   \( A^i(1),\dots,A^i(T_i) \)</li>
-<li>\( \mathbf{E}^i \): The effort sequence, \( E^i_1,\dots,E^i_{T_i} \)</li>
-<li>\( \mathbf{H}^i \): The stop sequence,   \( H^i_1,\dots,H^i_{T_i} \)</li>
+<li>\( \mathbf{X}_{1,T_i}^i \): The latent state sequence. \( (X^i_1,\dots,X^i_{T_i}) \)</li>
+<li>\( \mathbf{Y}_{1,T_i}^i \): The answer sequence. \( (Y^i_1,\dots,Y^i_{T_i}) \)</li>
+<li>\( \mathbf{A}_{1,T_i}^i \): The item sequence.   \( (A^i(1),\dots,A^i(T_i)) \)</li>
+<li>\( \mathbf{E}_{1,T_i}^i \): The effort sequence. \( (E^i_1,\dots,E^i_{T_i}) \)</li>
+<li>\( \mathbf{H}_{1,T_i}^i \): The stop sequence.   \( (H^i_1,\dots,H^i_{T_i}) \)</li>
+<li>For simplicity, omit the lower index when refering to the full sequence</li>
 </ul>
 
 </div>
@@ -1175,14 +1203,19 @@ h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 <div class="slideContent" >
 <p><strong>Identifcation Assumption 1</strong>: Learners are homogeneous and independent</p>
 
-<p>Let \( G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}) \) maps the observed variable to a one dimension set \( \Omega \) with size \( Z \).</p>
+<p>Let \( G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}) \) maps the observed variable to a set \( \Omega \) with size \( Z \).</p>
 
-<p>Let \( G^{-1}(z) \) denote the \( z \) element of mapping set.</p>
+<p>Let \( G^{-1}(z) \) denote the \( z^{th} \) element of mapping set.</p>
 
 <p>\[ 
 L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod_{z=1}^ZP(G^{-1}(z))^{\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)}
- \]
-It is easy to see that \( \{n1,\dots,n_Z\} \) are sufficient statistics where \( n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z) \)</p>
+ \]</p>
+
+<ul>
+<li>Let \( n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z) \)</li>
+</ul>
+
+<p>-It is easy to see that \( \{n1,\dots,n_Z\} \) are sufficient statistics</p>
 
 </div>
 
@@ -1195,8 +1228,8 @@ It is easy to see that \( \{n1,\dots,n_Z\} \) are sufficient statistics where \(
 
 <ul>
 <li>Response only, binary \( Y_t \), \( t \)=2, \( j=1 \)</li>
-<li>\( \Omega=\{\{Y_1=1,Y_2=1\},\{Y_1=0,Y_2=1\},\{Y_1=1,Y_2=0\},\{Y_1=0,Y_2=0\}\} \)</li>
-<li>\( G(\{Y_1=1,Y_2=1\})=1 \), \( G^{-1}(1) = \{Y_1=1,Y_2=1\} \)</li>
+<li>\( \Omega=\{(1,1),(0,1),(1,0),(0,0)\} \)</li>
+<li>\( G((1,0))=3 \), \( G^{-1}(3) = (1,0) \)</li>
 </ul></li>
 </ul>
 
@@ -1206,20 +1239,21 @@ It is easy to see that \( \{n1,\dots,n_Z\} \) are sufficient statistics where \(
 <section data-transition="linear" data-transition-speed="default">
 <h3>The Augmented Likelihood(1)</h3>
 <div class="slideContent" >
-<p>Let \( G^{-1}(z) = \mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h} \) and \( T_z \) be the length of the practice sequence.</p>
+<p>Assume that item sequences are exogeneously determined, Thus \( \mathbf{a} \) is independent of all other variables.</p>
+
+<p>Let \( G^{-1}(z) = (\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}) \) and \( T_z \) be the length of the practice sequence.</p>
 
 <p>\[ 
-P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}, \mathbf{X})
+P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
  \]</p>
 
-<p>Assume \( \mathbf{X} \) is known(augmented). Assume that item sequences are exogeneously determined, Thus \( \mathbf{a} \) is independent of all other variables.</p>
+<p>For a particular state augmentation \( \mathbf{X} \)</p>
 
 <p>\[ 
 \begin{aligned}
-P(G^{-1}(z)) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
-&= P(\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{e})P(\mathbf{h}|\mathbf{X})P(\mathbf{e},\mathbf{X}|\mathbf{a})
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a}) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
+&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X})P(\mathbf{E}=\mathbf{e},\mathbf{X}|\mathbf{a})
 \end{aligned}
-
  \]</p>
 
 </div>
@@ -1230,8 +1264,8 @@ P(G^{-1}(z)) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
 <div class="slideContent" >
 <p>\[ 
 \begin{aligned}
-P(\mathbf{y}|\mathbf{X},\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^K\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
-&\prod_{m=1}^{M-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
+P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
+&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
 \end{aligned}
  \]</p>
 
@@ -1243,8 +1277,8 @@ P(\mathbf{y}|\mathbf{X},\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^
 <div class="slideContent" >
 <p>\[ 
 \begin{aligned}
-P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
-&= \prod_{t=1}^{T_z}\prod_{k=1}^K[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
+P(\mathbf{H}=\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}h(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
+&= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
 \end{aligned}
  \]</p>
 
@@ -1256,11 +1290,11 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 <div class="slideContent" >
 <p>\[ 
 \begin{aligned}
-&P(\mathbf{X},\mathbf{e}|\mathbf{a})\\
-&= P(X_1)P(E_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
-&= \prod_{k=1}^K(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
-& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{A(t)=j,1(X_{t-1}=k,E_t=0)}]\\
-&[1^{1(X_{t-1}=K,X_t=K)}\prod_{k=1}^{K-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
+&P(\mathbf{X},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
+&= P(X_1)P(E_1|X_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
+&= \prod_{k=1}^{M_x}(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
+& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=0)}]\\
+&[1^{1(X_{t-1}=M_x,X_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
 &1^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}\\
 &0^{1-1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}]\}
 \end{aligned}
@@ -1276,6 +1310,7 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 <li><p>Need to prevent label switching</p>
 
 <ul>
+<li>E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.</li>
 <li><strong>Identifcation Assumption 2(a)</strong>: \( X_t,Y_t \) binary, \( c_j^{0,1} < c_j^{1,1} \)</li>
 <li><strong>Identifcation Assumption 2(b)</strong>: \( X_t,Y_t \) tetiary, \( c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j) \), \( c^{1,2}_j < c^{2,2}_j \)</li>
 </ul></li>
@@ -1317,7 +1352,7 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 <li>Recall sufficient statistics \( \{n_1,\dots,n_Z\} \). It implies Z moment conditions.</li>
 <li>Let the size of the parameter set \( \Theta \) to be W.</li>
 <li>Necessary Condition: \( Z\geq W \)</li>
-<li><p>Sufficient Condition: Nonlinear system makes it difficult to prove</p></li>
+<li><p>Sufficient Condition: difficult for nonlinear system</p></li>
 <li><p>Example(\( j=1 \), \( t=2 \),\( E_t=1 \),\( H_t=0 \)):</p>
 
 <ul>
@@ -1341,7 +1376,7 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 <ul>
 <li>Lack of Unique Identification</li>
 <li>Hard to incorporate the hazard model</li>
-<li>Hard to incorporate user heterogeneity(Future)</li>
+<li>[Future] Hard to incorporate user heterogeneity</li>
 </ul></li>
 <li><p>General Stategy of MCMC</p>
 
@@ -1356,22 +1391,22 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>Data Augmentation(1)</h3>
+<h3>Data Augmentation(1): Brute Force</h3>
 <div class="slideContent" >
 <ul>
-<li><p>Brute Force</p>
+<li><p>Calculate the initial density and conditional probability explicitly</p>
 
 <ul>
-<li>\( P(X_1|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A}) \)</li>
-<li>\( P(X_t|X_{t-1},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A}) \)</li>
-<li>Sample forward</li>
+<li>\( P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{(X_t=n\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A}) \)</li>
+<li>\( P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{((X_{t-1}=m,X_t=n)\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A}) \)</li>
+<li>\( P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=  \frac{P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{\sum_{k=1}^{M_x}P(X_t=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})} \)</li>
+<li>\( P(X_{t-1}=m|X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})} \)</li>
 </ul></li>
-<li><p>Forward recursion, backward sampling[Scott, 2002]</p>
+<li><p>Sampling Scheme</p>
 
 <ul>
-<li>\( \tilde{\pi}^k_t=P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,H_t, \Theta) \)</li>
-<li>\( P_{t}(i,j) = P(X_t=i,X_{t+1}=j|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta) \)</li>
-<li>reduce the computation cost</li>
+<li>Draw the last state by \( P(X_{T}|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A}) \)</li>
+<li>Draw backward by \( P(X_{t-1}|X_t=k) \) conditional on the last draw \( X_t=k \)</li>
 </ul></li>
 </ul>
 
@@ -1379,8 +1414,18 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>Data Augmentation: FRBS recursion</h3>
+<h3>Data Augmentation(2): FRBS</h3>
 <div class="slideContent" >
+<ul>
+<li><p>Forward recursion, backward sampling[Scott, 2002]</p>
+
+<ul>
+<li>\( \tilde{\pi}^k_t=P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,H_t, \Theta) \)</li>
+<li>\( P_{t}(m,n) = P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta) \)</li>
+</ul></li>
+<li><p>Recursion</p></li>
+</ul>
+
 <ol>
 <li><p>Initialize the marginal state density by</p>
 
@@ -1487,15 +1532,13 @@ P(\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^Kh(t,k)^{1(H_t=1,X_t=k)
 <h3>Characterize the Bias</h3>
 <div class="slideContent" >
 <p>\[ 
-\begin{aligned}
-E(\hat{\ell^k}) &= \frac{\sum_{t=1}^TP(X_t=k+1|X_{t-1}=k,H_t=0|\mathbf{Y},\mathbf{E})P(H_t=0,X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0,X_{t-1}=k,\mathbf{Y},\mathbf{E})}\\
-&= \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
-\end{aligned}
+E(\hat{\ell^k}) = \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
  \]</p>
 
 <ul>
-<li><p>Unbiase if and only if \( P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k) \), which means the hazard rate is independent of latent state</p></li>
+<li><p>Unbiased if and only if \( P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k) \), which means the stop decision is independent of latent state</p></li>
 <li><p>If \( h_t^1 < h_t^0 \), Then \( P(H_t=0|X_t=1,X_{t-1}=0) > P(H_t=0|X_{t-1}=0) \), and the pedagogical efficacy is <strong>biased upwards</strong></p></li>
+<li><p>Notice that if the hazard rate only depends on response but not state, the pedagogical efficacy is unbiased</p></li>
 </ul>
 
 </div>
@@ -1531,13 +1574,13 @@ E(\hat{\ell^k}) &= \frac{\sum_{t=1}^TP(X_t=k+1|X_{t-1}=k,H_t=0|\mathbf{Y},\mathb
 <li>Correct, damage the enenmy</li>
 <li>Incorrect, damaged by the enemy</li>
 <li>Maximum take 3 hits</li>
-<li>Longest streak is 10</li>
+<li>Longest streak is 10. Data collected at the first 5.</li>
 </ul></li>
 <li>Basic algorithmatic training
 
 <ul>
+<li>identical unidimensional latent skill</li>
 <li>Quasi-homogeneous items</li>
-<li>identical latent skill</li>
 </ul></li>
 </ul>
 
@@ -1551,7 +1594,7 @@ E(\hat{\ell^k}) &= \frac{\sum_{t=1}^TP(X_t=k+1|X_{t-1}=k,H_t=0|\mathbf{Y},\mathb
 <li><p>Sequential Order: Grade 1</p>
 
 <ul>
-<li>1,4,2. Which is the 2nd largest number?</li>
+<li>1,4,2. What is the 2nd largest number?</li>
 </ul></li>
 <li><p>Vertical Division: Grade 2</p></li>
 </ul>
