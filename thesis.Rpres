@@ -24,9 +24,9 @@ Practice Makes Perfect
 ========================================================
 - Merriam Webster: To do repeated exercises for proficiency
 
-- Very effective for K-12 STEM learning
-
 - Effective practice requires more than simple repetition
+
+- How to recommend?
 
 
 
@@ -62,16 +62,17 @@ A Motivating Example (1)
 
 A Motivating Example (2)
 ========================================================
+id: intro_mot
 - Practice as Assessment -> Optimal Stopping
 
   + The user's latent ability has to be inferred from the observed response
 
 - Practice as Instruction -> **Optiomal Recommendation**
 
-  + What matters is how the item helps the learner to elevate future mastery
-  + What we usually observe is how difficult the item given the current mastery
-  + The relationship between the item efficacy and item difficulty is unclear
-  + Folk wisdom is inverse U
+  + What matters is how the item instruction elevates the learner's mastery
+  + What observed is how item difficulty reveals the learner's mastery
+  + The folk wisdom is inverse U
+  + Break the conditional independence [IRT Comparison](#\irt)
 
 
 
@@ -84,7 +85,7 @@ type: prompt
   + Listening to lecture per se is not a practice [not measurable]
   + Batting exercise is a practice
 
-- Pedagogical efficacy = What makes practices effective
+- Pedagogical efficacy = What makes practices effective = learning
 
     + A hard question without a clear answer
 
@@ -136,8 +137,8 @@ Event Sequence
 Why Modelling Effort and Stop
 ========================================================
 - Theorectically
-  + Capture some noncognitive skills, like grit
   + Prevalent in low stake learning environment
+  + bias the pedagogical efficacy if ignored
 
 - Practically
   + Engagement is usually managed by the product manager
@@ -166,12 +167,14 @@ id: lp
     + Avoid mapping the knowledge space to item
 
 - **Assumption 2**: $X_t$ is discrete with $M_x$ number of states
+    + *Learning is moving from a lower state to a higher state*.
+    + More intuitive representation of probabilitic learning than continuous mastery
 
 
 The Learning Process (2)
 ========================================================
 
-- Learning is moving from a lower state to a higher state.
+- General pedagogical efficacy
 
 $$P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j)$$
 
@@ -243,7 +246,7 @@ id: ed
 
 
 $$
-P(E_t=1|X_t=k,A(t)=j) = e_j^k
+P(E_t=1|X_t=k,A(t)=j) = \gamma_j^k
 $$
 
 - The learner does not learn about the cost of effort
@@ -266,6 +269,8 @@ $P(Y_t=0|E_t=0,A(t)=j) = 1$
 The Stop Decision
 ========================================================
 id: sd
+- Stop: $H_t=1$
+
 - The hazard rate
 $$
 h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
@@ -273,8 +278,7 @@ $$
 
 - The hazard rate is duration dependent
 - The hazard rate varies with the latent state
-  + Not depends on response.
-  + An error due to slip and an error due to lack of mastery should have different implications
+  + Not depend on response [Error due to ignorance and error due to carelessness differs]
   + A plausible story: boredom V.s. Frustration
 
 
@@ -295,19 +299,145 @@ type: section
 
 Notation
 ========================================================
-  + $i$: the the learner id
-  + $N$： the number of learners
-  + $T_i$:the sequence length of learner $i$.
-  + $\mathbf{X}_{1,T_i}^i$: The latent state sequence. $(X^i_1,\dots,X^i_{T_i})$
-  + $\mathbf{Y}_{1,T_i}^i$: The answer sequence. $(Y^i_1,\dots,Y^i_{T_i})$
-  + $\mathbf{A}_{1,T_i}^i$: The item sequence.   $(A^i(1),\dots,A^i(T_i))$
-  + $\mathbf{E}_{1,T_i}^i$: The effort sequence. $(E^i_1,\dots,E^i_{T_i})$
-  + $\mathbf{H}_{1,T_i}^i$: The stop sequence.   $(H^i_1,\dots,H^i_{T_i})$
-  + For simplicity, omit the lower index when refering to the full sequence
++ $i$: the the learner id
++ $N$： the number of learners
++ $T_i$:the sequence length of learner $i$.
++ $\mathbf{X}_{1,T_i}^i$: The latent state sequence. $(X^i_1,\dots,X^i_{T_i})$
++ $\mathbf{Y}_{1,T_i}^i$: The answer sequence. $(Y^i_1,\dots,Y^i_{T_i})$
++ $\mathbf{A}_{1,T_i}^i$: The item sequence.   $(A^i(1),\dots,A^i(T_i))$
++ $\mathbf{E}_{1,T_i}^i$: The effort sequence. $(E^i_1,\dots,E^i_{T_i})$
++ $\mathbf{H}_{1,T_i}^i$: The stop sequence.   $(H^i_1,\dots,H^i_{T_i})$
+
+Notation(2)
+========================================================
+
+- Let $\mathbf{y}_{1,T_i}^i$ denote a realized sequence $(Y_1=y_1,\dots,Y_{T_i}=y_{T_i})$
+  + Same for $\mathbf{a}_{1,T_i}^i$,$\mathbf{e}_{1,T_i}^i$,$\mathbf{h}_{1,T_i}^i$
+
+- For simplicity, omit the lower index when refering to the full sequence
+  + e.g. $\mathbf{Y}^i = \mathbf{Y}_{1,T_i}^i$
+
+- Let assignment function $A(t)$ to be exogeneously determined, thus independent of all other parameters
+
+
+The Augmented Likelihood(1)
+========================================================
+
+- Consider observing the data $\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}$ of length $T$ for an individual
+  + suppress $i$
+
+- Augment the data by $\mathbf{X}$ and then marginalize over it.
+
+$$
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{a}) \propto \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
+$$
+
+- For a particular state augmentation $\mathbf{x}$, factor the likelihood according to the model
+
+$$
+\begin{aligned}
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}=\mathbf{x}|\mathbf{a})
+&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x})P(\mathbf{E}=\mathbf{e},\mathbf{X}=\mathbf{x}|\mathbf{a})
+\end{aligned}
+$$
+
+The Augmented Likelihood(2)
+========================================================
+$$
+\begin{aligned}
+P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
+&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
+\end{aligned}
+$$
+
+The Augmented Likelihood(3)
+========================================================
+$$
+\begin{aligned}
+P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x}) &= \prod_{t=1}^{T}\prod_{k=1}^{M_x}h(t,k)^{1(h_t=1,x_t=k)}(1-h(t,k))^{1(h_t=0,x_t=k)}\\
+&= \prod_{t=1}^{T}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(h_t=1,x_t=k)}(1-\lambda_ke^{\beta_kt})^{1(h_t=0,x_t=k)}
+\end{aligned}
+$$
+
+The Augmented Likelihood(4)
+========================================================
+$$
+\begin{aligned}
+&P(\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
+&= P(X_1=x_1)P(E_1=e_1|X_1=x_1)\prod_{t=2}^{T}P(E_t|X_{t-1}=x_{t-1})P(X_t=x_t|X_{t-1}=x_{t-1},E_t=e_t)\\
+&= \prod_{k=1}^{M_x}(\pi^k)^{1(x_1=k)}\prod_{j=1}^J(\gamma_j^k)^{1(A(t)=j,x_1=k,E_1=1)}(1-\gamma_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
+& \prod_{t=2}^{T}\prod_{j=1}^J\{[(\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=1)}(1-\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=0)}]\\
+&[1^{1(x_{t-1}=M_x,x_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)}(1-\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)}\\
+&1^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}\\
+&0^{1-1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}]\}
+\end{aligned}
+$$
+
+Identification (1)
+========================================================
+- Are all parameters identified?
+
+- MLE: Unique point mass in the measure of the parameter space
+  + **What I mean identification here**
+
+- MCMC: As long as the posterior parameter distribution is proper
+  + Multimodality makes it difficult to traverse the whole parameter space
+  + Multimodality makes MAP estimator meaningless
+
+General Identification Assumption
+========================================================
+
+- Learner homogeneity:
+  + **Identifcation Assumption 1**: Learner's initial mastery is generated i.i.d. from the multinomial distribution $\{\pi^k\}$
+
+- Need to prevent label switching
+  + E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.
+  + **Identifcation Assumption 2(a)**: $X_t,Y_t$ binary, $c_j^{0,1} < c_j^{1,1}$
+  + **Identifcation Assumption 2(b)**: $X_t,Y_t$ tetiary, $c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j)$, $c^{1,2}_j < c^{2,2}_j$
+
+Identification (2)
+========================================================
+
+- Similar to method of moments:
+  + The number of parameters is smaller than the number of moment conditions
+
+- Sufficient statistics are the optimal moment conditions
+
+
+Case Study : Identification of BKT model(1)
+========================================================
+id: bkt_identify
+- $T=2$, not uniquely identified
+  + Four equalities but they add up to 1. Thus only three moment conditions
+
+
+$$
+\begin{aligned}
+P(Y_1=1,Y_2=1) &= (1-\pi)(1-\ell)c_0c_0+(1-\pi)\ell c_0c_1+\pi c_1c_1\\
+P(Y_1=0,Y_2=1) &= (1-\pi)(1-\ell)(1-c_0)c_0+(1-\pi)\ell (1-c_0)c_1+\pi (1-c_1)c_1 \\
+P(Y_1=1,Y_2=0) &= (1-\pi)(1-\ell)c_0(1-c_0)+(1-\pi)\ell c_0(1-c_1)+\pi c_1(1-c_1)\\
+P(Y_1=0,Y_2=0) &= (1-\pi)(1-\ell)(1-c_0)(1-c_0)+(1-\pi)\ell (1-c_0)(1-c_1)+\pi (1-c_1)(1-c_1)\\
+\end{aligned}
+$$
+Case Study : Identification of BKT model(2)
+========================================================
+
+- $T=3$, uniquely identified
+  + Nine equalities with eight moments
+
+$$
+\begin{aligned}
+P(Y_1=1,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0^2(1-c_1) + (1-\pi)\ell c_0c_1(1-c_1)+\pi c_1^2(1-c_1) \\
+P(Y_1=1,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0(1-c_0)c_1 + (1-\pi)\ell c_0(1-c_1)c_1+\pi c_1^2(1-c_1) \\
+P(Y_1=0,Y_2=1,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell (1-c_0)c_0c_1 + (1-\pi)\ell (1-c_0)c_1^2+\pi c_1^2(1-c_1) \\
+P(Y_1=0,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)^2c_1 + (1-\pi)\ell (1-c_0)^2c_1+\pi c_1(1-c_1)^2 \\
+P(Y_1=0,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)c_0(1-c_1) + (1-\pi)\ell c0(1-c_0)(1-c_1)+\pi c_1(1-c_1)^2\\
+\end{aligned}
+$$
+[proof](#\bkt_proof)
 
 The Sufficient Statistics
 ========================================================
-**Identifcation Assumption 1**: Learners are homogeneous and independent
 
 Let $G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$ maps the observed variable to a set $\Omega$ with size $Z$.
 
@@ -319,7 +449,6 @@ $$
 
 - Let $n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)$
 
--It is easy to see that $\{n1,\dots,n_Z\}$ are sufficient statistics
 
 The Sufficient Statistics (Cont)
 ========================================================
@@ -328,94 +457,14 @@ The Sufficient Statistics (Cont)
   + $\Omega=\{(1,1),(0,1),(1,0),(0,0)\}$
   + $G((1,0))=3$, $G^{-1}(3) = (1,0)$
 
-
-The Augmented Likelihood(1)
+Identification
 ========================================================
-Assume that item sequences are exogeneously determined, Thus $\mathbf{a}$ is independent of all other variables.
-
-Let $G^{-1}(z) = (\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h})$ and $T_z$ be the length of the practice sequence.
-
-$$
-P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
-$$
-
-For a particular state augmentation $\mathbf{X}$
-
-$$
-\begin{aligned}
-P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a}) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
-&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X})P(\mathbf{E}=\mathbf{e},\mathbf{X}|\mathbf{a})
-\end{aligned}
-$$
-
-The Augmented Likelihood(2)
-========================================================
-$$
-\begin{aligned}
-P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
-&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
-\end{aligned}
-$$
-
-The Augmented Likelihood(3)
-========================================================
-$$
-\begin{aligned}
-P(\mathbf{H}=\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}h(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
-&= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
-\end{aligned}
-$$
-
-The Augmented Likelihood(4)
-========================================================
-$$
-\begin{aligned}
-&P(\mathbf{X},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
-&= P(X_1)P(E_1|X_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
-&= \prod_{k=1}^{M_x}(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
-& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=0)}]\\
-&[1^{1(X_{t-1}=M_x,X_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
-&1^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}\\
-&0^{1-1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}]\}
-\end{aligned}
-$$
-Identification (1)
-========================================================
-- Need to prevent label switching
-  + E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.
-  + **Identifcation Assumption 2(a)**: $X_t,Y_t$ binary, $c_j^{0,1} < c_j^{1,1}$
-  + **Identifcation Assumption 2(b)**: $X_t,Y_t$ tetiary, $c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j)$, $c^{1,2}_j < c^{2,2}_j$
-
-- The state density is non-degenerate
-  + **Identifcation Assumption 3** $\pi^k \neq 0$
-
-Identification (2)
-========================================================
-
-- For MLE:
-  + Unique identification matters
-
-- For MCMC:
-  + Only requires proper posterior distribution
-  + MAP point estimator is meaningless
-  + Convergence is problematic
-
-Identification for MLE
-========================================================
-- Recall sufficient statistics $\{n_1,\dots,n_Z\}$. It implies Z moment conditions.
+- By law of large numbers $\lim_{N\rightarrow \infty}\frac{\sum_i^N1(G(\mathbf{y},\mathbf{a},\mathbf{h},\mathbf{e})=z)}{N} \rightarrow p_z$
+- Sufficient statistics $\{p_1,\dots,p_Z\}$. It implies Z-1 moment conditions.
 - Let the size of the parameter set $\Theta$ to be W.
-- Necessary Condition: $Z\geq W$
-- Sufficient Condition: difficult for nonlinear system
 
-- Example($j=1$, $t=2$,$E_t=1$,$H_t=0$):
-
-  + $X_t$,$Y_t$ binary, Z=4, W=4
-
-  + $X_t$ tertiary, $Y_t$ binary, Z=4, W=6
-
-  + $X_t$,$Y_t$ tertiary,  Z=9, W=11
-
-**Identifcation Assumption 4**:$c^{0,2}_j=c^{2,0}_j=0$
+- Necessary condition: $Z\geq W$
+- Sufficient condition: Only possible to prove local unique identification result
 
 
 Estimation
@@ -919,6 +968,29 @@ include_graphics('fig/mcmc_3_param_12.png')
 Q&A
 =======================================================
 type: section
+
+Not IRT model
+=======================================================
+id: irt
+
+- Learning from doing is bad for assessment
+  + Local indepdence: Conditional on user score, items are independent of each other
+  + user score is assumed to be invariant
+
+- Cannot model pedagogical efficacy
+
+[return](#/intro_mot)
+
+Proof of Unique Identification
+=======================================================
+id:bkt_proof
+- $c_1=\frac{p_{101}-p_{011}}{p_{10}-p_{01}}$
+- $\frac{p_{110}-p_{101}}{p_{001}-p_{010}} =\frac{c_0}{1-c_0} \rightarrow c_0=\frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}}$
+- $\pi$ and $\ell$ can be expressed as a function of $c_0$ and $c_1$
+  + $p_{1}=\pi c_1+(1-\pi)c_0$
+  + $p_{01}-p_{10} = (1-\pi)\ell(c_1-c_0)$
+
+[return](#\bkt_identify)
 
 Special Case 1: Bayesian Knowledge Tracing Model
 =======================================================
