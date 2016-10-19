@@ -813,8 +813,8 @@ hljs.initHighlightingOnLoad();
 <div class="slideContent" >
 <ul>
 <li><p>Merriam Webster: To do repeated exercises for proficiency</p></li>
-<li><p>Very effective for K-12 STEM learning</p></li>
 <li><p>Effective practice requires more than simple repetition</p></li>
+<li><p>How to recommend?</p></li>
 </ul>
 
 </div>
@@ -867,7 +867,7 @@ hljs.initHighlightingOnLoad();
 </div>
 
 </section>
-<section data-transition="linear" data-transition-speed="default">
+<section id="intro_mot" data-transition="linear" data-transition-speed="default">
 <h3>A Motivating Example (2)</h3>
 <div class="slideContent" >
 <ul>
@@ -879,10 +879,10 @@ hljs.initHighlightingOnLoad();
 <li><p>Practice as Instruction -&gt; <strong>Optiomal Recommendation</strong></p>
 
 <ul>
-<li>What matters is how the item helps the learner to elevate future mastery</li>
-<li>What we usually observe is how difficult the item given the current mastery</li>
-<li>The relationship between the item efficacy and item difficulty is unclear</li>
-<li>Folk wisdom is inverse U</li>
+<li>What matters is how the item instruction elevates the learner&#39;s mastery</li>
+<li>What observed is how item difficulty reveals the learner&#39;s mastery</li>
+<li>The folk wisdom is inverse U</li>
+<li>Break the conditional independence <a href="#irt">IRT Comparison</a></li>
 </ul></li>
 </ul>
 
@@ -899,7 +899,7 @@ hljs.initHighlightingOnLoad();
 <li>Listening to lecture per se is not a practice [not measurable]</li>
 <li>Batting exercise is a practice</li>
 </ul></li>
-<li><p>Pedagogical efficacy = What makes practices effective</p>
+<li><p>Pedagogical efficacy = What makes practices effective = learning</p>
 
 <ul>
 <li>A hard question without a clear answer</li>
@@ -968,8 +968,8 @@ hljs.initHighlightingOnLoad();
 <li><p>Theorectically</p>
 
 <ul>
-<li>Capture some noncognitive skills, like grit</li>
 <li>Prevalent in low stake learning environment</li>
+<li>bias the pedagogical efficacy if ignored</li>
 </ul></li>
 <li><p>Practically</p>
 
@@ -1010,7 +1010,12 @@ hljs.initHighlightingOnLoad();
 <ul>
 <li>Avoid mapping the knowledge space to item</li>
 </ul></li>
-<li><p><strong>Assumption 2</strong>: \( X_t \) is discrete with \( M_x \) number of states</p></li>
+<li><p><strong>Assumption 2</strong>: \( X_t \) is discrete with \( M_x \) number of states</p>
+
+<ul>
+<li><em>Learning is moving from a lower state to a higher state</em>.</li>
+<li>More intuitive representation of probabilitic learning than continuous mastery</li>
+</ul></li>
 </ul>
 
 </div>
@@ -1020,7 +1025,7 @@ hljs.initHighlightingOnLoad();
 <h3>The Learning Process (2)</h3>
 <div class="slideContent" >
 <ul>
-<li>Learning is moving from a lower state to a higher state.</li>
+<li>General pedagogical efficacy</li>
 </ul>
 
 <p>\[ P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j) \]</p>
@@ -1118,7 +1123,7 @@ c^{k,m}_j = P(Y_{j,t}=m|X_t=k)
 <p><strong>Assumption 10</strong>: Effort choice is independent, conditioning on the latent mastery and the item</p>
 
 <p>\[ 
-P(E_t=1|X_t=k,A(t)=j) = e_j^k
+P(E_t=1|X_t=k,A(t)=j) = \gamma_j^k
  \]</p>
 
 <ul>
@@ -1148,6 +1153,7 @@ P(E_t=1|X_t=k,A(t)=j) = e_j^k
 <h3>The Stop Decision</h3>
 <div class="slideContent" >
 <ul>
+<li><p>Stop: \( H_t=1 \)</p></li>
 <li><p>The hazard rate
 \[ 
 h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
@@ -1156,8 +1162,7 @@ h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 <li><p>The hazard rate varies with the latent state</p>
 
 <ul>
-<li>Not depends on response.</li>
-<li>An error due to slip and an error due to lack of mastery should have different implications</li>
+<li>Not depend on response [Error due to ignorance and error due to carelessness differs]</li>
 <li>A plausible story: boredom V.s. Frustration</li>
 </ul></li>
 </ul>
@@ -1192,8 +1197,206 @@ h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 <li>\( \mathbf{A}_{1,T_i}^i \): The item sequence.   \( (A^i(1),\dots,A^i(T_i)) \)</li>
 <li>\( \mathbf{E}_{1,T_i}^i \): The effort sequence. \( (E^i_1,\dots,E^i_{T_i}) \)</li>
 <li>\( \mathbf{H}_{1,T_i}^i \): The stop sequence.   \( (H^i_1,\dots,H^i_{T_i}) \)</li>
-<li>For simplicity, omit the lower index when refering to the full sequence</li>
 </ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Notation(2)</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Let \( \mathbf{y}_{1,T_i}^i \) denote a realized sequence \( (Y_1=y_1,\dots,Y_{T_i}=y_{T_i}) \)</p>
+
+<ul>
+<li>Same for \( \mathbf{a}_{1,T_i}^i \),\( \mathbf{e}_{1,T_i}^i \),\( \mathbf{h}_{1,T_i}^i \)</li>
+</ul></li>
+<li><p>For simplicity, omit the lower index when refering to the full sequence</p>
+
+<ul>
+<li>e.g. \( \mathbf{Y}^i = \mathbf{Y}_{1,T_i}^i \)</li>
+</ul></li>
+<li><p>Let assignment function \( A(t) \) to be exogeneously determined, thus independent of all other parameters</p></li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>The Augmented Likelihood(1)</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Consider observing the data \( \mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h} \) of length \( T \) for an individual</p>
+
+<ul>
+<li>suppress \( i \)</li>
+</ul></li>
+<li><p>Augment the data by \( \mathbf{X} \) and then marginalize over it.</p></li>
+</ul>
+
+<p>\[ 
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{a}) \propto \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
+ \]</p>
+
+<ul>
+<li>For a particular state augmentation \( \mathbf{x} \), factor the likelihood according to the model</li>
+</ul>
+
+<p>\[ 
+\begin{aligned}
+P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}=\mathbf{x}|\mathbf{a})
+&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x})P(\mathbf{E}=\mathbf{e},\mathbf{X}=\mathbf{x}|\mathbf{a})
+\end{aligned}
+ \]</p>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>The Augmented Likelihood(2)</h3>
+<div class="slideContent" >
+<p>\[ 
+\begin{aligned}
+P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
+&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
+\end{aligned}
+ \]</p>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>The Augmented Likelihood(3)</h3>
+<div class="slideContent" >
+<p>\[ 
+\begin{aligned}
+P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x}) &= \prod_{t=1}^{T}\prod_{k=1}^{M_x}h(t,k)^{1(h_t=1,x_t=k)}(1-h(t,k))^{1(h_t=0,x_t=k)}\\
+&= \prod_{t=1}^{T}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(h_t=1,x_t=k)}(1-\lambda_ke^{\beta_kt})^{1(h_t=0,x_t=k)}
+\end{aligned}
+ \]</p>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>The Augmented Likelihood(4)</h3>
+<div class="slideContent" >
+<p>\[ 
+\begin{aligned}
+&P(\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
+&= P(X_1=x_1)P(E_1=e_1|X_1=x_1)\prod_{t=2}^{T}P(E_t|X_{t-1}=x_{t-1})P(X_t=x_t|X_{t-1}=x_{t-1},E_t=e_t)\\
+&= \prod_{k=1}^{M_x}(\pi^k)^{1(x_1=k)}\prod_{j=1}^J(\gamma_j^k)^{1(A(t)=j,x_1=k,E_1=1)}(1-\gamma_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
+& \prod_{t=2}^{T}\prod_{j=1}^J\{[(\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=1)}(1-\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=0)}]\\
+&[1^{1(x_{t-1}=M_x,x_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)}(1-\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)}\\
+&1^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}\\
+&0^{1-1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}]\}
+\end{aligned}
+ \]</p>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Identification (1)</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Are all parameters identified?</p></li>
+<li><p>MLE: Unique point mass in the measure of the parameter space</p>
+
+<ul>
+<li><strong>What I mean identification here</strong></li>
+</ul></li>
+<li><p>MCMC: As long as the posterior parameter distribution is proper</p>
+
+<ul>
+<li>Multimodality makes it difficult to traverse the whole parameter space</li>
+<li>Multimodality makes MAP estimator meaningless</li>
+</ul></li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>General Identification Assumption</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Learner homogeneity:</p>
+
+<ul>
+<li><strong>Identifcation Assumption 1</strong>: Learner&#39;s initial mastery is generated i.i.d. from the multinomial distribution \( \{\pi^k\} \)</li>
+</ul></li>
+<li><p>Need to prevent label switching</p>
+
+<ul>
+<li>E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.</li>
+<li><strong>Identifcation Assumption 2(a)</strong>: \( X_t,Y_t \) binary, \( c_j^{0,1} < c_j^{1,1} \)</li>
+<li><strong>Identifcation Assumption 2(b)</strong>: \( X_t,Y_t \) tetiary, \( c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j) \), \( c^{1,2}_j < c^{2,2}_j \)</li>
+</ul></li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Identification (2)</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Similar to method of moments:</p>
+
+<ul>
+<li>The number of parameters is smaller than the number of moment conditions</li>
+</ul></li>
+<li><p>Sufficient statistics are the optimal moment conditions</p></li>
+</ul>
+
+</div>
+
+</section>
+<section id="bkt_identify" data-transition="linear" data-transition-speed="default">
+<h3>Case Study : Identification of BKT model(1)</h3>
+<div class="slideContent" >
+<ul>
+<li>\( T=2 \), not uniquely identified
+
+<ul>
+<li>Four equalities but they add up to 1. Thus only three moment conditions</li>
+</ul></li>
+</ul>
+
+<p>\[ 
+\begin{aligned}
+P(Y_1=1,Y_2=1) &= (1-\pi)(1-\ell)c_0c_0+(1-\pi)\ell c_0c_1+\pi c_1c_1\\
+P(Y_1=0,Y_2=1) &= (1-\pi)(1-\ell)(1-c_0)c_0+(1-\pi)\ell (1-c_0)c_1+\pi (1-c_1)c_1 \\
+P(Y_1=1,Y_2=0) &= (1-\pi)(1-\ell)c_0(1-c_0)+(1-\pi)\ell c_0(1-c_1)+\pi c_1(1-c_1)\\
+P(Y_1=0,Y_2=0) &= (1-\pi)(1-\ell)(1-c_0)(1-c_0)+(1-\pi)\ell (1-c_0)(1-c_1)+\pi (1-c_1)(1-c_1)\\
+\end{aligned}
+ \]</p>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Case Study : Identification of BKT model(2)</h3>
+<div class="slideContent" >
+<ul>
+<li>\( T=3 \), uniquely identified
+
+<ul>
+<li>Nine equalities with eight moments</li>
+</ul></li>
+</ul>
+
+<p>\[ 
+\begin{aligned}
+P(Y_1=1,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0^2(1-c_1) + (1-\pi)\ell c_0c_1(1-c_1)+\pi c_1^2(1-c_1) \\
+P(Y_1=1,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0(1-c_0)c_1 + (1-\pi)\ell c_0(1-c_1)c_1+\pi c_1^2(1-c_1) \\
+P(Y_1=0,Y_2=1,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell (1-c_0)c_0c_1 + (1-\pi)\ell (1-c_0)c_1^2+\pi c_1^2(1-c_1) \\
+P(Y_1=0,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)^2c_1 + (1-\pi)\ell (1-c_0)^2c_1+\pi c_1(1-c_1)^2 \\
+P(Y_1=0,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)c_0(1-c_1) + (1-\pi)\ell c0(1-c_0)(1-c_1)+\pi c_1(1-c_1)^2\\
+\end{aligned}
+ \]
+<a href="#bkt_proof">proof</a></p>
 
 </div>
 
@@ -1201,8 +1404,6 @@ h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
 <section data-transition="linear" data-transition-speed="default">
 <h3>The Sufficient Statistics</h3>
 <div class="slideContent" >
-<p><strong>Identifcation Assumption 1</strong>: Learners are homogeneous and independent</p>
-
 <p>Let \( G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}) \) maps the observed variable to a set \( \Omega \) with size \( Z \).</p>
 
 <p>Let \( G^{-1}(z) \) denote the \( z^{th} \) element of mapping set.</p>
@@ -1214,8 +1415,6 @@ L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod
 <ul>
 <li>Let \( n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z) \)</li>
 </ul>
-
-<p>-It is easy to see that \( \{n1,\dots,n_Z\} \) are sufficient statistics</p>
 
 </div>
 
@@ -1237,132 +1436,15 @@ L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>The Augmented Likelihood(1)</h3>
-<div class="slideContent" >
-<p>Assume that item sequences are exogeneously determined, Thus \( \mathbf{a} \) is independent of all other variables.</p>
-
-<p>Let \( G^{-1}(z) = (\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}) \) and \( T_z \) be the length of the practice sequence.</p>
-
-<p>\[ 
-P(G^{-1}(z)) = \sum_{X_1}\dots\sum_{X_{T_z}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
- \]</p>
-
-<p>For a particular state augmentation \( \mathbf{X} \)</p>
-
-<p>\[ 
-\begin{aligned}
-P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a}) &= P(\mathbf{y},\mathbf{e}, \mathbf{h}, \mathbf{X}| \mathbf{a})\\
-&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X})P(\mathbf{E}=\mathbf{e},\mathbf{X}|\mathbf{a})
-\end{aligned}
- \]</p>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>The Augmented Likelihood(2)</h3>
-<div class="slideContent" >
-<p>\[ 
-\begin{aligned}
-P(\mathbf{Y}=\mathbf{y}|\mathbf{X},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T_z} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
-&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
-\end{aligned}
- \]</p>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>The Augmented Likelihood(3)</h3>
-<div class="slideContent" >
-<p>\[ 
-\begin{aligned}
-P(\mathbf{H}=\mathbf{h}|\mathbf{X}) &= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}h(t,k)^{1(H_t=1,X_t=k)}(1-h(t,k))^{1(H_t=0,X_t=k)}\\
-&= \prod_{t=1}^{T_z}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
-\end{aligned}
- \]</p>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>The Augmented Likelihood(4)</h3>
-<div class="slideContent" >
-<p>\[ 
-\begin{aligned}
-&P(\mathbf{X},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
-&= P(X_1)P(E_1|X_1)\prod_{t=2}^{T_z}P(E_t|X_{t-1})P(X_t|X_{t-1},E_{t})\\
-&= \prod_{k=1}^{M_x}(\pi^k)^{1(X_1=k)}\prod_{j=1}^J(e_j^k)^{1(A(t)=j,X_1=k,E_1=1)}(1-e_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
-& \prod_{t=2}^{T_z}\prod_{j=1}^J\{[(e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=1)}(1-e_j^k)^{1(A(t)=j,X_{t-1}=k,E_t=0)}]\\
-&[1^{1(X_{t-1}=M_x,X_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)}(1-\ell^k_j)^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}\\
-&1^{1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}\\
-&0^{1-1(A(t)=j,X_{t-1}=k,X_t=k+1,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)-1(A(t)=j,X_{t-1}=k,X_t=k,E_t=0)}]\}
-\end{aligned}
- \]</p>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>Identification (1)</h3>
+<h3>Identification</h3>
 <div class="slideContent" >
 <ul>
-<li><p>Need to prevent label switching</p>
-
-<ul>
-<li>E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.</li>
-<li><strong>Identifcation Assumption 2(a)</strong>: \( X_t,Y_t \) binary, \( c_j^{0,1} < c_j^{1,1} \)</li>
-<li><strong>Identifcation Assumption 2(b)</strong>: \( X_t,Y_t \) tetiary, \( c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j) \), \( c^{1,2}_j < c^{2,2}_j \)</li>
-</ul></li>
-<li><p>The state density is non-degenerate</p>
-
-<ul>
-<li><strong>Identifcation Assumption 3</strong> \( \pi^k \neq 0 \)</li>
-</ul></li>
+<li>By law of large numbers \( \lim_{N\rightarrow \infty}\frac{\sum_i^N1(G(\mathbf{y},\mathbf{a},\mathbf{h},\mathbf{e})=z)}{N} \rightarrow p_z \)</li>
+<li>Sufficient statistics \( \{p_1,\dots,p_Z\} \). It implies Z-1 moment conditions.</li>
+<li><p>Let the size of the parameter set \( \Theta \) to be W.</p></li>
+<li><p>Necessary condition: \( Z\geq W \)</p></li>
+<li><p>Sufficient condition: Only possible to prove local unique identification result</p></li>
 </ul>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>Identification (2)</h3>
-<div class="slideContent" >
-<ul>
-<li><p>For MLE:</p>
-
-<ul>
-<li>Unique identification matters</li>
-</ul></li>
-<li><p>For MCMC:</p>
-
-<ul>
-<li>Only requires proper posterior distribution</li>
-<li>MAP point estimator is meaningless</li>
-<li>Convergence is problematic</li>
-</ul></li>
-</ul>
-
-</div>
-
-</section>
-<section data-transition="linear" data-transition-speed="default">
-<h3>Identification for MLE</h3>
-<div class="slideContent" >
-<ul>
-<li>Recall sufficient statistics \( \{n_1,\dots,n_Z\} \). It implies Z moment conditions.</li>
-<li>Let the size of the parameter set \( \Theta \) to be W.</li>
-<li>Necessary Condition: \( Z\geq W \)</li>
-<li><p>Sufficient Condition: difficult for nonlinear system</p></li>
-<li><p>Example(\( j=1 \), \( t=2 \),\( E_t=1 \),\( H_t=0 \)):</p>
-
-<ul>
-<li>\( X_t \),\( Y_t \) binary, Z=4, W=4</li>
-<li>\( X_t \) tertiary, \( Y_t \) binary, Z=4, W=6</li>
-<li>\( X_t \),\( Y_t \) tertiary,  Z=9, W=11</li>
-</ul></li>
-</ul>
-
-<p><strong>Identifcation Assumption 4</strong>:\( c^{0,2}_j=c^{2,0}_j=0 \)</p>
 
 </div>
 
@@ -2122,6 +2204,43 @@ E(\hat{\gamma}) = \ell_1e^0_1-\ell_0e^0_0
 <section data-state="section" data-transition="linear" data-transition-speed="default">
 <h2>Q&amp;A</h2>
 <div class="slideContent" >
+
+</div>
+
+</section>
+<section id="irt" data-transition="linear" data-transition-speed="default">
+<h3>Not IRT model</h3>
+<div class="slideContent" >
+<ul>
+<li><p>Learning from doing is bad for assessment</p>
+
+<ul>
+<li>Local indepdence: Conditional on user score, items are independent of each other</li>
+<li>user score is assumed to be invariant</li>
+</ul></li>
+<li><p>Cannot model pedagogical efficacy</p></li>
+</ul>
+
+<p><a href="#/intro_mot">return</a></p>
+
+</div>
+
+</section>
+<section id="bkt_proof" data-transition="linear" data-transition-speed="default">
+<h3>Proof of Unique Identification</h3>
+<div class="slideContent" >
+<ul>
+<li>\( c_1=\frac{p_{101}-p_{011}}{p_{10}-p_{01}} \)</li>
+<li>\( \frac{p_{110}-p_{101}}{p_{001}-p_{010}} =\frac{c_0}{1-c_0} \rightarrow c_0=\frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}} \)</li>
+<li>\( \pi \) and \( \ell \) can be expressed as a function of \( c_0 \) and \( c_1 \)
+
+<ul>
+<li>\( p_{1}=\pi c_1+(1-\pi)c_0 \)</li>
+<li>\( p_{01}-p_{10} = (1-\pi)\ell(c_1-c_0) \)</li>
+</ul></li>
+</ul>
+
+<p><a href="#bkt_identify">return</a></p>
 
 </div>
 
