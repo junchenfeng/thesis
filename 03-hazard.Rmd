@@ -6,39 +6,31 @@ library(dplyr)
 library(tidyr)
 library(gridExtra)
 proj_dir = getwd()
-load(paste0(proj_dir,'/_data/02/production_data.RData'))
-load(paste0(proj_dir,'/_data/02/fit_lc_data.RData'))
 ```
 
-## The Optimal Practice Policy
-To motivate the discussion of this chapter, consider the following problem in recommending routine learning task:
 
-The goal is to train the learner so that their knowledge point mastery($\pi^{(i)}$) exceeds a pre-determined set of requirements ($\bar{\pi}$). The instrument is a bank of practice items with item parameter $\{s_j, g_j,\ell_j\}$. The problem is to recommend the next practice item conditions on the learner's response history. Under the assumption that the pedagogical efficacy is invariant to the number of repetition, the optimal choice is to pick the (class of) item with highest $\ell_j$.
+## Motivation
+To motivate the discussion of this chapter, consider the following problem. A teacher wants the students to practice on divisions online. She can assign one of the two sets of quizzes that contain the same number of (interchangeable) items, say $T$. The system only reports the average success rate at each practice opportunity (the unconditional learning curve). The intuitive policy is to choose the set of quiz that offers the highest learning gain, which is defined as the difference in success rate between the last practice and the first practice.
 
-A naive solution is to pick the item with the steepest ascending learning curve. If there is no exit decision, such naive solution is valid. However, under differential hazard rates,  the slope of the learning curve reflects both the pedagogical efficacy and the degree of dynamic selection bias. The naive optimal pick can just be a mediocre item with a really high dynamic selection bias.
+If the students finish all items in the quiz, the intuitive policy is an optimal policy because the learning curve is the sufficient statistics for the pedagogical efficacy. However, if the students do not finish all items, the unconditional learning curve is not enough to make the decision. Suppose both quiz sets have the same pedagogical efficacy and students always finish set A, but students who make a wrong response in set B are more likely to stop practicing. The unconditional learning curve of set B will report a higher learning gain, an illusion of superiority caused by sample selection bias. 
 
-An alternative way to motivate the discussion is to consider the reporting of the learner's knowledge mastery. If the hazard rate of the learned is smaller than that of the unlearned, the pedagogical efficacy(or learning rate) of the practice is (in general) biased upwards. Thus the reporting is too optimistic. 
+Because routine task practice is an important aspect of learning recommendation, consistent estimation of the pedagogical efficacy is the pre-requisite for the optimal recommendation. This chapter analyzes the condition under which exit decision biases the estimated pedagogical efficacy and how to correct for the bias by the general model setup in chapter 2. This chapter is organized as the following. Section 3.2 characterizes the selection bias caused by exit decision. Section 3.3 describes how the general model corrects the bias and verify the correction with simulation dataset. Section 3.4 apply the bias correction in a real dataset.
 
+Throughout the chapter, assume there is no effort level choice($E_{t} = 1 \quad \forall t$) and there is only one item($J=1$).
 
 
 ## Exit Decision and Dynamic Selection Bias
 
-It is a stylized fact that the learner makes different exit decision based on the response. Some of it is mechanical. For example, if the user is allowed to practice until they accumulate X errors, there is differential attrition rate after Xth practice even if the underlying hazard rate homogeneous. However, the author suspects that non-cognitive skill also drives the differential exit decision.
+It is a stylized fact that the learner stops the practice based on the response. The differential exit decision may be the result of a mechanical rule rather than user agency. Some of it is mechanical. For example, if the learner is allowed to practice until they accumulate X errors, the attrition rates after Xth practice are different between a correct response and an incorrect response, even if the learner is willing to practice more. However, user agency can drive differential attrition too. As speculated in chapter 2, the learner who has mastered the knowledge finds repetitive practices boring while the learner who has not mastered the knowledge finds repetitive practices frustrating. Both boredom and frustration lead to attrition, but in a differential way.
 
-This most important finding of this section is that a biased learning curve is not a sufficient condition of a biased learning rate estimation. The state dependent differential hazard rate leads to bias in the pedagogical efficacy estimation.
-
-Throughout the chapter, assume there is no effort level choice, or $E_{j,t} = 1 \quad \forall j,t$.
+Under either mechanism, the observed learning curve deviates from the learning curve that is generated by $s,g,\ell$. The question is when the estimated pedagogical efficacy is biased if the analyst applies the learning through practice model that does not account for the exit decisions. Because under no exit, no effort and one item, the general model is the Bayesian Knowledge Tracing(BKT) model, BKT stands in for the no exit estimator for the rest of the analysis.The surprising result is that user independent differential attrition rate does not bias the BKT estimator. The BKT estimator is only biased if the differential hazard rate depends on the state of the user.
 
 
-### Bias in Learning Curve and Bias in Learning Rate
+
+### Unbiased BKT Estimator in the State-independent Attrition  
 
 
-If the exit decision is a function of $Y_t$, it can be shown that $P(Y_t|H_t=0) \neq P(Y_t)$ and $P(X_t|H_t=0) \neq P(X_t)$. The learning curve shifted upwards. There is a higher percentage of learners who master the knowledge point than that under the no exit regime. However, the Baum-Welch estimator is still unbiased because 
-
-$$
-P(X_t|H_t,Y_t) = P(X_t|Y_t)
-$$
-If the exit decision only depends on $Y_t$, the survival likelihood is cancelled out in calculatiing the posterior density of $X_t$. 
+If the exit decision is only a function of $Y_t$, it can be shown that $P(Y_t|H_t=0) \neq P(Y_t)$ and $P(X_t|H_t=0) \neq P(X_t)$. The learning curve shifted upwards. There is a higher percentage of learners who master the knowledge point than that under the no exit regime. However, the BKT estimator is still unbiased because the survival likelihood is canceled out in calculating the posterior density of $X_t$. 
 
 Here the author provides a stretch of the proof. Let $\mathbf{Y}$ be all the observed response. 
 
@@ -63,30 +55,56 @@ $$
 
 The intuition above premiers the following theorem (proof in Appendix 1.a):
 
-**Theorem 1**: If the exit decision depends only on the response, the Baum-Welch estimator is not biased. 
+**Theorem 1**: If the exit decision depends only on the response, the BKT estimator is not biased. 
 
-### State Dependent Differential Hazard Rate and Bias in the Learning Rate
-
-Using the same technique, one can prove that state dependency with differential hazard rates is a sufficient and necessary conditions for the bias in the learning rate(proof in Appendix 1.b).
-
-**Theorem 2**: If the exit decision depends on the latent state, the Baum-Welch estimators are not biased if and only if hazard rates of each state are equal.
-
-The dynamic selection bias usually requires heterogeneity among the agents to manifest itself. However. for the Baum-Welch estimator, bias can be produced for homogeneous learners under state-dependent attrition. The bias is likely to be aggravated if learner heterogeneity is the true data generating process. 
-
-Unfortunately, the bias is not signed although simulation shows that if $h^1(t)<h^0(t)$, the bias is in general positive for reasonable values of slip and guess ($s<0.3$, $g<0.5$).
+### The bias of BKT Estimator in the State-dependent Attrition 
 
 
+Under state-dependent attrition, the expectation of BKT estimator (in a two-period model) is 
 
-## Application
+$$
+\begin{aligned}
+E(\hat{\ell}) &= \frac{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(X_t=1|X_{t-1}=0,H_t=0,\mathbf{Y})P(H_t=0,X_t=1,X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(H_t=0,X_{t-1}=0,\mathbf{Y})}\\
+&= \ell\frac{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(H_t=0|X_t=1,X_{t-1}=0|\mathbf{Y})P(X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(H_t=0|X_{t-1}=0,\mathbf{Y})P(X_{t-1}=0|\mathbf{Y})}
+\end{aligned}
+$$
+If the attrition rate is the same,$P(H_t|X_t=1,X_{t-1}=0)=P(H_t|X_{t-1}=0)$ then the BKT estimator is still unbiased Becaue
 
-This section first demonstrates the bias in the estimated pedagogical efficacy under state-dependent differential hazard rate and how the general learning model corrects the bias by jointly modeling the practice persistence and the practice performance.
+$$
+\begin{aligned}
+E(\hat{\ell}) &= \ell\frac{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(H_t=0|X_{t-1}=0|\mathbf{Y})P(X_{t-1}=0,\mathbf{Y})}{\sum_{t=1}^TE_{(\mathbf{Y},H_t=0)}P(H_t=0|X_{t-1}=0,\mathbf{Y})P(X_{t-1}=0|\mathbf{Y})}\\
+&=\ell
+\end{aligned}
+$$
+If the attrition rate differs, the BKT estimator is biased. The intuition above premiers theorem two.
+
+**Theorem 2**: If the exit decision depends on the latent state, the BKT estimators are biased if and only if hazard rates of each state are different.
+
+If $h_t^1<h_t^0$, Then $P(H_t|X_t=1,X_{t-1}=0)>P(H_t|X_{t-1}=0)$, and it follows that the BKT estimator is biased upwards.
+
+**Lemma 1**: If $h_t^1<h_t^0$, $E(\hat{\ell})>\ell$.
+
+## Bias Correction with The General Model
+
+### Theory
+
+The general model corrects the selection bias caused by the exit decision because it explicitly models the exit decision and is able to obtain the posterior state density conditioning on both the response and the exit decision.
+
+**TODO: A formal Proof**
+
+$$
+\begin{aligned}
+E(\hat{\ell}_{hybrid}) &= \frac{\sum_{t=1}^TE_{(\mathbf{Y},H_T)}P(X_t=1,X_{t-1}=0|\mathbf{Y},H_T)}{\sum_{t=1}^TE_{(\mathbf{Y},H_T)}P(X_{t-1}=0|\mathbf{Y},H_T)}\\
+&= \ell
+\end{aligned}
+$$
 
 ### Simulation
 
 The learning rate is set as $\ell = 0.3$. the initial probability of mastery is set as $\pi = 0.4$. The slip rate is $s = 0.05$ and the guess rate is $g = 0.2$. **TODO: add the rationale for the simulation parameter choice.**
 
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Hazard Rates of the Simulation", fig.align='center'}
+```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Hazard Rates of the Simulation", fig.align='center',out.height='8cm',out.width='8cm'}
 
 hazard_rate = data.frame(t=seq(5), correct=seq(0.05,0.25,0.05), incorrect=seq(0.1,0.5,0.1))
 long_hazard_rate = hazard_rate %>% gather(response, harzard_rate,-t)
@@ -96,9 +114,10 @@ qplot(data=long_hazard_rate, x=t, y = harzard_rate, geom='line', col=response) +
 ```
 
 
-Fit the data to a model with exit decision(Hybrid) and a model without exit decision(BKT). Figure 3.2 compares the point estimation of the Hybrid model and the BKT model to the true value. The Hybrid mitigate some of the positive bias from the dynamic selection. 
+Fit the data to a model with exit decision(Hybrid) and a model without exit decision(BKT). Figure 3.2 compares the point estimation of the Hybrid model and the BKT model to the true value. It shows that the hybrid model effectively mitigates the positive selection bias of the BKT estimator.
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Estimated Learning Rate. True(Solid), BKT(Blue Dash), Hybrid(Red Dotted), Distribution of Hybrid(Dotted Dash) ", fig.align='center'}
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Estimated Learning Rate. True(Solid), BKT(Blue Dash), Hybrid(Red Dotted), Distribution of Hybrid(Dotted Dash) ", fig.align='center',out.height='8cm',out.width='8cm'}
 file_path = paste0(proj_dir,'/_data/02/res/sim/incomplete_point_estimation.txt')
 point_est = read.table(file_path, sep=',', col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'))
 file_path = paste0(proj_dir,'/_data/02/res/sim/true_param.txt')
@@ -115,7 +134,7 @@ mcmc_survive_sample_chains = mcmc_survive_chains %>% filter(t>5000) %>% filter(t
 ggplot(data=mcmc_survive_sample_chains,aes(x=l)) + geom_density(linetype=4)+
     geom_vline(xintercept = point_est$l[point_est$algo=='em'], colour="blue", linetype = "longdash") + 
     geom_vline(xintercept = point_est$l[point_est$algo=='mcmc_s'], colour="red", linetype = "dotted") + 
-    geom_vline(xintercept=true_param$l) + ggtitle('learning rate')
+    geom_vline(xintercept=0.3) + ggtitle('learning rate')
 
 
 ```
@@ -124,7 +143,7 @@ ggplot(data=mcmc_survive_sample_chains,aes(x=l)) + geom_density(linetype=4)+
 
 Another way to evaluate the model performance is to compare the learning curve of no exit($P(Y_t=1|H_t=0)$). The true learning curve and the fitted learning curves are plotted in Figure 3.3. 
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "True and Fitted Learning Curves(Hybrid=model with exit, BKT=model without exit)", fig.align='center'}
+```{r,echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "True and Fitted Learning Curves(Hybrid=model with exit, BKT=model without exit)", fig.align='center',out.height='8cm',out.width='8cm'}
 
 update_mastery <- function(mastery, learn_rate){
   return (mastery + (1-mastery)*learn_rate)
@@ -165,15 +184,11 @@ lc_data = rbind(true_lc, bkt_lc, hybrid_lc)
 
 lc_data$type = factor(lc_data$type)
 qplot(data=lc_data, x=t,y=ypct,col=type, linetype=type, geom='line') + ggtitle('Conditional Learning Curves - P(Yt=1|Ht=0)') + ylab('Success Rate') + xlab('Number of Practice Opportunity')
-
-
-
 ```
 
+## Case Study with a Real Dataset
 
-
-
-### Real Dataset
+### The data collection
 To examine the performance of the hybrid model in practice, this chapter uses the data from a Chinese online learning service provider.
 
 The data are collected from December 2015 and January 2016 in China. The target learners are mainly first-grade, second-grade, and third-grade schoolchildren. The demographics of the learner population are unknown beyond the grade distribution. The practices are supplemental learning materials that the students can play on their own initiative. There is no material punishment for low performance or an early exit.
@@ -184,14 +199,11 @@ The data are collected from a gamified learning environment, framed as a turn-ba
 <center>![Figure 3.3: The Gamified Learning Interface](fig/app.png)</center>
 
 
-Each practice sequence trains ONE knowledge point but with different question forms. For example, if the knowledge point is "Two digit minus one digit", the item can be "13-9" or "37-6". The items can be essentially viewed as identical. **TODO:Check the observed success rate**. For each knowledge point, there are sizable but finite items in the question bank. If the learner practices long enough to exhaust the question bank, he encounters questions from the past. 
+Each practice sequence trains ONE knowledge point but with different question forms. For example, if the knowledge point is "Two digit minus one digit", the item can be "13-9" or "37-6". The items treated as if they have identical item parameters. **TODO:Check the observed success rate**. For each knowledge point, there are a sizable but finite set of items in the question bank. If the learner practices long enough to exhaust them all, he encounters questions from the past. 
 
-This chapter chooses three representative knowledge points out of more than 200 candidates:  sequential order within 5(grade 1), two digit number minus one digit number(grade 2) and vertical division(grade 3). Appendix 2 details the data cleaning process. The two items represent "slow learning" and "fast learning" judged by the learning curve.
+This chapter chooses two representative knowledge points out of more than 200 candidates:  sequential order within 5(grade 1) and vertical division(grade 3). Appendix 2 details the data cleaning process.  The two items represent "slow learning" and "fast learning" judged by the unconditional learning curve, which is plotted in Figure 3.4.
 
-
-The observed (unconditional) learning curves are plotted as the following:
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical Learning Curves of Different Knowledge Points", fig.align='center'}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical Learning Curves of Different Knowledge Points", fig.align='center',out.height='8cm',out.width='8cm'}
 
 kpids =  c('2','138')
 kp_names = c('Sequential Order','Vertical Division')
@@ -214,9 +226,9 @@ qplot(data=lc_plot , x=t, y=pct, geom='line', col=knowlege_point, linetype=knowl
 
 ```
 
-The hazard rate curve is plotted as the following. The hazard rate curves for sequential order and two digit subtraction are not very different but the hazard rates are very different for the vertical division.
+The hazard rate curve is plotted in Figure 3.5. The hazard rate curves for sequential order are different at the first two times but similar in the rest. The hazard rate of incorrect responses is consistently higher than that of the correct responses for the  vertical division.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical Hazard Rates of Different Knowledge Points", fig.align='center'}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical Hazard Rates of Different Knowledge Points", fig.align='center',out.height='8cm',out.width='8cm'}
 #Check the hazard rate
 #There is significant difference for item 138. Not so much for other items
 imputate_hazard_rate <- function(test_data, Tmax){
@@ -235,26 +247,56 @@ imputate_hazard_rate <- function(test_data, Tmax){
 }
 
 
-test_data = spell_data %>% filter(kpid==2)
-hr_data = imputate_hazard_rate(test_data, 5)
+kp_spell_data = spell_data %>% filter(kpid==2)
+hr_data = imputate_hazard_rate(kp_spell_data, 5)
 hr_data$res = factor(hr_data$res)
-h1=qplot(data=hr_data, x=t, y=hr, col=res, linetype=res, geom='line') + ylab('Hazard Rate') + 
+# check the fitted hazard rate
+file_path = paste0(proj_dir,'/_data/02/res/',2,'/full_point_estimation.txt')
+param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','Lambda','betaX','betaT','betaXT'), header=F,sep=',') 
+
+# generate hazard rate curves
+fit_hr = data.frame(t=seq(5))
+fit_hr = fit_hr %>% mutate(incorrect=param_data$Lambda[2]*exp(param_data$betaT[2]*(t-1))) %>%
+                mutate(correct=incorrect*exp(param_data$betaX[2]+param_data$betaXT[2]*(t-1))) %>%
+                gather(res,hr,-t)
+
+
+h1=qplot(data=hr_data, x=t,y=hr,geom='line', col=res) + 
+  geom_line(data=fit_hr, aes(x=t,y=hr,col=res),linetype='dashed')+ 
+  ylab('Hazard Rate')+ 
   theme(axis.text.x=element_blank(),
         axis.title.x=element_blank(),
-        axis.ticks.x=element_blank())
+        axis.ticks.x=element_blank())+ 
+  ggtitle('Sequential Order(Solid-Data, Dashed-Fitted)')
 
-test_data = spell_data %>% filter(kpid==138)
-hr_data = imputate_hazard_rate(test_data, 5)
+
+
+kp_spell_data = spell_data %>% filter(kpid==138)
+hr_data = imputate_hazard_rate(kp_spell_data, 5)
 hr_data$res = factor(hr_data$res)
-h2=qplot(data=hr_data, x=t, y=hr, col=res, linetype=res, geom='line') + ylab('Hazard Rate') + xlab('Number of Practice Opportunity')
+# check the fitted hazard rate
+file_path = paste0(proj_dir,'/_data/02/res/138/full_point_estimation.txt')
+param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','Lambda','betaX','betaT','betaXT'), header=F,sep=',') 
+
+# generate hazard rate curves
+fit_hr = data.frame(t=seq(5))
+fit_hr = fit_hr %>% mutate(incorrect=param_data$Lambda[2]*exp(param_data$betaT[2]*(t-1))) %>%
+                mutate(correct=incorrect*exp(param_data$betaX[2]+param_data$betaXT[2]*(t-1))) %>%
+                gather(res,hr,-t)
+
+h2=qplot(data=hr_data, x=t,y=hr,geom='line', col=res) + geom_line(data=fit_hr, aes(x=t,y=hr,col=res),linetype='dashed')+ ylab('Hazard Rate')+ 
+  xlab('Number of practice') + ggtitle('Vertical Division(Solid-Data, Dashed-Fitted)')
+
 
 grid.arrange(h1, h2, ncol=1)
+
+
 
 ```
 
 ### Compare the Learning Curves
 
-The learning rate estimated by the hybrid model is way smaller than that of the classical BKT model. 
+The learning rate estimated by the hybrid model is way smaller than that of the classical BKT model. Again, it shows that the hybrid is able to mitigate the positive selection bias predicted by Lemma 1.
 
 |Knowledge Point | BKT | Hybrid|
 |----------------|-----|-------|
@@ -264,7 +306,7 @@ The learning rate estimated by the hybrid model is way smaller than that of the 
 As a result, the latent learning curve of the hybrid model is much flatter than that of the classical BKT model. However, after adjusting for the hazard rate, the observed response curve of the hybrid model is closer to the shape of the observed learning curve. The difference is especially astounding for the vertical division where the differential hazard rates are more profound.
  
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical and Fitted Learning Curves", fig.align='center'}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Empirical and Fitted Learning Curves", fig.align='center',out.height='8cm',out.width='8cm'}
 
 impute_x_hazard <-function(pi,h0,h1){
   return(pi*(1-h1)/(pi*(1-h1)+(1-pi)*(1-h0)))
@@ -289,19 +331,25 @@ generate_learning_curve_hazard<-function(slip,guess,pi,learn_rate,h0_vec,h1_vec,
 
 for (i in seq(2)){
     file_path = paste0(proj_dir,'/_data/02/res/',kpids[i],'/full_point_estimation.txt')
-    param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','h01','h02','h03','h04','h05','h11','h12','h13','h14','h15'), header=F,sep=',') 
+    param_data = read.table(file_path, col.names=c('algo','s','g','pi','l','Lambda','betaX','betaT','betaXT'), header=F,sep=',') 
     
     bkt_lc = generate_learning_curve(param_data[1,2], param_data[1,3], param_data[1,4], param_data[1,5], 5)
+    
     h0_vec = c(param_data[2,6],param_data[2,7],param_data[2,8],param_data[2,9],param_data[2,10])
     h1_vec = c(param_data[2,11],param_data[2,12],param_data[2,13],param_data[2,14],param_data[2,15])
-    hybrid_observ_lc = generate_learning_curve_hazard(param_data[2,2], param_data[2,3], param_data[2,4], param_data[2,5], h0_vec, h1_vec, 5)
+    
+    fit_hrates = data.frame(t=seq(5))
+    fit_hrates = fit_hrates %>% mutate(h0=param_data$Lambda[2]*exp(param_data$betaT[2]*(t-1))) %>%
+                mutate(h1=h0*exp(param_data$betaX[2]+param_data$betaXT[2]*(t-1)))
+    
+    hybrid_observ_lc = generate_learning_curve_hazard(param_data[2,2], param_data[2,3], param_data[2,4], param_data[2,5], fit_hrates$h0, fit_hrates$h1, 5)
     hybrid_latent_lc = generate_learning_curve(param_data[2,2], param_data[2,3], param_data[2,4], param_data[2,5], 5)
 
     tmp_data = data.frame(t=seq(5))
-    tmp_data$Empirical = lc_plot$pct[lc_plot$knowlege_point==kp_names[i]]
+    tmp_data$data = lc_plot$pct[lc_plot$knowlege_point==kp_names[i]]
     tmp_data$BKT = bkt_lc$ypct
-    tmp_data$HybridLatent = hybrid_latent_lc$ypct
-    tmp_data$HybridObserv = hybrid_observ_lc$ypct
+    tmp_data$GMLatent = hybrid_latent_lc$ypct
+    tmp_data$GMObserv = hybrid_observ_lc$ypct
     tmp_data = tmp_data %>% gather(algo, pct, -t)
     tmp_data$kpname =kp_names[i]
     
@@ -313,40 +361,39 @@ for (i in seq(2)){
 }
 lc_data$algo=factor(lc_data$algo)
 
-qplot(data=lc_data, x=t, y=pct, geom='line', col=algo, linetype=algo, facets=.~kpname) + ylab('Success Rate') + xlab('Number of Practice Opportunities')
+
+empirical_lc = lc_data %>% filter(algo =='Empirical') %>% mutate(type=as.character(algo))
+fit_lc = lc_data %>% filter(algo !='Empirical')
+
+h1 = qplot(data=lc_data %>% filter(kpname=='Sequential Order'), x=t, y=pct, geom='line', col=algo,linetype=algo) + 
+  scale_colour_manual(values = c("red", "black",   "blue", "blue"),name='') + 
+  scale_linetype_manual(values=c("dashed", "solid","dotted","dotdash"))+
+  ylab('Success Rate') + 
+  xlab('Number of Practice Opportunities') +
+  ggtitle("Sequential Order")+
+  theme(legend.position="top")+
+  guides(linetype=FALSE)
+
+h2 = qplot(data=lc_data %>% filter(kpname=='Vertical Division'), x=t, y=pct, geom='line', col=algo,linetype=algo) + 
+  scale_colour_manual(values = c("red", "black",   "blue", "blue"),name='') + 
+  scale_linetype_manual(values=c("dashed", "solid","dotted","dotdash"))+
+  ylab('Success Rate') + 
+  xlab('Number of Practice Opportunities') +
+  ggtitle("Vertical Division")+
+  theme(legend.position="top")+
+  guides(linetype=FALSE)
+
+grid.arrange(h1,h2,ncol=2)
 
 ```
 
 ## Discussion and Future Work
-### Hot Streak Effect
-If the user is on a winning streak, they are less likely to stop. Consequently the each response is not independent and cannot directly apply the product rule. 
-
-The "streak" (or sequence) dependence a testable hypothesis. Under the assumption of independent response sequence, the probability of termination is only a function of item characteristics. The probability distribution of termination shall be identical, conditioning on the preceding answer sequence, a direct application of the definition of statistical independence.
-
-Figure 3 shows the (2nd) easiest case of sequence dependence. Conditioning on the answer sequence of last 2 items (2-item sequence), whether the user gets it right or wrong influences the termination of a spell. The left panel shows the pdf of termination probability for the wrong answer while the right panel that of the right answer. Four numbers differentiate the previous answer patterns: 0 stands for two wrong, 1 for first wrong and second right, 10 for first right and second wrong, 11 for both right.
-
-There are two interesting observations from this figure:
-    
-(1) If the current answer is wrong, the data generating process is close to sequence independence, with two winning streaks slightly increases the chance of keep practicing.
-
-(2) If the current answer is right, the data generating process is sequence dependent, especially for 3 wins in a row, with the rest scenario close to sequence independent.
-
-A similar pattern can be found for 3-item sequence or 4 item sequence.
-
-The caveat of such exploratory analysis is a selection process. Group the data by the triplet of items, retain the group that has more than 400 data points. Then group those retain triplets by a combination of the current and previous responses, retain those triplets that have data in all 8 possible combinations. After the two-step filtering, only 215 item triplets remains, accounting for around 60% of the total response data.
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.cap = "Hot Streak Effect", fig.align='center'}
-fig_3_data$streak_id = factor(fig_3_data$streak_id)
-qplot(data=fig_3_data, x=pct, col=streak_id, linetype=streak_id,geom='density', facets=.~ans_tag) + xlab('Conditional Hazard Rate')
-```
 
 ### user Heterogeneity
-
-The key insight of this chapter is that selection bias does influence parameter estimate. However, the basis for latent knowledge modeling may be too strong. Bayesian Knowledge Tracing model makes a very strong assumption about the process which is unlikely to be met in reality. Duolingo[@streeter2015mixture] proposes a nonparametric mixture model to replace the BKT, which claims to have superior empirical performance. Mixture model can be implemented in MCMC by data augmentation scheme and it may help to solve the identification problem of the mixture learning curve model as well.
+The dynamic selection bias usually requires heterogeneity among the agents to manifest itself. However. for the Baum-Welch estimator, bias can be produced for homogeneous learners under state-dependent attrition. The bias is likely to be aggravated if learner heterogeneity is the true data generating process. Duolingo[@streeter2015mixture] proposes a nonparametric mixture model to replace the BKT, which claims to have superior empirical performance. Mixture model can be implemented in MCMC by data augmentation scheme and it may help to solve the identification problem of the mixture learning curve model as well.
 
 
 ## Appendix
-
-
 
 ### 1. Proof of Theorem 1
 

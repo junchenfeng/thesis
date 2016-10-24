@@ -11,9 +11,17 @@ link-citations: yes
 description: "Junchen Feng's dissertation."
 ---
 
-# Abstract
-Chpater 2: General Model and identification
+# Abstract{-}
 
-Chapter 3: Selection bias caused by hazard rate
+The age of digital education is dawning. With ubiquitous high-speed internet access and smart devices comes the blossom of digital learning service and learning data. Not only do we collect more quantity of data, but also higher quality data. Yet our understanding of the learning data lags the progress in the collection of data. This dissertation aims to provide a framework that takes advantage of the user engagement data to help identify the latent knowledge mastery of the learner and the pedagogical efficacy of the learning material.
 
-Chapter 4: Selection bias casued by effort
+Chapter Two establishes the general model of learning through practices. Building on the backbone of a hidden Markov model of latent knowledge mastery evolution, the general model also characterizes the stop decision and the effort choice that are dependent on the learner's knowledge mastery. The chapter lists the identification assumption to uniquely identify all parameters of the general model. The chapter details how parameters can be identified by the A Markov Chain Monte Carlo algorithm, combining the backward recursion forward sampling for data augmentation, Gibbs sampling for the conjugate posterior update, and the adaptive rejection sampling for the non-conjugate posterior update.
+
+Chapter three characterizes the selection bias in the pedagogical efficacy estimation if the stop decision is not modeled. If the hazard rate depends on and differs between the latent knowledge mastery states, the estimated pedagogical efficacy is biased with a model that does not model the practice persistence. In particular, if the mastered learner is less likely to quit than the unmastered, the estimated pedagogical efficacy is biased upwards. The chapter applies the general model to both simulation and real dataset, whose result supports the theory.
+
+Chapter four characterizes the selection bias in the pedagogical efficacy estimation if the effort choice is not modeled. If the effort choice depends on and differs between the latent knowledge mastery states, the estimated pedagogical efficacy is biased with a model that does not model the practice concentration. In particular, if the unmastered learner is not always on task, the estimated pedagogical efficacy is biased downwards. The chapter applies the general model to both simulation and real dataset, whose result supports the theory.
+
+
+
+
+

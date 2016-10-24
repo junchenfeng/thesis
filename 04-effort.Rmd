@@ -1,0 +1,468 @@
+# Effort Induced Measurement Error in the Pedagogical Efficacy Estimation{#effort}
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stargazer)
+library(gridExtra)
+library(knitr)
+rm(list=ls())
+
+proj_dir = getwd()
+input_file_path = paste0(proj_dir,'/_data/03/paper_data.RData')
+load(input_file_path)
+options(digits=2)
+
+```
+
+## Motivation:Experimental Evaluation of Pedagogical Efficacy
+
+To motivate the discussion of this chapter, consider the task of comparing the efficacy of two pedagogical methods by an randomized control trials. The experiment has a random assignment of the learners, two assessments before and after the treatment, and even zero sample attrition. To simplify, assume there is no guess, no slip, and no learning for the test instrument, so that the difference in response success rate is the difference in learning gain. The analyst estimate the average difference in pedagogical efficacy ($\gamma$) by difference in difference with the following regression
+
+
+$$
+Y_{i,T} = \beta_d D_i + \beta_t T + \gamma D_i T + \epsilon_{i,T}
+$$
+
+What can go wrong in this by-the-book RCT analysis? The DID estimator is unbiased only if learners always exert effort in the experiment. Consider an extreme case where the efficacy of two pedagogical methods are equivalent if the learner exerts effort but the method A make all of learners exert effort while method B make none of the learners exert effort. Under the "no pain no gain" assumption from chapter 2, learners with method B does not show any learning gain. The DID estimator falsely concludes that method A is superior to method B.
+
+In another word, the difference in the success rate of the response consists of the difference in learning gain condition on exerting effort and the difference in the effort level. In this thesis, the pedagogical efficacy is narrowly defined as the difference in the conditional learning gain, therefore selection into the exerting effort is a selection bias. The distinguishment is useful in practice because the pedagogical efficacy is addressed by the content modification while the engagement can be changed by incentive design or interface improvement.
+
+
+The chapter is organized as the following. Section 4.2 characterizes the bias. Section 4.3 discuss the bias correct with the general model and verify the claim with a simulation analysis. Section 4.4 applies the method to a real data set.
+
+
+
+## Selection bias of the Effort Choice
+Throughout the chapter, assumes there is no exit choice $H_t=0 \quad \forall t$. 
+
+### Bias of BKT Estimator with One Item
+The benchmark model is a model that assumes no effort choice. Limiting to the case of one item, the benchmark model reduces to the Bayesian Knowledge Tracing (BKT) Model. The BKT estimator of the pedagogical efficacy.
+
+$$
+\hat{\ell} = \frac{\sum_{t=1}^T\sum_{i=1}^NP(X_t=1,X_{t-1}=0|Y_i)}{\sum_{t=1}^T\sum_{i=1}^NP(X_{t-1}=0|Y_i}
+$$
+Let $E_t$ denote the effort level and $e_0=P(E_t=1|X_t=0)$ be the probability of making an effort conditioning on not mastered. The expecation of the BKT estimator is
+
+$$
+\begin{aligned}
+E(\hat{\ell}) &= \frac{\sum_{t=1}^TE_{\mathbf{Y}}P(X_t=1,X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
+&= \frac{\sum_{t=1}^TE_{(\mathbf{Y})}P(X_t=1,X_{t-1}=0,E_{t-1}=1|\mathbf{Y})+E_{\mathbf{Y}}P(X_t=1,X_{t-1}=0,E_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
+&=\frac{\sum_{t=1}^TE_{(\mathbf{Y})}\ell e_0 P(X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
+&= \ell e_0 
+\end{aligned}
+$$
+The transition from the second line to the third line is due to Assumption 8 in chapter, which states $P(X_t=1,X_{t-1}=0,E_{t-1}=0)=0 \quad \forall t$.
+
+The BKT estimator of the pedagogical efficacy is attenuated by the presence of the slacking, which gives Lemma 2
+
+**Lemma 2**: If $P(E_t=1|X_t=0)<1$, the BKT estimator has downward bias.
+
+
+
+###  Bias of BKT Estimator with Multiple Items:
+**TODO: derive the bias in a DID style comparison. **
+If estimated separately, $\ell^1(1-e^1_0)-\ell^0(1-e^0_0)$. Not sure what it is under joint estimation.
+
+## Bias Correction With the General Model
+
+
+### Theory
+If the effort is observed for all periods, the general model corrects the bias by estimating the parameter from the subset of the data with no slacking. 
+
+$$
+\begin{aligned}
+E(\hat{\ell}_{Hybrid}) &= \frac{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}P(X_t=1,X_{t-1}=0,E_{t-1}=1|\mathbf{Y})}{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}P(X_{t-1}=0,E_{t-1}=1|\mathbf{Y})} \\
+&=\frac{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}\ell e_0 P(X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^Te_0E_{(\mathbf{Y},\mathbf{E})}P(X_{t-1}=0|\mathbf{Y})}\\
+&= \ell
+\end{aligned}
+$$
+
+Unfortunately, the effort level is usually not directly observed, although it may be inferred from auxiliary data. Even if the model is correctly specified, a noisy measure of effort still leads to an inconsistent estimator of the pedagogical efficacy. 
+
+### Simulation
+**TODO**
+
+## Case Study with a Real Dataset
+
+This section applies the effort-bias correction to an experimental dataset. The section first describes the data collection process, then describes the effort level identification, then provide evidence of differential effort choice, and finally shows the distribution of estimated parameters from different model and effort specification.
+
+
+### The Learning Environment
+
+The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is used after school, rather than in the classroom.
+
+The product is framed as a role-playing game where the learner clears a level to claim the reward. Level clearance is defined as accumulating 12 correct answers. The screen shots of the initiation, practice and the completion of the level are shown from figure 4.1 to 4.3.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Level Initiation", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/initial.png")
+```
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Practice Interface", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/practice.png")
+```
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "Level Completion", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/completion.png")
+```
+
+
+The monetary value of the reward for a correct response is very low. The virtual currency (Xuedou) can exchange for in-game gears or real world gifts. During the experiment, the reward for each correct response is about  a tenth of a penny in RMB (or $0.00014). Although the incentive is tiny, the learners nevertheless game the system to efficiently mine the virtual currency. To "encode success into exercises"[@lemov2012practice], the system lowers the cost of errors almost to zero so as to encourage the learners to practice until correct.There is no punishment for an incorrect answer and the correct answer is shown to them before they go to the next question. If they make a mistake, the learner can practice a similar item to earn an additional but smaller reward. Because the reward is independent of the item difficulty, some students developed a strategy to skip difficult items in hope to get an easier one to score a correct response on the first attempt. All these system gaming behavior results in significant measurement error in the logged response. The overall frequency of observing a blank answer for the math practices is about 20%.
+
+Another detail worth mentioning is the interaction when there are multiple sub-questions. The learner does not get feedback on any subquestion but the overall result when they submit all answers. The submit is irreversible. Once the learner moves to the next sub-question, they cannot go back to the last.
+
+### The Design and the Implementation of The Experiment 
+
+The experiment is administrated from June 9th, 2016 to June 10th 2016 to third-grade students whose parents paid for the learning product. By then, all learners should have been taught the required knowledge point in the school.
+
+
+The learning task trains the knowledge point of the circumference and area formula of rectangles. 
+
+The pre-test item (Figure 4.4) asks the learner to calculate the circumference and area of two identical rectangles joined by length, given the length and width of the small rectangle.
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "The Pre-test Item", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/f1.png")
+```
+
+
+The training item is a modified version of the original question(Figure 4.5). The question is identical to the original one except for the value of the length and width. It also preserves the feature that the joined width is the new length.
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "The Training Exercise", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/f2.png")
+```
+
+The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. The scaffolding is drawn from the teaching experiment of in-house tutor experts. To wit:
+
+(1) What is the length and width of the new rectangle
+
+(2) What is the circumference of the new rectangle
+
+(3) What is the area of the new rectangle
+
+The post-test item skill (Figure 4.6) asks the learner to calculate the same quantities for two rectangles joined by width. A highly similar yet not identical item enhances the measurement validity while prevents student memorizing the answer.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "The Post-test Item", fig.align='center',out.height='8cm',out.width='8cm'}
+include_graphics("fig/f3.png")
+```
+
+In the 12 item recommendation package, the experiment package occupies the 5th to 7th position for all qualified users in the order of the pre-test, training item, and the post-test. Other items are recommended base on their previous learning record. If the learner does not quit during the level, they finished the experiment in one setting. The control group receives the training item without scaffolding. The first treatment group receives the item with vocabulary description of the scaffolding that the learner solves step by step as sub-questions. The second treatment group receives the item with a link to the animation of the scaffolding with human voice over. If the learner chooses not to open the link and directly answers the item, it is effectively the same as the naive repetition. Unfortunately, the log does not track if the learner watches the video or if the learner finished the video. On aggregate, the video is played about 800 times. If each view is a by a separate id, the maximum exposure to the video treatment is about 30% of the treatment 2 group. The average watch time is about 47 seconds, out of the total length of 67 seconds.
+
+The recruited users are randomly assigned with one of three item packets based on the remainder of their user id divided by 5: 0 is the control group, 2 vocabulary treatment, and 4 video treatment. The user id is randomly generated.
+
+### Effort Identification
+
+#### Log Data
+The identification of the model hinges on the identification of the effort level. The effort level is not directly observed but has to be inferred from auxiliary data. The log data collected for the experiment includes the following fields:
+
+(1) learner id
+
+(2) question id
+
+(3) Submit time
+
+(4) time spent on the question (seconds)
+
+(5) the grade (0-1)
+
+(6) the actual answer in the text
+
+Table 5.1 is a sample of the original data log
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+knitr::kable(
+  head(data%>%select(uid, eid, cmt_time, cmt_timelen,atag_pct, answers), 1), booktabs = TRUE,
+  col.names = c('User ID', 'Item ID', 'Submit Time', 'Time Spent on Item', 'Score', 'Answers'),
+  align='c',
+  caption = 'Demo data from the Log'
+)
+```
+
+The time spent on the item is defined as the time elapsed between the time the server sends out the question to the learner's device and the time the  learner's submitted answer on the last subquestion received by the server. The transmission time in the network is negligible, usually in the magnitude of 10 milliseconds. The time spent does not distinguish how much time spent on each sub question and it is not a clean measure of student's active learning time. What student did between the question  presentation and the answer submission is not observed.
+
+#### Answer Classifcation
+
+The answers are initially classified into six categories:
+
+(1) Blank answer: The learner submits nothing on the circumference and the area
+
+(2) Non-blank wrong answer: Neither circumference nor area is correctly calculated and not includes in the slip or the wrong shape category 
+
+(3) Slip: The answer is correctly calculated but the learner inputs in a wrong way
+
+(4) Wrong Shape: The learner calculates correctly either the circumference or the area of the small rectangle
+
+(5) right circumference: The learner correctly calculates the circumference of the large rectangle 
+
+(6) right area: The learner correctly calculates the area of the large rectangle
+
+(7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
+
+The Table 4.2 and Table 4.3 show the summary statistics of different groups' answer composition at a different stage of the experiment. Appendix 2 shows a breakdown of the top answers in each category. Other than the non-blank wrong answer, all four error categories have clustered answer patterns: The top 5 answers cover over 50% of the answers. The category of the non-blank answer has a wide dispersion. The top non-blank answer for all but the pre-test item and the vocabulary scaffolding is the correct answer to the pre-test question, which occupies about 30% of the non-blank answer. Curiously, that is not the case for vocabulary scaffolding questions. In that question,  significantly more students provide the wrong shape answer. This is likely because the learner does not really read the question carefully and thus misunderstand the question.
+
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+ans_composition = data %>% group_by(group, qtype) %>% 
+  summarize(blank = mean(blank_ans)*100,
+            nonblank=mean(nonblank)*100,
+            wrongshape=mean(wrong_shape)*100,
+            rightcirc=mean(circ_right)*100,
+            rightarea=mean(area_right)*100,
+            slip=mean(is_slip)*100,
+            correct=mean(score==1)*100)
+knitr::kable(
+  ans_composition %>% arrange(qtype,group)%>% select(-rightcirc,-rightarea,-wrongshape,-correct), booktabs = TRUE,
+  col.names=c('Group','Task','Blank Ans(%)','Non Blank Wrong Ans (%)', 'Slip(%)'),
+  align='c',
+  caption = 'Answer Composition - All Wrong'
+)
+```
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+knitr::kable(
+  ans_composition %>% arrange(qtype,group) %>% select(-blank,-nonblank,-slip), booktabs = TRUE,
+  col.names=c('Group','Task','Wrong Shape(%)', 'Right Circ(%)', 'Right Area(%)','Correct(%)'),
+  align='c',
+  caption = 'Answer Composition - Other'
+)
+```
+
+#### Definition of Effort
+
+The effort level is assumed to be a binary variable, slack or valid attempt. The blank answer and nonblank wrong answer is classified as a slack. All the rest is defined as a valid attempt. The harsh definition of the slack aims to justify the assumption 7 that if there is no effort then no learning. It also satisfies the assumption 8 because the guess rate is assumed to be 0 for the fill-in-the-blank questions thus no effort means the wrong answer for sure. The summary statistics of the effort levels are presented in Table 4.4.
+
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+giveup_stat = data %>% group_by(group, qtype) %>% 
+  summarize(slack = mean(giveup)*100, 
+            deligent=mean(valid)*100,
+            correct=mean(atag_pct==1)*100)
+knitr::kable(
+  giveup_stat %>% arrange(qtype,group), booktabs = TRUE,
+  col.names=c('Group','Task','Slack Error (%)', 'Valid Error(%)','Correct(%)'),
+  align='c',
+  caption = 'Effort Level Composition'
+)
+```
+
+#### Robust Check of the Effort Identification
+
+One way to check the validity of the classification is to look at the distribution of time spent on the item. 
+
+
+Figure 4.1 shows the distribution of time spent on task when submitting a blank answer. The overall pattern is that the duration gets shorter after the learner passes the pre-test. If there is a small chance that the learner who submits a blank answer ponders on it, for the training practice and post-test, the blank answer is clearly
+
+
+In the pre-test, the distribution of the blank answer is not so left skewed compared to that in the later items. The learner may at least read through the question text before decides to drop it. In the subsequent items, except for the vocabulary scaffolding question, the learner submit a blank answer in such a short time that they give up so easily. For the control group and the video scaffolding group, the average time to submit a blank answer drops from 14 seconds on the pre-test to 6 seconds in the training and post-test. The vocabulary group spent more time to submit a blank answer because they have to click three times. In the post-test, the vocabulary scaffolding group has a significant drop in the time spent.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item with Blank Answer", fig.align='center',out.height='8cm',out.width='8cm'}
+qplot(data=data %>% filter(cmt_timelen<=60&blank_ans), x=cmt_timelen, geom='density', facets=group~qtype)+xlab('Time Spent on Task (Seconds)')
+```
+
+Examine the time distribution for the rest three categories as shown in Figure 4.2. The time distribution of valid effort is very similar to that of the correct answer. The distribution centres around 40 seconds and is stable across different tasks, which reflects the time needed to comprehend and solve the problem. In contrast, the distribution of the slack is very different. The slack distribution is skewed to the left and the skewness increase from pre-test to the training practice and the post-test. Both properties of the slack distribution echo that of the blank answer. It is thus a suggestive evidence that the non-blank totally wrong answer is the result of slacking rather than good faith effort.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item by Error Types With Nonblank Answers", fig.align='center',out.height='8cm',out.width='8cm'}
+qplot(data=data %>% filter(cmt_timelen<=120&!blank_ans), x=cmt_timelen, geom='density', col=etype, linetype=etype,facets=group~qtype) + xlab('Time Spent on Task (Seconds)')
+
+```
+
+#### Differential Effort Level Choice
+
+Figure 4.3 describes the frequency of slack pattern by groups. The first tick on the x-axis ('0,0,0') means the learner never slack. The last tick on the x-axis ('1,1,1') means the learner always slacks. In general, the effort level is quite persistent. about 50% of the users always exert effort while about 15% of the users never do. The vocabulary scaffolding group has the lowest frequency in the all-effort group, which is statistically significant compared to the control group but not statistically significant compared to the video scaffolding group. There is also a small tick for the vocabulary scaffolding group to give up only on the training question, although the difference is not significant. An alternative specification of slack, which only defines blank answer as slack, shows a similar pattern.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Slack Pattern", fig.align='center',out.height='8cm',out.width='8cm'}
+# Check the sequence dependence
+wide_data=  data %>%
+  select(uid,group,seq_id,giveup) %>%
+  spread(seq_id,giveup)
+names(wide_data) = c('uid','group','t1','t2','t3')
+
+effort_persistence = merge(wide_data %>% group_by(group,t1,t2,t3) %>% summarize(n=n()), wide_data %>% group_by(group) %>% summarize(N=n())) %>% mutate(pct=n/N)
+
+effort_persistence$pattern = '0,0,0'
+effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '1,1,0'
+effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&!effort_persistence$t3] = '1,0,0'
+effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '1,0,1'
+effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '1,1,1'
+effort_persistence$pattern[!effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '0,0,1'
+effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '0,1,0'
+effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '0,1,1'
+
+
+effort_persistence$pattern = factor(effort_persistence$pattern)
+
+ggplot(data=effort_persistence, aes(x=pattern,y=pct, fill=group))+ geom_bar(stat = "identity",position="dodge") + xlab('Slack Pattern') + ylab('Frequency') + ggtitle('Frequency of the Slack Pattern: 1=Slack,0=Effort. Three Items (E1,E2,E3)')
+```
+
+Another evidence of differential effort choice is the increasing likelihood for the learned students to give up. Because the guess rate is effectively zero, the learners who correctly answers the pre-test question must master the knowledge point. If they exert full effort, the true effect is zero, thus the placebo group. Table 4.5 describes their effort level choice in the training practice and the post-test. The vocabulary group almost doubled the probability of slacking. 
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "", fig.align='center',out.height='8cm',out.width='8cm'}
+placebo=  data %>%filter(is_placebo==1)%>% group_by(qtype, group) %>% summarize(gpct=mean(giveup)*100)
+
+knitr::kable(
+  placebo %>% filter(qtype!='pre')%>% select(group, qtype,gpct), booktabs = TRUE,
+  col.names=c('Group','Task','Slack (%)'),
+  align='c',
+  caption = 'The Slack Probability for the Placebo Learners'
+)
+```
+
+
+### The result
+
+#### Summary Statistics
+
+Before revealing the distribution of the estimated parameter, it is helpful to look at learning curve and slack curve of the original data. Figure 4.4 describes the percentage of the correct response by the group and by the task. The raw data show that the control group and the video scaffolding is almost identical but the vocabulary scaffolding group declines. Figure 4.5 describes the percentage of slackers by the group and by the task. The probability of slacking increases over time and the vocabulary scaffolding has the biggest increase. Because not all users exert full efforts, the estimated pedagogical efficacy is biased downwards. Because there is a differential probability of slacking, there is a differential degree of bias in the estimated parameters.
+
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "The Learning Curve", fig.align='center',out.height='8cm',out.width='8cm'}
+all =  data %>% group_by(seq_id, group) %>% summarize(ypct=mean(score),yint=mean(y),gpct=mean(giveup))
+
+ qplot(data=all, x=seq_id, y =yint, geom='line', col=group,linetype=group) + ggtitle('Learning Curve ')+ xlab('Task') + ylab('Average')+scale_x_continuous(breaks=c(1,2,3),labels=c("Pre", "Train","Post"))
+
+
+
+```
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "The Slack Curve", fig.align='center',out.height='8cm',out.width='8cm'}
+
+qplot(data=all, x=seq_id, y =gpct, geom='line', col=group,linetype=group) + ggtitle('Slack Curve')+ xlab('Task') + ylab('Average')+scale_x_continuous(breaks=c(1,2,3),labels=c("Pre", "Train","Post"))
+```
+
+
+
+#### The MCMC results
+
+Figure 4.7 compares the parameters estimated by a model without effort choice with that by a model with effort choice. Both the downward bias and the selection bias are manifested in the comparison. The effort choice model almost doubles the estimated pedagogical efficacy compared to the baseline model. In addition, the distributions of the pedagogical efficacy for the different group are almost indistinguishable in the baseline model but are very different in the effort choice model. 
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate", fig.align='center',out.height='8cm',out.width='8cm'}
+params_effort_man = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual.txt'), sep=',')
+params_no_effort = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort.txt'), sep=',')
+names(params_effort_man) = c('pre','no','vocabulary','video','post')
+names(params_no_effort) = c('pre','no','vocabulary','video','post')
+
+sample_idx = seq(300,1000,10)
+lrate = params_no_effort[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m1 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
+lrate = params_effort_man[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m2 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
+
+grid.arrange(m1,m2)
+
+params_effort_man_3 = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual_y3.txt'), sep=',')
+params_no_effort_3 = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort_y3.txt'), sep=',')
+
+params_effort_man_3_0 = params_effort_man_3 %>% select(V1,V3,V5,V7,V9)
+params_effort_man_3_1 = params_effort_man_3 %>% select(V2,V4,V6,V8,V10)
+
+params_no_effort_3_0 = params_no_effort_3 %>% select(V1,V3,V5,V7,V9)
+params_no_effort_3_1 = params_no_effort_3 %>% select(V2,V4,V6,V8,V10)
+
+names(params_effort_man_3_0) = c('pre','no','vocabulary','video','post')
+names(params_effort_man_3_1) = c('pre','no','vocabulary','video','post')
+names(params_no_effort_3_0) = c('pre','no','vocabulary','video','post')
+names(params_no_effort_3_1) = c('pre','no','vocabulary','video','post')
+
+sample_idx = seq(300,1000,10)
+lrate = params_no_effort_3_0[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m3 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
+lrate = params_effort_man_3_0[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m4 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort ')+xlim(c(0,1))
+
+grid.arrange(m3,m4)
+
+lrate = params_no_effort_3_1[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m5 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
+lrate = params_effort_man_3_1[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate$group = factor(lrate$group)
+m6 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
+
+grid.arrange(m5,m6)
+```
+
+
+
+
+
+
+## Discussion and Future Work
+
+The state-dependent effort choice does not generate the clustering of effort. 
+
+
+## Appendix
+
+### 1. Derivation of the Multiple item bias.
+
+**TODO**
+
+
+### 2. Breakdown of the answer category
+
+**TODO:SUPPLY THE RIGHT ANSWER**
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+type_ans_stat = data %>% group_by(qtype, eid, ans_type, raw_ans) %>% summarize(n=n()) %>%
+  group_by(qtype,eid,ans_type) %>% arrange(desc(n))
+
+
+type_stat = data %>% group_by(qtype,eid, ans_type) %>% summarize(N=n())
+
+ans_stat = merge(type_ans_stat, type_stat) %>% mutate(pct=n/N) %>%
+  filter(ans_type %in% c('wrong shape', 'slip','non-blank ans', 'right area','right circumference')) %>%
+  group_by(qtype,eid, ans_type) %>% arrange(qtype, eid, ans_type, desc(pct)) %>%
+  mutate(cum_pct = cumsum(pct)) %>%
+  mutate(idx = row_number()) %>% filter(idx<=5) %>%
+  select(qtype,eid, ans_type, raw_ans,n, pct, cum_pct) %>% ungroup()
+```
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+knitr::kable(
+  ans_stat %>% filter(ans_type=='non-blank ans')%>% select(-ans_type) , booktabs = TRUE,
+  caption = 'Answer Breakdown: Nonblank Answer'
+)
+```
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+knitr::kable(
+  ans_stat %>% filter(ans_type=='wrong shape') %>% select(-ans_type) , booktabs = TRUE,
+  caption = 'Answer Breakdown: Wrong Shape'
+)
+```
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+knitr::kable(
+  ans_stat %>% filter(ans_type=='right area') %>% select(-ans_type) , booktabs = TRUE,
+  caption = 'Answer Breakdown: Right Area'
+)
+```
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+knitr::kable(
+  ans_stat %>% filter(ans_type=='right circumference') %>% select(-ans_type) , booktabs = TRUE,
+  caption = 'Answer Breakdown: Right Circumference'
+)
+```
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+knitr::kable(
+  ans_stat %>% filter(ans_type=='slip') %>% select(-ans_type) , booktabs = TRUE,
+  caption = 'Answer Breakdown: Slip'
+)
+```

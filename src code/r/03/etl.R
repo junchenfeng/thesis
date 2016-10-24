@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(gridExtra)
 proj_dir = getwd()
 
 # MISSING the raw data generation
@@ -9,7 +10,7 @@ proj_dir = getwd()
 ###
 # Appendix II: Identification of
 ###
-file_path = paste0(proj_dir,'/_data/02/work_dataset_exp_merged.RData')
+file_path = paste0(proj_dir,'/_data/03/work_dataset_exp_merged.RData')
 load(file_path)
 
 meta_24921$cmt_timelen = meta_24921$cmt_timelen/1000
@@ -114,32 +115,40 @@ meta_24921_1st_attempt = meta_24921 %>%
   ungroup() %>%
   arrange(uid,cmt_time)
 
-# retain the 0,2,4
-meta_24921_1st_attempt = meta_24921_1st_attempt %>% transform(gid=uid%%5) %>% filter(gid%in%c(0,2,4))
+# filter out the last attempt
+meta_24921_1st_attempt = meta_24921_1st_attempt %>% transform(gid=uid%%5) %>% filter(eid != 'Q_10200351208705')
+meta_24921_1st_attempt$group = factor(meta_24921_1st_attempt$gid, labels=c('No-3','No-2','Vocabulary-3','Vocabulary-2','Video'))
+meta_24921_1st_attempt$type = 0
+meta_24921_1st_attempt$type[meta_24921_1st_attempt$group %in% c('No-2', 'Vocabulary-2')] = 1
+meta_24921_1st_attempt$type = factor(meta_24921_1st_attempt$type, labels=c('Pretest','No Pretest'))
 
-# retain users with full responses to 4 items
+
+# retain users with full responses to 3 items for group 0,2,4 and 2 items for group 1,3
 valid_user_sum = meta_24921_1st_attempt %>%
-  group_by(uid,gid) %>%
+  group_by(uid,group) %>%
   summarize(k=length(unique(eid)))  %>%
-  transform(is_valid_user = k==4)
+  transform(is_valid_user = (k==3&group %in%c('No-3','Vocabulary-3','Video')) | (k==2&group %in%c('No-2','Vocabulary-2')) )
 
-user_retention_stat = valid_user_sum %>% group_by(gid,k) %>% summarize(n=n())
-user_retention_stat = merge(user_retention_stat, user_retention_stat %>% group_by(gid) %>% summarize(N=sum(n)))
-user_retention_stat = user_retention_stat %>% mutate(pct=n/N) %>% group_by(gid) %>% mutate(cumpct=cumsum(pct))
+
+
 
 # generate the data for the regression model
-placebo_status = meta_24921_1st_attempt %>% filter(eid=='Q_10201056649366') %>% mutate(is_placebo = as.numeric(atag_pct==1)) %>% select(uid, is_placebo)
-train_time = meta_24921_1st_attempt %>% filter(eid %in% c('Q_10201056655901','Q_10201058056988','Q_10201056658103')) %>% select(uid,cmt_timelen)
-
-workdata = meta_24921_1st_attempt %>%
-  filter(uid %in% valid_user_sum$uid[valid_user_sum$k==4]) %>%
-  select(uid,gid,eid,atag_pct,giveup,cmt_time,is_blank_ans) %>% rename(y=atag_pct)
-
-workdata = merge(placebo_status, workdata, by='uid')
-workdata = merge(train_time, workdata, by='uid')
+# placebo_status = meta_24921_1st_attempt %>% filter(eid=='Q_10201056649366') %>% mutate(is_placebo = as.numeric(atag_pct==1)) %>% select(uid, is_placebo)
+# train_time = meta_24921_1st_attempt %>% filter(eid %in% c('Q_10201056655901','Q_10201058056988','Q_10201056658103')) %>% select(uid,cmt_timelen)
+#
+# workdata = meta_24921_1st_attempt %>%
+#   filter(uid %in% valid_user_sum$uid[valid_user_sum$k==4]) %>%
+#   select(uid,gid,eid,atag_pct,giveup,cmt_time,is_blank_ans) %>% rename(y=atag_pct)
+#
+# workdata = merge(placebo_status, workdata, by='uid')
+# workdata = merge(train_time, workdata, by='uid')
 
 
 # check which questions the user failed
+workdata = meta_24921_1st_attempt %>%
+  filter(uid %in% valid_user_sum$uid[valid_user_sum$is_valid_user]) %>%
+  select(uid,gid,eid,atag_pct,giveup,cmt_time,is_blank_ans) %>% rename(y=atag_pct)
+
 workdata$seq_id = 2
 workdata$seq_id[workdata$eid=='Q_10201056649366'] = 1
 workdata$seq_id[workdata$eid=='Q_10201056666357'] = 3

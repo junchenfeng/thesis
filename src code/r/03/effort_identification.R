@@ -33,14 +33,58 @@ meta_24921_1st_attempt = meta_24921 %>%
   arrange(uid,cmt_time)
 
 # retain the 0,2,4
-meta_24921_1st_attempt = meta_24921_1st_attempt %>% transform(gid=uid%%5) %>% filter(gid%in%c(0,2,4))
+meta_24921_1st_attempt = meta_24921_1st_attempt %>% transform(gid=uid%%5) %>% filter(eid != 'Q_10200351208705')
+meta_24921_1st_attempt$group = factor(meta_24921_1st_attempt$gid, labels=c('No-3','No-2','Vocabulary-3','Vocabulary-2','Video'))
+meta_24921_1st_attempt$type = 0
+meta_24921_1st_attempt$type[meta_24921_1st_attempt$group %in% c('No-2', 'Vocabulary-2')] = 1
+meta_24921_1st_attempt$type = factor(meta_24921_1st_attempt$type, labels=c('Pretest','No Pretest'))
+
 
 # retain users with full responses to 4 items
 valid_user_sum = meta_24921_1st_attempt %>%
-  filter(eid!='Q_10200351208705') %>%
-  group_by(uid,gid) %>%
+  group_by(uid,group) %>%
   summarize(k=length(unique(eid)))  %>%
-  transform(is_valid_user = k==3)
+  transform(is_valid_user = (k==3&group %in%c('No-3','Vocabulary-3','Video')) | (k==2&group %in%c('No-2','Vocabulary-2')) )
+
+# generate graphs
+
+user_retention_stat = valid_user_sum %>% group_by(group,k) %>% summarize(n=n())
+user_retention_stat = merge(user_retention_stat, user_retention_stat %>% group_by(group) %>% summarize(N=sum(n)))
+user_retention_stat = user_retention_stat %>% mutate(pct=n/N) %>% group_by(group) %>% mutate(cumpct=cumsum(pct))
+
+user_retention_stat_3 = user_retention_stat %>% filter(group %in% c('No-3','Vocabulary-3','Video'))
+user_retention_stat_2 = user_retention_stat %>% filter(group %in% c('No-2','Vocabulary-2'))
+
+# Get the attrition
+m1=ggplot(data=user_retention_stat_3, aes(x=k, y=pct, fill=group))+
+  geom_bar(stat = "identity",position="dodge") +
+  xlab('Last Item') + ylab('Pct') +
+  ggtitle('Attrition Percentage-pretest') +
+  theme(legend.position = "bottom") + ylim(c(0,1))
+
+m2=ggplot(data=user_retention_stat_2, aes(x=k, y=pct, fill=group))+
+  geom_bar(stat = "identity",position="dodge") +
+  xlab('Last Item') + ylab('Pct') +
+  ggtitle('Attrition Percentage- No pretest') +
+  theme(legend.position = "bottom") + ylim(c(0,1))
+
+grid.arrange(m1,m2, ncol=2)
+
+# Compare the last response
+work_data = meta_24921_1st_attempt %>% filter(uid %in% valid_user_sum$uid[valid_user_sum$is_valid_user])
+last_res_stat = work_data %>% filter(eid %in% c('Q_10201056666357','Q_10201056649366'))
+last_res_stat$qid = factor(last_res_stat$eid, labels=c('pretest','posttest'))
+
+
+last_res_stat = last_res_stat%>% group_by(type,qid,group) %>% summarize(pct=mean(atag))
+
+ggplot(data=last_res_stat, aes(x=qid, y=pct, fill=group))+
+  geom_bar(stat = "identity",position="dodge") +
+  facet_grid(.~type)+
+  xlab('Item') + ylab('Success Rate') +
+  ggtitle('Test Result') +
+  theme(legend.position = "bottom") + ylim(c(0,1))
+
 
 work_data = merge(meta_24921_1st_attempt %>% filter(uid %in% valid_user_sum$uid[valid_user_sum$is_valid_user]), ans_data)
 
@@ -51,7 +95,8 @@ work_data$score = work_data$atag_pct
 work_data$score[work_data$eid=='Q_10201056658103'&work_data$ans1=='28'&work_data$ans2=='48'] = 1.0
 work_data$score[work_data$eid=='Q_10201056658103'&work_data$ans1=='28'&work_data$ans2!='48'] = 0.5
 work_data$score[work_data$eid=='Q_10201056658103'&work_data$ans1!='28'&work_data$ans2=='48'] = 0.5
-
+work_data$score[work_data$eid=='Q_10201056658103'&work_data$ans1!='28'&work_data$ans2!='48'] = 0
+work_data$score[work_data$eid=='Q_10201056666357'&work_data$ans1=='36'&work_data$ans2=='80'] = 0
 
 
 
@@ -191,8 +236,7 @@ data = rbind(pre_data, control_data, treat1_data, treat2_data, post_data)
 
 data = data %>%  mutate(valid = score<1 &(is_slip |wrong_shape| area_right | circ_right),
                         right=score==1,
-                        nonblank = !right & !valid&!blank_ans) %>%
-                transform(gid=uid%%5)
+                        nonblank = !right & !valid & !blank_ans)
 
 data$ans_type = 'correct'
 data$ans_type[data$wrong_shape==1] = 'wrong shape'
@@ -214,13 +258,20 @@ data$seq_id[data$eid=='Q_10201056649366'] = 1
 data$seq_id[data$eid=='Q_10201056666357'] = 3
 
 data$qtype = factor(data$seq_id, labels=c('pre','train','post'))
-data$group = factor(data$gid, labels=c('ctrl','treat1','treat2'))
 data$y = as.numeric(data$score==1)
 
 data$nonblank[data$qtype=='pre'&data$wrong_shape==T] = 0
 data$valid[data$qtype=='pre'&data$wrong_shape==T] = 1
 data = data %>% mutate(giveup = blank_ans | nonblank)
 
+giveup_stat = data %>% group_by(qtype, group, type) %>% summarize(pct=mean(giveup))
+
+ggplot(data=giveup_stat, aes(x=qtype, y=pct, fill=group))+
+  geom_bar(stat = "identity",position="dodge") +
+  facet_grid(.~type)+
+  xlab('Item') + ylab('Slack Rate') +
+  ggtitle('Giveup Percentage') +
+  theme(legend.position = "bottom") + ylim(c(0,1))
 
 placebo_status = data %>% filter(eid=='Q_10201056649366') %>% mutate(is_placebo = as.numeric(score==1)) %>% filter(is_placebo==1)
 data$is_placebo = 0
@@ -272,25 +323,46 @@ ans_stat = merge(type_ans_stat, type_stat) %>% mutate(pct=n/N) %>%
 
 # Check the sequence dependence
 wide_data=  data %>%
-  select(uid,gid,seq_id,giveup) %>%
+  select(uid,group,type,seq_id,giveup) %>%
   spread(seq_id,giveup)
-names(wide_data) = c('uid','gid','t1','t2','t3')
+names(wide_data) = c('uid','group','type','t1','t2','t3')
 
-effort_persistence = merge(wide_data %>% group_by(gid,t1,t2,t3) %>% summarize(n=n()), wide_data %>% group_by(gid) %>% summarize(N=n())) %>% mutate(pct=n/N)
+effort_persistence = merge(wide_data %>% group_by(group,type,t1,t2,t3) %>% summarize(n=n()),
+                           wide_data %>% group_by(group,type) %>% summarize(N=n())) %>%
+  mutate(pct=n/N)
 
 effort_persistence$pattern = '0,0,0'
-effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '1,1,0'
-effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&!effort_persistence$t3] = '1,0,0'
-effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '1,0,1'
-effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '1,1,1'
-effort_persistence$pattern[!effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '0,0,1'
-effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '0,1,0'
-effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '0,1,1'
+effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3 &effort_persistence$type=='Pretest'] = '1,1,0'
+effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&!effort_persistence$t3&effort_persistence$type=='Pretest'] = '1,0,0'
+effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3 &effort_persistence$type=='Pretest'] = '1,0,1'
+effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&effort_persistence$t3  &effort_persistence$type=='Pretest'] = '1,1,1'
+effort_persistence$pattern[!effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3&effort_persistence$type=='Pretest'] = '0,0,1'
+effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3&effort_persistence$type=='Pretest'] = '0,1,0'
+effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&effort_persistence$t3 &effort_persistence$type=='Pretest'] = '0,1,1'
+
+effort_persistence$pattern[effort_persistence$t2 &effort_persistence$t3  &effort_persistence$type=='No Pretest'] = '1,1'
+effort_persistence$pattern[effort_persistence$t2 &!effort_persistence$t3 &effort_persistence$type=='No Pretest'] = '1,0'
+effort_persistence$pattern[!effort_persistence$t2&effort_persistence$t3  &effort_persistence$type=='No Pretest'] = '0,1'
+effort_persistence$pattern[!effort_persistence$t2&!effort_persistence$t3 &effort_persistence$type=='No Pretest'] = '0,0'
 
 
 effort_persistence$pattern = factor(effort_persistence$pattern)
 
-ggplot(data=effort_persistence, aes(x=pattern,y=pct, fill=factor(gid)))+ geom_bar(stat = "identity",position="dodge")
+effort_persistence_3 = effort_persistence %>% filter(type=='Pretest')
+effort_persistence_2 = effort_persistence %>% filter(type=='No Pretest')
+
+
+m1 = ggplot(data=effort_persistence_3, aes(x=pattern,y=pct, fill=group)) +
+  geom_bar(stat = "identity",position="dodge")+
+  ggtitle('Pretest')+
+  theme(legend.position = "bottom") + ylim(c(0,1))
+
+m2 = ggplot(data=effort_persistence_2, aes(x=pattern,y=pct, fill=group)) +
+  geom_bar(stat = "identity",position="dodge")+
+  ggtitle('No Pretest')+
+  theme(legend.position = "bottom") + ylim(c(0,1))
+
+grid.arrange(m1,m2,ncol=2)
 
 
 #
@@ -317,8 +389,11 @@ ggplot(data=effort_persistence, aes(x=pattern,y=pct, fill=factor(gid)))+ geom_ba
 # check the response time
 
 qplot(data=data, x=cmt_timelen, geom='density', col=etype, facets=group~qtype)
-qplot(data=data %>% filter(cmt_timelen<=120), x=cmt_timelen, geom='density', col=etype, facets=group~qtype)
-qplot(data=data %>% filter(cmt_timelen<=120&!blank_ans), x=cmt_timelen, geom='density', col=etype,facets=group~qtype)
+
+qplot(data=data %>% filter(cmt_timelen<=60&blank_ans), x=cmt_timelen, geom='density', facets=group~qtype) + xlab('time spent')
+
+qplot(data=data %>% filter(cmt_timelen<=120&!blank_ans), x=cmt_timelen, geom='density', col=etype,facets=group~qtype) + xlab('time spent')+
+  theme(legend.position = "bottom")
 
 
 # output for the paper
@@ -353,7 +428,51 @@ write.csv(output_data, file=paste0(proj_dir, '/_data/03/exp_output.csv'), row.na
 write.csv(output_data_effort_manual, file=paste0(proj_dir, '/_data/03/exp_output_effort_manual.csv'), row.names = F, quote = F)
 write.csv(output_data_effort_auto, file=paste0(proj_dir, '/_data/03/exp_output_effort_auto.csv'), row.names = F, quote = F)
 
+# parse it into discrete choice
+output_data = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score)
+
+output_data$y = 1
+output_data$y[output_data$score==1] = 2
+output_data$y[output_data$score==0] = 0
+output_data = output_data %>% select(-score)
+
+
+output_data_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, giveup) %>%
+  mutate(is_e=0, is_v=1-giveup) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score,is_e,is_v)
+
+output_data_effort_manual$y = 1
+output_data_effort_manual$y[output_data_effort_manual$score==1] = 2
+output_data_effort_manual$y[output_data_effort_manual$score==0] = 0
+output_data_effort_manual = output_data_effort_manual %>% select(-score)
+output_data_effort_manual = output_data_effort_manual %>% select(i,t,j,y,is_e,is_v)
+
+
+output_data_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, blank_ans) %>%
+  mutate( is_e=0, is_v=1-blank_ans) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score,is_e,is_v)
+
+output_data_effort_auto$y = 1
+output_data_effort_auto$y[output_data_effort_auto$score==1] = 2
+output_data_effort_auto$y[output_data_effort_auto$score==0] = 0
+output_data_effort_auto = output_data_effort_auto %>% select(-score)
+output_data_effort_auto = output_data_effort_auto %>% select(i,t,j,y,is_e,is_v)
+
+
+write.csv(output_data, file=paste0(proj_dir, '/_data/03/exp_output_y3.csv'), row.names = F, quote = F)
+write.csv(output_data_effort_manual, file=paste0(proj_dir, '/_data/03/exp_output_effort_manual_y3.csv'), row.names = F, quote = F)
+write.csv(output_data_effort_auto, file=paste0(proj_dir, '/_data/03/exp_output_effort_auto_y3.csv'), row.names = F, quote = F)
+
 # after python estimate the model. Reload
+
+
 
 params_effort_man = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual.txt'), sep=',')
 params_effort_auto = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_automatic.txt'), sep=',')
