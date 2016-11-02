@@ -339,14 +339,11 @@ Figure 4.7 compares the parameters estimated by a model without effort choice wi
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate", fig.align='center',out.height='8cm',out.width='8cm'}
 params_effort_man = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual.txt'), sep=',')
 params_no_effort = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort.txt'), sep=',')
-names(params_effort_man) = c('pre','no','vocabulary','video','post')
-names(params_no_effort) = c('pre','no','vocabulary','video','post')
 
-sample_idx = seq(300,1000,10)
-lrate = params_no_effort[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_no_effort %>% select(V2,V3,V4)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m1 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_effort_man %>% select(V2,V3,V4)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m2 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
 
@@ -366,20 +363,19 @@ names(params_effort_man_3_1) = c('pre','no','vocabulary','video','post')
 names(params_no_effort_3_0) = c('pre','no','vocabulary','video','post')
 names(params_no_effort_3_1) = c('pre','no','vocabulary','video','post')
 
-sample_idx = seq(300,1000,10)
-lrate = params_no_effort_3_0[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_no_effort_3_0 %>% select(-pre,-post)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m3 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man_3_0[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_effort_man_3_0 %>% select(-pre,-post)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m4 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort ')+xlim(c(0,1))
 
 grid.arrange(m3,m4)
 
-lrate = params_no_effort_3_1[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_no_effort_3_1 %>% select(-pre,-post)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m5 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man_3_1[sample_idx,] %>% select(-pre,-post)%>% gather(group,val)
+lrate = params_effort_man_3_1 %>% select(-pre,-post)%>% gather(group,val)
 lrate$group = factor(lrate$group)
 m6 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
 

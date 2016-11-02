@@ -73,26 +73,30 @@ spell_data = spell_data %>% arrange(uid, spell_id, desc(t))
 spell_data = spell_data %>% transform(raw = t-lag(t,1), idx=as.integer((t-lag(t,1))>=0))
 spell_data$idx[1] = 1
 
-output_spell_data = spell_data %>% select(kpid, spell_id, t, atag, idx) %>% arrange(spell_id, t)
+# take the first spell under user's name
+valid_spell_id = spell_data%>% group_by(uid) %>% summarize(first_spell_id=min(spell_id))
+
+
+output_spell_data = spell_data %>% filter(spell_id %in% valid_spell_id$first_spell_id) %>% select(kpid, spell_id, t, atag, idx) %>% arrange(spell_id, t)
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_2.csv')
-write.table(output_spell_data %>% filter(t<=5) %>% filter(kpid==2) %>% select(-kpid) %>% filter(spell_id %% 20 %in% c(3) ), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data %>% filter(t<=4) %>% filter(kpid==2) %>% select(-kpid) %>% filter(spell_id %% 30 %in% c(0,1) ), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_87.csv')
-write.table(output_spell_data%>% filter(t<=5) %>% filter(kpid==87) %>% select(-kpid) %>% filter(spell_id %% 20 %in% c(3) ), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data%>% filter(t<=4) %>% filter(kpid==87) %>% select(-kpid) %>% filter(spell_id %% 15 %in% c(0,1) ), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_138.csv')
-write.table(output_spell_data%>% filter(t<=5) %>% filter(kpid==138) %>% select(-kpid) %>% filter(spell_id %% 20 %in%c(3,9)), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data%>% filter(t<=4) %>% filter(kpid==138) %>% select(-kpid) %>% filter(spell_id %% 3 %in%c(0,1)), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_2_outsample.csv')
-write.table(output_spell_data %>% filter(t<=5) %>% filter(kpid==2) %>% select(-kpid) %>% filter(spell_id %% 20 %in% c(5) ), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data %>% filter(t<=4) %>% filter(kpid==2) %>% select(-kpid) %>% filter(spell_id %% 30 %in% c(2) ), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_87_outsample.csv')
-write.table(output_spell_data%>% filter(t<=5) %>% filter(kpid==87) %>% select(-kpid) %>% filter(spell_id %% 20 %in% c(5) ), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data%>% filter(t<=4) %>% filter(kpid==87) %>% select(-kpid) %>% filter(spell_id %% 15 %in% c(2) ), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 output_file_path = paste0(proj_dir,'/_data/02/spell_data_138_outsample.csv')
-write.table(output_spell_data%>% filter(t<=5) %>% filter(kpid==138) %>% select(-kpid) %>% filter(spell_id %% 20 %in%c(5,0)), file=output_file_path, row.names=F, col.names=F, sep=',')
+write.table(output_spell_data%>% filter(t<=4) %>% filter(kpid==138) %>% select(-kpid) %>% filter(spell_id %% 3 %in%c(2)), file=output_file_path, row.names=F, col.names=F, sep=',')
 
 
 

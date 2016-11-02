@@ -215,7 +215,7 @@ The effort level is important because it shapes the learning gain and the observ
 
 **Assumption 8**: $P(X_t=m|X_{t-1}=n, A(t)=j, E_t=0) = 0 \forall j, m > n$
 
-Furthermore, assume that if the learner does not exert effort, the response is always false. 
+Furthermore, assume that if the learner does not exert effort, the response is always completely incorrect. 
 
 **Assumption 9**: $P(Y_t=0|E_t=0,A_t=j) = 1 \forall j$
 
@@ -225,24 +225,30 @@ It shall be noticed that assumption 7 and assumption 8 generate positive autocor
 
 ### The Stop Decision
 
-The hazard rate at sequence $t$ is the probability of exit conditioning on continue at sequence $t-1$.
-
-$$
-h^k_{t,j}=P(H_t=1|H_{t-1}=0,X_t=k,A_t=j)
-$$
+The hazard rate at sequence $t$ is the probability of exit conditioning on continue at sequence $t-1$. Assume
 
 **Assumption 10**: Stop decision is independent of item characteristics
 
-**Assumption 11**: The duration dependence of the hazard rate is proportional
-
-
-Under assumption 10 and 11, the hazard rate can be expressed as:
 
 $$
-h_t^k = \lambda_k e^{\beta_k t}
+h_t=P(H_t=1|H_{t-1}=0,X_t,Y_t)
+$$
+Whether the differential hazard rate depends on the response or the state merits some discussions. If the difference in the hazard rates depend on the response, a model without the stopping decision consitently estimated $\pi$,$\ell$, and $c$. However, if the difference in the hazard rates depend on the state, a model without the stopping decision introduces selection bias into other parameters. Both dependence structures can happen in reasonable scenarios. "X-Strike" rule is an example of the response dependent hazard model. If the learner always keep going unless is forced to stop after accumulating X failures, the stop decision is a function of the responses, and the hazard rate depends on the responses. In contrast, the differential attrition caused by boredom or frustration is likely a case of state dependent hazard model. If the learner has already mastered the knowledge point, further practices produce no learning gain and they are bored. If the learner hasn't mastered the knowledge point after a few exercises, they are frustrated. This may cause the differential hazard rate.
+
+
+Furthermore, the functional form of hazard rate may also be scenario dependent. Continue with the previous two examples. If the hazard rate is driven by boredom or frustration, it is reasonable to model the duration dependence as a proportional hazard model with time trend. Thus the hazard rate can be expressed as:
+
+$$
+P(H_t=1|H_{t-1}=0,X_t=k)= h_t^k = \lambda_k e^{\beta_k t} 
 $$
 
-The differential hazard rate can be mechanical. For example, if the learner is forced to stop after X failures, the hazard rate rises as the number of failures accumulates. Since lower mastery learner are more prone to error, they are more prone to stop. However, the latent state can influence the hazard rate by the active choice of the learner. The author suspects two reasons for attrition, boredom and frustration. If the learner has already mastered the knowledge point, further practices produce no learning gain and they are bored. If the learner hasn't mastered the knowledge point after a few exercises, they are frustrated. This may cause the differential hazard rate based on response observed in data. Furthermore, the author speculates that frustration hurts the learner's engagement more than the boredom.
+However, if the hazard rate is driven by the X-strike rule, then the hazard rate is likely to be discontinuous. Without further knowledge on the functional form, it is reasonable to specify a discrete cell estimator on the hazard rate
+$$
+ P(H_t=1|H_{t-1}=0,Y_t=r)= h_t^r
+$$
+
+Chapter 3 will discuss the ramification of the dependence structure and functional form on the estimation of the pedagogical efficacy.
+
 
 ### Example: Zone of Proximal Development
 
