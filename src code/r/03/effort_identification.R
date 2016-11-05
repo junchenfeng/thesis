@@ -32,7 +32,6 @@ meta_24921_1st_attempt = meta_24921 %>%
   ungroup() %>%
   arrange(uid,cmt_time)
 
-# retain the 0,2,4
 meta_24921_1st_attempt = meta_24921_1st_attempt %>% transform(gid=uid%%5) %>% filter(eid != 'Q_10200351208705')
 meta_24921_1st_attempt$group = factor(meta_24921_1st_attempt$gid, labels=c('No-3','No-2','Vocabulary-3','Vocabulary-2','Video'))
 meta_24921_1st_attempt$type = 0
@@ -40,7 +39,7 @@ meta_24921_1st_attempt$type[meta_24921_1st_attempt$group %in% c('No-2', 'Vocabul
 meta_24921_1st_attempt$type = factor(meta_24921_1st_attempt$type, labels=c('Pretest','No Pretest'))
 
 
-# retain users with full responses to 4 items
+# retain users with full responses
 valid_user_sum = meta_24921_1st_attempt %>%
   group_by(uid,group) %>%
   summarize(k=length(unique(eid)))  %>%
@@ -88,6 +87,8 @@ ggplot(data=last_res_stat, aes(x=qid, y=pct, fill=group))+
 
 work_data = merge(meta_24921_1st_attempt %>% filter(uid %in% valid_user_sum$uid[valid_user_sum$is_valid_user]), ans_data)
 
+work_data$ans1 = trimws(work_data$ans1)
+work_data$ans2 = trimws(work_data$ans2)
 
 
 # Re grade the whole question Q_10201056658103
@@ -99,14 +100,12 @@ work_data$score[work_data$eid=='Q_10201056658103'&work_data$ans1!='28'&work_data
 work_data$score[work_data$eid=='Q_10201056666357'&work_data$ans1=='36'&work_data$ans2=='80'] = 0
 
 
-
 identify_giveup <- function(data, target_eid){
   data$is_slip = 0
   data$wrong_shape = 0
   data$circ_right = 0
   data$area_right = 0
   data$blank_ans = 0
-  data$wrong_shape_w = 0
 
 
   # error type format:
@@ -127,7 +126,6 @@ identify_giveup <- function(data, target_eid){
     circ_right = setdiff(unique(data$raw_ans[right_1_idx]), is_slip)
     area_right = setdiff(unique(data$raw_ans[right_2_idx]), is_slip)
     wrong_shape = c('[["26","40"]]','[["26",""]]','[["","40"]]','[["26","26"]]','[["40","40"]]','[["40","26"]]','[["40",""]]','[["","26"]]')
-    wrong_shape_w = c()
     blank_error = c('[["",""]]')
 
   }
@@ -141,7 +139,6 @@ identify_giveup <- function(data, target_eid){
     area_right = append(setdiff(unique(data$raw_ans[right_2_idx]), is_slip), c('[["48",""]]'))
 
     wrong_shape = c('[["20","24"]]','[["20",""]]','[["","24"]]','[["20","20"]]','[["24","24"]]','[["24","20"]]','[["24",""]]','[["","20"]]')
-    wrong_shape_w = c()
     blank_error = c('[["",""]]','[[],[]]')
   }
   else if (target_eid=='Q_10201056658103-o'){
@@ -156,28 +153,8 @@ identify_giveup <- function(data, target_eid){
     circ_right = append(setdiff(unique(data$raw_ans[right_1_idx]), is_slip), c('[["","28"]]'))
     area_right = append(setdiff(unique(data$raw_ans[right_2_idx]), is_slip), c('[["48",""]]'))
 
-    # # The wrong shape identification is different for the 2nd question
-    # wrong_shape = c('[["6","4"],["20"],["24"]]',
-    #                 '[["6","4"],["20"],[]]',
-    #                 '[["6","4"],[],["24"]]',
-    #                 '[["6",""],["20"],["24"]]',
-    #                 '[["6",""],["20"],[]]',
-    #                 '[["6",""],[],["24"]]',
-    #                 '[["","4"],["20"],["24"]]',
-    #                 '[["","4"],["20"],[]]',
-    #                 '[["","4"],[],["24"]]',
-    #                 '[["",""],["20"],["24"]]',
-    #                 '[["4","6"],["20"],[]]',
-    #                 '[["4","6"],[],["24"]]',
-    #                 '[["6","4"],["20"],["24"]]')
-    # wrong_shape_both = which(data$ans1=='20'&data$ans2=='24')
-    # wrong_shape_circ = which(data$ans1=='20'&data$ans2=='')
-    # wrong_shape_area = which(data$ans1==''&data$ans2=='24')
-    # all_wrong_shape = unique(append(append(data$answers[wrong_shape_both],data$answers[wrong_shape_circ]),data$answers[wrong_shape_area]))
-    # wrong_shape_w = setdiff(all_wrong_shape, wrong_shape)
 
-    wrong_shape = c('[["20","24"]]','[["20",""]]','[["","24"]]')
-    wrong_shape_w = c()
+    wrong_shape = c('[["20","24"]]','[["20",""]]','[["","24"]]','[["20","20"]]','[["24","24"]]','[["24","20"]]','[["24",""]]','[["","20"]]')
 
     blank_error = c('[["8","6"],[],[]]','[["",""],[],[]]','[["6","4"],[],[]]')
   }
@@ -192,28 +169,21 @@ identify_giveup <- function(data, target_eid){
     area_right = setdiff(unique(data$raw_ans[right_2_idx]), append(is_slip, c('[["36","80"]]')))
     wrong_shape = c('[["26","40"]]','[["26",""]]','[["","40"]]','[["26","26"]]','[["40","40"]]','[["40","26"]]','[["40",""]]','[["","26"]]')
     blank_error = c('[["",""]]')
-    wrong_shape_w = c()
   }
 
   if (target_eid=='Q_10201056658103-o'){
     data$is_slip[data$answers %in% is_slip & data$atag_pct!=1] = 1
     data$blank_ans[data$answers %in% blank_error & data$atag_pct!=1] = 1
     data$wrong_shape[data$raw_ans %in% wrong_shape & data$atag_pct!=1] = 1
-    data$wrong_shape_w[data$raw_ans %in% wrong_shape_w & data$atag_pct!=1] = 1
     data$circ_right[data$raw_ans %in% circ_right & data$atag_pct!=1] = 1
     data$area_right[data$raw_ans %in% area_right & data$atag_pct!=1] = 1
   }else{
     data$is_slip[data$raw_ans %in% is_slip & data$score!=1] = 1
     data$blank_ans[data$raw_ans %in% blank_error & data$score!=1] = 1
     data$wrong_shape[data$raw_ans %in% wrong_shape & data$score!=1] = 1
-    data$wrong_shape_w[data$raw_ans %in% wrong_shape_w & data$score!=1] = 1
     data$circ_right[data$raw_ans %in% circ_right & data$score!=1] = 1
     data$area_right[data$raw_ans %in% area_right & data$score!=1] = 1
   }
-
-
-
-
   # Exception Rules
   return(data)
 }
@@ -228,6 +198,9 @@ treat2_data = identify_giveup(work_data %>%filter(eid=='Q_10201058056988'), 'Q_1
 post_data = identify_giveup(work_data %>%filter(eid=='Q_10201056666357'), 'Q_10201056666357' ) # first assessment
 
 data = rbind(pre_data, control_data, treat1_data, treat2_data, post_data)
+
+
+
 
 # first_step_success_idx = which((treat1_data$sans1=='8'&treat1_data$sans2=='6')|(treat1_data$sans1=='6'&treat1_data$sans2=='8'))
 # success_user = treat1_data$uid[first_step_success_idx]
@@ -247,6 +220,10 @@ data$ans_type[data$blank_ans==1] = 'blank ans'
 data$ans_type[data$is_slip==1] = 'slip'
 
 
+data$item_type = 'train'
+data$item_type[data$eid=='Q_10201056649366'] = 'pre-test'
+data$item_type[data$eid=='Q_10201056666357'] = 'post-test'
+data$item_type = factor(data$item_type, levels=c('pre-test','train','post-test'))
 
 data$etype='blank'
 data$etype[data$right]='correct'
@@ -263,6 +240,67 @@ data$y = as.numeric(data$score==1)
 data$nonblank[data$qtype=='pre'&data$wrong_shape==T] = 0
 data$valid[data$qtype=='pre'&data$wrong_shape==T] = 1
 data = data %>% mutate(giveup = blank_ans | nonblank)
+
+## Do additional grading
+
+# give grade to area and circumference
+# The sequential thinking is
+# (1) correctly identifies shape
+# (2) correctly calculate the circumference
+# (3) correctly calculate the area
+
+# the unclassified only accounts for a very small percentage of the right shape, <1%
+#data %>% filter(wrong_shape==0&giveup==0&score==0&is_slip==0) %>% group_by(eid) %>% summarize(n=n())
+data = data %>% mutate(score0 = as.numeric(wrong_shape==0&giveup==0))
+
+
+data$score1 = 0
+data$score1[data$score==1] = 1
+data$score1[data$score!=1&data$score!=0&data$ans1=='36'&data$eid=='Q_10201056649366'] = 1
+data$score1[data$score!=1&data$score!=0&data$ans1=='42'&data$eid=='Q_10201056666357'] = 1
+data$score1[data$score!=1&data$score!=0&data$ans1=='28'&data$eid %in% c('Q_10201056655901','Q_10201056658103','Q_10201058056988')] = 1
+
+data$score1[data$score!=1&data$ans1=='26'&data$wrong_shape==1&data$eid %in% c('Q_10201056649366', 'Q_10201056666357')] = 1
+data$score1[data$score!=1&data$ans1=='20'&data$wrong_shape==1&data$eid %in% c('Q_10201056655901','Q_10201056658103','Q_10201058056988')] = 1
+
+
+# make up the wrong shape
+
+data$score2 = 0
+data$score2[data$score==1] = 1
+data$score2[data$score==1] = 1
+data$score2[data$score!=1&data$score!=0&data$ans2=='80'&data$eid %in% c('Q_10201056649366', 'Q_10201056666357')] = 1
+data$score2[data$score!=1&data$score!=0&data$ans2=='48'&data$eid %in% c('Q_10201056655901','Q_10201056658103','Q_10201058056988')] = 1
+
+data$score2[data$score!=1&data$ans2=='40'&data$wrong_shape==1&data$eid %in% c('Q_10201056649366', 'Q_10201056666357')] = 1
+data$score2[data$score!=1&data$ans1=='24'&data$wrong_shape==1&data$eid %in% c('Q_10201056655901','Q_10201056658103','Q_10201058056988')] = 1
+
+#
+# data$giveup1 = data$giveup
+# data$giveup1[data$ans1==''] = 1
+# data$blank_ans1 = data$blank_ans
+# data$blank_ans1[data$ans1==''] = 1
+#
+#
+# data$giveup2 = data$giveup
+# data$giveup2[data$ans2==''] = 1
+# data$blank_ans2 = data$blank_ans
+# data$blank_ans2[data$ans2==''] = 1
+
+right_shape_stat = data %>% filter(giveup==0) %>% group_by(group,item_type) %>% summarize(p=mean(score0))
+ggplot(data=right_shape_stat, aes(x=item_type, y=1-p, fill=group))+geom_bar(stat='identity',position='dodge')
+
+circ_stat = data %>% filter(giveup==0)%>% group_by(group,item_type) %>% summarize(p=mean(score1))
+ggplot(data=circ_stat, aes(x=item_type, y=1-p, fill=group))+geom_bar(stat='identity',position='dodge')
+
+area_stat = data %>% filter(giveup==0) %>% group_by(group,item_type) %>% summarize(p=mean(score2))
+ggplot(data=area_stat, aes(x=item_type, y=1-p, fill=group))+geom_bar(stat='identity',position='dodge')
+
+
+
+
+# diagnostics
+
 
 giveup_stat = data %>% group_by(qtype, group, type) %>% summarize(pct=mean(giveup))
 
@@ -402,10 +440,17 @@ file_path = paste0(proj_dir,'/_data/03/paper_data.RData')
 save.image(file_path)
 
 
-# output to bkt
+# output to csv
+
+# only take 0,2,4
+# only take the control and the video
+data = data %>% filter(gid%%2==0) %>% filter(group %in% c('No-3','Video'))
+
 # rename with user
 user_info = data %>% group_by(uid) %>% summarise() %>% ungroup()%>% mutate(i=row_number()-1)
-eid_info = data.frame(eid = c('Q_10201056649366','Q_10201056655901','Q_10201056658103','Q_10201058056988','Q_10201056666357'), j=seq(0,4,1))
+eid_info = data.frame(eid = c('Q_10201056649366','Q_10201056655901','Q_10201058056988','Q_10201056666357'), j=seq(0,3,1))
+
+
 
 output_data = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, y) %>%
   mutate(t=seq_id-1) %>% select(-seq_id) %>%
@@ -424,84 +469,121 @@ output_data_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, 
   arrange(i,t) %>%
   select(i,t,j,y,is_e,is_v)
 
-write.csv(output_data, file=paste0(proj_dir, '/_data/03/exp_output.csv'), row.names = F, quote = F)
-write.csv(output_data_effort_manual, file=paste0(proj_dir, '/_data/03/exp_output_effort_manual.csv'), row.names = F, quote = F)
-write.csv(output_data_effort_auto, file=paste0(proj_dir, '/_data/03/exp_output_effort_auto.csv'), row.names = F, quote = F)
+write.csv(output_data, file=paste0(proj_dir, '/_data/03/output/exp_output.csv'), row.names = F, quote = F)
+write.csv(output_data_effort_manual, file=paste0(proj_dir, '/_data/03/output/exp_output_effort_manual.csv'), row.names = F, quote = F)
+write.csv(output_data_effort_auto, file=paste0(proj_dir, '/_data/03/output/exp_output_effort_auto.csv'), row.names = F, quote = F)
+
+
+# output score 0
+output_data_0 = merge(merge(data, user_info), eid_info) %>%select(i, seq_id, j, score0) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score0)
+
+output_data_0_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score0, giveup) %>%
+  mutate(is_e=0, is_v=1-giveup) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score0,is_e,is_v)
+
+output_data_0_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score0, blank_ans) %>%
+  mutate(is_e=0, is_v=1-blank_ans) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score0,is_e,is_v)
+
+write.csv(output_data_0, file=paste0(proj_dir, '/_data/03/output/exp_output_0.csv'), row.names = F, quote = F)
+write.csv(output_data_0_effort_manual, file=paste0(proj_dir, '/_data/03/output/exp_output_0_effort_manual.csv'), row.names = F, quote = F)
+write.csv(output_data_0_effort_auto, file=paste0(proj_dir, '/_data/03/output/exp_output_0_effort_auto.csv'), row.names = F, quote = F)
+
+
+# output score 1
+output_data_1 = merge(merge(data, user_info), eid_info) %>%select(i, seq_id, j, score1) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score1)
+
+output_data_1_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score1, giveup) %>%
+  mutate(is_e=0, is_v=1-giveup) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score1,is_e,is_v)
+
+output_data_1_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score1, blank_ans) %>%
+  mutate(is_e=0, is_v=1-blank_ans) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score1,is_e,is_v)
+
+write.csv(output_data_1, file=paste0(proj_dir, '/_data/03/output/exp_output_1.csv'), row.names = F, quote = F)
+write.csv(output_data_1_effort_manual, file=paste0(proj_dir, '/_data/03/output/exp_output_1_effort_manual.csv'), row.names = F, quote = F)
+write.csv(output_data_1_effort_auto, file=paste0(proj_dir, '/_data/03/output/exp_output_1_effort_auto.csv'), row.names = F, quote = F)
+
+# output score 2
+output_data_2 = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score2) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score2)
+
+output_data_2_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score2, giveup) %>%
+  mutate(is_e=0, is_v=1-giveup) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score2,is_e,is_v)
+
+output_data_2_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score2, blank_ans) %>%
+  mutate(is_e=0, is_v=1-blank_ans) %>%
+  mutate(t=seq_id-1) %>% select(-seq_id) %>%
+  arrange(i,t) %>%
+  select(i,t,j,score2,is_e,is_v)
+
+write.csv(output_data_2, file=paste0(proj_dir, '/_data/03/output/exp_output_2.csv'), row.names = F, quote = F)
+write.csv(output_data_2_effort_manual, file=paste0(proj_dir, '/_data/03/output/exp_output_2_effort_manual.csv'), row.names = F, quote = F)
+write.csv(output_data_2_effort_auto, file=paste0(proj_dir, '/_data/03/output/exp_output_2_effort_auto.csv'), row.names = F, quote = F)
+
 
 # parse it into discrete choice
-output_data = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score) %>%
+output_data_y3 = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score) %>%
   mutate(t=seq_id-1) %>% select(-seq_id) %>%
   arrange(i,t) %>%
   select(i,t,j,score)
 
-output_data$y = 1
-output_data$y[output_data$score==1] = 2
-output_data$y[output_data$score==0] = 0
-output_data = output_data %>% select(-score)
+output_data_y3$y = 1
+output_data_y3$y[output_data_y3$score==1] = 2
+output_data_y3$y[output_data_y3$score==0] = 0
+output_data_y3 = output_data_y3 %>% select(-score)
 
 
-output_data_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, giveup) %>%
+output_data_y3_effort_manual = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, giveup) %>%
   mutate(is_e=0, is_v=1-giveup) %>%
   mutate(t=seq_id-1) %>% select(-seq_id) %>%
   arrange(i,t) %>%
   select(i,t,j,score,is_e,is_v)
 
-output_data_effort_manual$y = 1
-output_data_effort_manual$y[output_data_effort_manual$score==1] = 2
-output_data_effort_manual$y[output_data_effort_manual$score==0] = 0
-output_data_effort_manual = output_data_effort_manual %>% select(-score)
-output_data_effort_manual = output_data_effort_manual %>% select(i,t,j,y,is_e,is_v)
+output_data_y3_effort_manual$y = 1
+output_data_y3_effort_manual$y[output_data_y3_effort_manual$score==1] = 2
+output_data_y3_effort_manual$y[output_data_y3_effort_manual$score==0] = 0
+output_data_y3_effort_manual = output_data_y3_effort_manual %>% select(-score)
+output_data_y3_effort_manual = output_data_y3_effort_manual %>% select(i,t,j,y,is_e,is_v)
 
 
-output_data_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, blank_ans) %>%
+output_data_y3_effort_auto = merge(merge(data, user_info), eid_info) %>% select(i, seq_id, j, score, blank_ans) %>%
   mutate( is_e=0, is_v=1-blank_ans) %>%
   mutate(t=seq_id-1) %>% select(-seq_id) %>%
   arrange(i,t) %>%
   select(i,t,j,score,is_e,is_v)
 
-output_data_effort_auto$y = 1
-output_data_effort_auto$y[output_data_effort_auto$score==1] = 2
-output_data_effort_auto$y[output_data_effort_auto$score==0] = 0
-output_data_effort_auto = output_data_effort_auto %>% select(-score)
-output_data_effort_auto = output_data_effort_auto %>% select(i,t,j,y,is_e,is_v)
+output_data_y3_effort_auto$y = 1
+output_data_y3_effort_auto$y[output_data_y3_effort_auto$score==1] = 2
+output_data_y3_effort_auto$y[output_data_y3_effort_auto$score==0] = 0
+output_data_y3_effort_auto = output_data_y3_effort_auto %>% select(-score)
+output_data_y3_effort_auto = output_data_y3_effort_auto %>% select(i,t,j,y,is_e,is_v)
 
 
-write.csv(output_data, file=paste0(proj_dir, '/_data/03/exp_output_y3.csv'), row.names = F, quote = F)
-write.csv(output_data_effort_manual, file=paste0(proj_dir, '/_data/03/exp_output_effort_manual_y3.csv'), row.names = F, quote = F)
-write.csv(output_data_effort_auto, file=paste0(proj_dir, '/_data/03/exp_output_effort_auto_y3.csv'), row.names = F, quote = F)
+write.csv(output_data_y3, file=paste0(proj_dir, '/_data/03/output/exp_output_y3.csv'), row.names = F, quote = F)
+write.csv(output_data_y3_effort_manual, file=paste0(proj_dir, '/_data/03/output/exp_output_effort_manual_y3.csv'), row.names = F, quote = F)
+write.csv(output_data_y3_effort_auto, file=paste0(proj_dir, '/_data/03/output/exp_output_effort_auto_y3.csv'), row.names = F, quote = F)
 
-# after python estimate the model. Reload
-
-
-
-params_effort_man = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual.txt'), sep=',')
-params_effort_auto = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_automatic.txt'), sep=',')
-params_no_effort = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort.txt'), sep=',')
-
-sample_idx = seq(300,1000,10)
-
-lrate = data.frame(q1=params_effort_man$V23[sample_idx],q2=params_effort_man$V24[sample_idx],q3=params_effort_man$V25[sample_idx])
-lrate = lrate %>% gather(qid,val)
-m1 = qplot(data=lrate, x=val, col=factor(qid), geom='density')
-
-lrate = data.frame(q1=params_effort_auto$V23[sample_idx],q2=params_effort_auto$V24[sample_idx],q3=params_effort_auto$V25[sample_idx])
-lrate = lrate %>% gather(qid,val)
-m2 = qplot(data=lrate, x=val, col=factor(qid), geom='density')
-
-lrate = data.frame(q1=params_no_effort$V23[sample_idx],q2=params_no_effort$V24[sample_idx],q3=params_no_effort$V25[sample_idx])
-lrate = lrate %>% gather(qid,val)
-m3 = qplot(data=lrate, x=val, col=factor(qid), geom='density')
-
-grid.arrange(m1,m2,m3)
-
-
-# Alternatively, only identify blank answer as giveups
-#TODO: examine the MCMC results
-
-##############
-# Now do DID #
-##############
-library(stargazer)
 
 
 

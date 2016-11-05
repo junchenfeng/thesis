@@ -14,75 +14,134 @@ input_file_path = paste0(proj_dir,'/_data/03/paper_data.RData')
 load(input_file_path)
 options(digits=2)
 
+# filter out vocab
+
+data = data%>%  filter(group %in% c('No-3','Video'))
+data$group = factor(as.character(data$group), levels=c( "No-3","Video"), labels=c('Control','Treatment'))
+
 ```
 
 ## Motivation:Experimental Evaluation of Pedagogical Efficacy
 
-To motivate the discussion of this chapter, consider the task of comparing the efficacy of two pedagogical methods by an randomized control trials. The experiment has a random assignment of the learners, two assessments before and after the treatment, and even zero sample attrition. To simplify, assume there is no guess, no slip, and no learning for the test instrument, so that the difference in response success rate is the difference in learning gain. The analyst estimate the average difference in pedagogical efficacy ($\gamma$) by difference in difference with the following regression
+To motivate the discussion of this chapter, consider the task of comparing the pedagogical efficacy of two items by an randomized control trial. The experiment has a random assignment of the learners, two assessments before and after the treatment, and even zero sample attrition. To simplify, assume there is no noise in the signal ($P(Y_t=1|X_t=1)=1,P(Y_t=1|X_t=0)=0$), and no learning for the test instruments, so that the difference in response success rate is the difference in learning gain. The analyst estimate the average difference in pedagogical efficacy ($\gamma$) by the classical DID linear regression
 
 
 $$
 Y_{i,T} = \beta_d D_i + \beta_t T + \gamma D_i T + \epsilon_{i,T}
 $$
 
-What can go wrong in this by-the-book RCT analysis? The DID estimator is unbiased only if learners always exert effort in the experiment. Consider an extreme case where the efficacy of two pedagogical methods are equivalent if the learner exerts effort but the method A make all of learners exert effort while method B make none of the learners exert effort. Under the "no pain no gain" assumption from chapter 2, learners with method B does not show any learning gain. The DID estimator falsely concludes that method A is superior to method B.
+However, the seemingly rigorous analysis makes a very strong implicit assumption: The DID estimator is unbiased only if learners always exert effort in the experiment. Consider an extreme case where the efficacy of two pedagogical methods are equivalent but the method A make all of learners exert effort while method B make none of the learners exert effort. Under the "no pain no gain" assumption from chapter 2, learners with method B does not show any learning gain. The DID estimator falsely concludes that method A is superior to method B.
 
-In another word, the difference in the success rate of the response consists of the difference in learning gain condition on exerting effort and the difference in the effort level. In this thesis, the pedagogical efficacy is narrowly defined as the difference in the conditional learning gain, therefore selection into the exerting effort is a selection bias. The distinguishment is useful in practice because the pedagogical efficacy is addressed by the content modification while the engagement can be changed by incentive design or interface improvement.
+The key insight is that with effort choice, the observed response is not the same as the response specified in the response-only model. In a way, the effort choice introduces a measurement error that is not conditional mean indepenent of the treatment assignement. In the absence of an instrumental variable, this chapter solves the measurement problem by explicitly models the data generating process.
 
 
 The chapter is organized as the following. Section 4.2 characterizes the bias. Section 4.3 discuss the bias correct with the general model and verify the claim with a simulation analysis. Section 4.4 applies the method to a real data set.
 
 
 
-## Selection bias of the Effort Choice
-Throughout the chapter, assumes there is no exit choice $H_t=0 \quad \forall t$. 
+## The non-monotoncity of the Difference in Difference Estimator 
+Throughout the chapter, assumes there is no exit choice $H_t=0 \quad \forall t$. To simplify the discussion, assume the $M_x=2$ and $M_y=2$. The pre-test item id is 0, the post-test item id is 1. The treatment item id is $T$ and the control item id is $C$
 
-### Bias of BKT Estimator with One Item
-The benchmark model is a model that assumes no effort choice. Limiting to the case of one item, the benchmark model reduces to the Bayesian Knowledge Tracing (BKT) Model. The BKT estimator of the pedagogical efficacy.
+### The non-monotoncity of the Unconditional DID Estimator 
+It can be shown that the unconditional DID estimator converges to 
 
 $$
-\hat{\ell} = \frac{\sum_{t=1}^T\sum_{i=1}^NP(X_t=1,X_{t-1}=0|Y_i)}{\sum_{t=1}^T\sum_{i=1}^NP(X_{t-1}=0|Y_i}
+\hat{\delta} \rightarrow [P(Y_0=0,Y_1=1|T)-P(Y_0=1,Y_1=|T)] - [P(Y_0=0,Y_1=1|C)-P(Y_0=1,Y_1=|C)] 
 $$
-Let $E_t$ denote the effort level and $e_0=P(E_t=1|X_t=0)$ be the probability of making an effort conditioning on not mastered. The expecation of the BKT estimator is
+With the model structure, 
+$$
+\hat{\delta} \rightarrow (\ell_T-\ell_C)(1-\pi)(1-\ell_0)(c_1^{1,1}-c_1^{1,0})
+$$
+
+Although $\hat{\delta}$ is not a consistent estimator of difference of pedagogical efficacy($\ell_T-\ell_C$), it is a montone function of the pedagogical efficacy under fairly loose conditions. If the researcher is only interested in the ranking of the two items, the DID estimator is a valid measurement, although not efficient. 
+
+**Theorem 1**: If $\pi<1$, $\ell_0<1$ and $c_1^{1,1} \geq c_1^{1,0}$, the DID estimator is a montone function of the pedagogical efficacy.
+
+However, if there is effort choice, the DID estimator now converges to  
+
+$$
+\hat{\delta} \rightarrow (\ell_Te^0_T-\ell_Ce^0_C)(1-\pi)(1-\ell_0e^0_0)(c_1^{1,1}e_1^1-c_1^{1,0}e_1^0)
+$$
+To establish the monotonicity, one needs a stronger assumption.
+
+**Theorem 2**: With effort choice, if $\pi<1$ and $\ell_0<1$, $(\ell_Te^0_T-\ell_Ce^0_C)(c_1^{1,1}e_1^1-c_1^{1,0}e_1^0)>0$  the DID estimator is a montone function of the pedagogical efficacy difference.
+
+Theorem 2 does not have an intuitive reading, further constain the behavior of effort choice $e_j^0 \leq e_j^1$
+
+**Lemma 1** If the effort probability is monotone function of the mastery, the necessary and sufficient condition for DID estimator to be a montone function of the pedagogical efficacy difference is
+$$
+(\ell_T-\ell_C)(\frac{\ell_T}{\ell_C}-\frac{e^0_C}{e^0_T}) > 0
+$$
+Assume $\ell_T>\ell_C$, then $\frac{\ell_T}{\ell_C}>\frac{e^0_C}{e^0_T}$. Intuitively, it means that the more pedagogical effective item must either induces more effort or not discouraging enough. This is not always the case because the path less traveled can be the shorter path.
+
+### The non-monotoncity of the Conditional DID Estimator 
+
+One intuitive solution is to condition the analysis on the sub-sample that exerts effort on the training question. However, the conditional DID estimator does not guarantee a monotone function of the pedagogical efficacy. The key insight is that conditioning on the effort changes initial state desnity.
+
+$$
+\tilde{\pi}_D=P(X_0=1|E_D=1) = \frac{\pi e^1_D}{[(1-\pi)(1-\ell_0)e_0+(1-\pi)(1-e_0)]e^0_D+[(1-\pi)\ell_0e_0+\pi]e_D^1} \neq \pi
+$$
+
+It is general the case that $\tilde{\pi}_T \neq \tilde{\pi}_C$. Therefore, the balanced sample assumption is no longer true.
+
+**Theorem 3** Conditioning on the effort on the training question is not a sufficient condition of being montone function of the pedagogical efficacy difference.
+
+
+
+## Simulation
+
+This section demostrates theorem 1 and theorem 2 in the previous section. The relevant parameters are
 
 $$
 \begin{aligned}
-E(\hat{\ell}) &= \frac{\sum_{t=1}^TE_{\mathbf{Y}}P(X_t=1,X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
-&= \frac{\sum_{t=1}^TE_{(\mathbf{Y})}P(X_t=1,X_{t-1}=0,E_{t-1}=1|\mathbf{Y})+E_{\mathbf{Y}}P(X_t=1,X_{t-1}=0,E_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
-&=\frac{\sum_{t=1}^TE_{(\mathbf{Y})}\ell e_0 P(X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^TE_{\mathbf{Y}}P(X_{t-1}=0|\mathbf{Y})}\\
-&= \ell e_0 
+P(X_0=1) = \pi &= 0.4\\
+P(X_t=1|X_{t-1}=0,0)=\ell_0 &= 0.1\\
+P(X_t=1|X_{t-1}=0,T)=\ell_T &= 0.6\\
+P(X_t=1|X_{t-1}=0,C)=\ell_C &= 0.4\\
+P(Y_1=1|X_t=1) =c_1^{1,1}&= 0.9\\
+P(Y_1=1|X_t=0) =c_1^{1,0}&= 0.1\\
 \end{aligned}
 $$
-The transition from the second line to the third line is due to Assumption 8 in chapter, which states $P(X_t=1,X_{t-1}=0,E_{t-1}=0)=0 \quad \forall t$.
+Consequently the expected DID difference is 0.0864.
 
-The BKT estimator of the pedagogical efficacy is attenuated by the presence of the slacking, which gives Lemma 2
+1000 learners are simulated. Half of the learner receives item sequence (0,T,1) and the other receives item sequence (0,C,1).
 
-**Lemma 2**: If $P(E_t=1|X_t=0)<1$, the BKT estimator has downward bias.
+### No Effort Choice
 
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+data_dir = paste0(proj_dir, '/_data/03/sim/')
 
+exp1_data = read.table(paste0(data_dir, 'exp1.txt'),sep=',',col.names=c('i','t','j','y'))
+treat_status = exp1_data %>% filter(t==1) %>% mutate(D=j-1) %>% select(i,D)
+analysis_data = merge(exp1_data %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,y), treat_status)
+mod1 = lm(data=analysis_data, y~t*D)
+mcmc_param1 =  read.table(paste0(data_dir, 'exp1_param.txt'),sep=',') %>% select(V2,V3) %>% rename(l0=V2,l1=V3) %>% mutate(ldif=l1-l0)
+```
 
-###  Bias of BKT Estimator with Multiple Items:
-**TODO: derive the bias in a DID style comparison. **
-If estimated separately, $\ell^1(1-e^1_0)-\ell^0(1-e^0_0)$. Not sure what it is under joint estimation.
+The DID estimates is `r -mod1$coefficients[4]`, although the sign is right(monotone) and it is significant. In comparison, the MAP of $\delta_{\ell}=\ell_T-\ell_C$ is `r -mean(mcmc_param1$ldif)` and the 95% credible interval is (`r quantile(mcmc_param1$ldif, prob=0.05)`,`r quantile(mcmc_param1$ldif, prob=0.95)`). 
 
-## Bias Correction With the General Model
-
-
-### Theory
-If the effort is observed for all periods, the general model corrects the bias by estimating the parameter from the subset of the data with no slacking. 
+### With Effort Choice
+The effort rate is set to offset the learning gain difference, All effort rates are 1 except for 
 
 $$
 \begin{aligned}
-E(\hat{\ell}_{Hybrid}) &= \frac{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}P(X_t=1,X_{t-1}=0,E_{t-1}=1|\mathbf{Y})}{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}P(X_{t-1}=0,E_{t-1}=1|\mathbf{Y})} \\
-&=\frac{\sum_{t=1}^TE_{(\mathbf{Y},\mathbf{E})}\ell e_0 P(X_{t-1}=0|\mathbf{Y})}{\sum_{t=1}^Te_0E_{(\mathbf{Y},\mathbf{E})}P(X_{t-1}=0|\mathbf{Y})}\\
-&= \ell
+P(E_T=1|X_t=0) =e_T^0&= 0.4\\
+P(E_C=1|X_t=0) =e_T^0&= 0.6\\
 \end{aligned}
 $$
 
-Unfortunately, the effort level is usually not directly observed, although it may be inferred from auxiliary data. Even if the model is correctly specified, a noisy measure of effort still leads to an inconsistent estimator of the pedagogical efficacy. 
+The DID should return 0.
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-### Simulation
-**TODO**
+exp3_data = read.table(paste0(data_dir, 'exp3.txt'),sep=',',col.names=c('i','t','j','y','h','e'))
+treat_status = exp3_data %>% filter(t==1) %>% mutate(D=j-1) %>% select(i,D)
+analysis_data = merge(exp3_data %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,y), treat_status)
+mod3 = lm(data=analysis_data, y~t*D)
+mcmc_param3 =  read.table(paste0(data_dir, 'exp3_param.txt'),sep=',') %>% select(V2,V3) %>% rename(l0=V2,l1=V3) %>% mutate(ldif=l1-l0)
+```
+
+The DID estimates is `r -mod3$coefficients[4]`, it is no longer significant.. In comparison, the MAP of $\delta_{\ell}=\ell_T-\ell_C$ is `r -mean(mcmc_param3$ldif)` and the 95% credible interval is (`r quantile(mcmc_param3$ldif, prob=0.05)`,`r quantile(mcmc_param3$ldif, prob=0.95)`). 
+
 
 ## Case Study with a Real Dataset
 
@@ -131,7 +190,7 @@ The training item is a modified version of the original question(Figure 4.5). Th
 include_graphics("fig/f2.png")
 ```
 
-The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. The scaffolding is drawn from the teaching experiment of in-house tutor experts. To wit:
+The scaffolding guides the learner to find the width and length of the new shape and then apply the formula. It implicitly assumes that the student mastered the formula of circumference and area, but cannot piece the information together. The scaffolding is drawn from the teaching experiment of in-house tutor experts. To wit:
 
 (1) What is the length and width of the new rectangle
 
@@ -145,9 +204,9 @@ The post-test item skill (Figure 4.6) asks the learner to calculate the same qua
 include_graphics("fig/f3.png")
 ```
 
-In the 12 item recommendation package, the experiment package occupies the 5th to 7th position for all qualified users in the order of the pre-test, training item, and the post-test. Other items are recommended base on their previous learning record. If the learner does not quit during the level, they finished the experiment in one setting. The control group receives the training item without scaffolding. The first treatment group receives the item with vocabulary description of the scaffolding that the learner solves step by step as sub-questions. The second treatment group receives the item with a link to the animation of the scaffolding with human voice over. If the learner chooses not to open the link and directly answers the item, it is effectively the same as the naive repetition. Unfortunately, the log does not track if the learner watches the video or if the learner finished the video. On aggregate, the video is played about 800 times. If each view is a by a separate id, the maximum exposure to the video treatment is about 30% of the treatment 2 group. The average watch time is about 47 seconds, out of the total length of 67 seconds.
+In the 12 item recommendation package, the experiment package occupies the 5th to 7th position for all qualified users in the order of the pre-test, training item, and the post-test. Other items are recommended base on their previous learning record. If the learner does not quit during the level, they finished the experiment in one setting. The control group receives the training item without scaffolding. The treatment group receives the item with a link to the animation of the scaffolding with human voice over. If the learner chooses not to open the link and directly answers the item, it is effectively the same as the control group. Unfortunately, the log does not track if the learner watches the video or if the learner finished the video. On aggregate, the video is played about 800 times. If each view is a by a separate id, the maximum exposure to the video treatment is about 30% of the  group. The average watch time is about 47 seconds, out of the total length of 67 seconds.
 
-The recruited users are randomly assigned with one of three item packets based on the remainder of their user id divided by 5: 0 is the control group, 2 vocabulary treatment, and 4 video treatment. The user id is randomly generated.
+The recruited users are randomly assigned with one of three item packets based on the remainder of their user id divided by 5: 0 is the control group and 4 the treatment group. The user id is randomly generated.
 
 ### Effort Identification
 
@@ -169,7 +228,7 @@ The identification of the model hinges on the identification of the effort level
 Table 5.1 is a sample of the original data log
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-knitr::kable(
+kable(
   head(data%>%select(uid, eid, cmt_time, cmt_timelen,atag_pct, answers), 1), booktabs = TRUE,
   col.names = c('User ID', 'Item ID', 'Submit Time', 'Time Spent on Item', 'Score', 'Answers'),
   align='c',
@@ -197,11 +256,12 @@ The answers are initially classified into six categories:
 
 (7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
 
-The Table 4.2 and Table 4.3 show the summary statistics of different groups' answer composition at a different stage of the experiment. Appendix 2 shows a breakdown of the top answers in each category. Other than the non-blank wrong answer, all four error categories have clustered answer patterns: The top 5 answers cover over 50% of the answers. The category of the non-blank answer has a wide dispersion. The top non-blank answer for all but the pre-test item and the vocabulary scaffolding is the correct answer to the pre-test question, which occupies about 30% of the non-blank answer. Curiously, that is not the case for vocabulary scaffolding questions. In that question,  significantly more students provide the wrong shape answer. This is likely because the learner does not really read the question carefully and thus misunderstand the question.
+The Table 4.2 and Table 4.3 show the summary statistics of different groups' answer composition at a different stage of the experiment. Appendix 2 shows a breakdown of the top answers in each category. Other than the non-blank wrong answer, all four error categories have clustered answer patterns: The top 5 answers cover over 50% of the answers. The category of the non-blank answer has a wide dispersion. The top non-blank answer for all but the pre-test item is the correct answer to the pre-test question, which occupies about 30% of the non-blank answer.
 
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-ans_composition = data %>% group_by(group, qtype) %>% 
+ans_composition = data  %>%
+  group_by(group, qtype) %>% 
   summarize(blank = mean(blank_ans)*100,
             nonblank=mean(nonblank)*100,
             wrongshape=mean(wrong_shape)*100,
@@ -209,7 +269,7 @@ ans_composition = data %>% group_by(group, qtype) %>%
             rightarea=mean(area_right)*100,
             slip=mean(is_slip)*100,
             correct=mean(score==1)*100)
-knitr::kable(
+kable(
   ans_composition %>% arrange(qtype,group)%>% select(-rightcirc,-rightarea,-wrongshape,-correct), booktabs = TRUE,
   col.names=c('Group','Task','Blank Ans(%)','Non Blank Wrong Ans (%)', 'Slip(%)'),
   align='c',
@@ -217,9 +277,12 @@ knitr::kable(
 )
 ```
 
+Conditional on making an valid effort, here are the success rate of each step of the scaffolding. It turns out that the scaffolding does not increase the identification of the right but reduce the error of the wrong circumference!
+
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
-knitr::kable(
-  ans_composition %>% arrange(qtype,group) %>% select(-blank,-nonblank,-slip), booktabs = TRUE,
+ans_composition = data %>% group_by(qtype,group) %>% summarize(p0=mean(score0)*100,p1=mean(score1)*100,p2=mean(score2)*100,p=mean(score)*100)
+kable(
+  ans_composition, booktabs = TRUE,
   col.names=c('Group','Task','Wrong Shape(%)', 'Right Circ(%)', 'Right Area(%)','Correct(%)'),
   align='c',
   caption = 'Answer Composition - Other'
@@ -228,7 +291,7 @@ knitr::kable(
 
 #### Definition of Effort
 
-The effort level is assumed to be a binary variable, slack or valid attempt. The blank answer and nonblank wrong answer is classified as a slack. All the rest is defined as a valid attempt. The harsh definition of the slack aims to justify the assumption 7 that if there is no effort then no learning. It also satisfies the assumption 8 because the guess rate is assumed to be 0 for the fill-in-the-blank questions thus no effort means the wrong answer for sure. The summary statistics of the effort levels are presented in Table 4.4.
+The effort level is assumed to be a binary variable, slack or valid attempt. The blank answer and nonblank wrong answer is classified as a slack. All the rest is defined as a valid attempt. The harsh definition of the slack aims to justify the assumption 7 that if there is no effort then no learning. It also satisfies the assumption 8 because the guess rate is assumed to be 0 for the fill-in-the-blank questions thus no effort means the wrong answer for sure. The summary statistics of the effort levels are presented in Table 4.4. The key take away from the table is that the treatment group has higher slack error rate in the training questions.
 
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
@@ -236,7 +299,7 @@ giveup_stat = data %>% group_by(group, qtype) %>%
   summarize(slack = mean(giveup)*100, 
             deligent=mean(valid)*100,
             correct=mean(atag_pct==1)*100)
-knitr::kable(
+kable(
   giveup_stat %>% arrange(qtype,group), booktabs = TRUE,
   col.names=c('Group','Task','Slack Error (%)', 'Valid Error(%)','Correct(%)'),
   align='c',
@@ -252,7 +315,7 @@ One way to check the validity of the classification is to look at the distributi
 Figure 4.1 shows the distribution of time spent on task when submitting a blank answer. The overall pattern is that the duration gets shorter after the learner passes the pre-test. If there is a small chance that the learner who submits a blank answer ponders on it, for the training practice and post-test, the blank answer is clearly
 
 
-In the pre-test, the distribution of the blank answer is not so left skewed compared to that in the later items. The learner may at least read through the question text before decides to drop it. In the subsequent items, except for the vocabulary scaffolding question, the learner submit a blank answer in such a short time that they give up so easily. For the control group and the video scaffolding group, the average time to submit a blank answer drops from 14 seconds on the pre-test to 6 seconds in the training and post-test. The vocabulary group spent more time to submit a blank answer because they have to click three times. In the post-test, the vocabulary scaffolding group has a significant drop in the time spent.
+In the pre-test, the distribution of the blank answer is not so left skewed compared to that in the later items. The learner may at least read through the question text before decides to drop it. In the subsequent items, except for the vocabulary scaffolding question, the learner submit a blank answer in such a short time that they give up so easily. The average time to submit a blank answer drops from 14 seconds on the pre-test to 6 seconds in the training and post-test. 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item with Blank Answer", fig.align='center',out.height='8cm',out.width='8cm'}
 qplot(data=data %>% filter(cmt_timelen<=60&blank_ans), x=cmt_timelen, geom='density', facets=group~qtype)+xlab('Time Spent on Task (Seconds)')
@@ -268,7 +331,7 @@ qplot(data=data %>% filter(cmt_timelen<=120&!blank_ans), x=cmt_timelen, geom='de
 
 #### Differential Effort Level Choice
 
-Figure 4.3 describes the frequency of slack pattern by groups. The first tick on the x-axis ('0,0,0') means the learner never slack. The last tick on the x-axis ('1,1,1') means the learner always slacks. In general, the effort level is quite persistent. about 50% of the users always exert effort while about 15% of the users never do. The vocabulary scaffolding group has the lowest frequency in the all-effort group, which is statistically significant compared to the control group but not statistically significant compared to the video scaffolding group. There is also a small tick for the vocabulary scaffolding group to give up only on the training question, although the difference is not significant. An alternative specification of slack, which only defines blank answer as slack, shows a similar pattern.
+Figure 4.3 describes the frequency of slack pattern by groups. The first tick on the x-axis ('0,0,0') means the learner never slack. The last tick on the x-axis ('1,1,1') means the learner always slacks. In general, the effort level is quite persistent. about 50% of the users always exert effort while about 15% of the users never do. An alternative specification of slack, which only defines blank answer as slack, shows a similar pattern.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Slack Pattern", fig.align='center',out.height='8cm',out.width='8cm'}
 # Check the sequence dependence
@@ -294,7 +357,7 @@ effort_persistence$pattern = factor(effort_persistence$pattern)
 ggplot(data=effort_persistence, aes(x=pattern,y=pct, fill=group))+ geom_bar(stat = "identity",position="dodge") + xlab('Slack Pattern') + ylab('Frequency') + ggtitle('Frequency of the Slack Pattern: 1=Slack,0=Effort. Three Items (E1,E2,E3)')
 ```
 
-Another evidence of differential effort choice is the increasing likelihood for the learned students to give up. Because the guess rate is effectively zero, the learners who correctly answers the pre-test question must master the knowledge point. If they exert full effort, the true effect is zero, thus the placebo group. Table 4.5 describes their effort level choice in the training practice and the post-test. The vocabulary group almost doubled the probability of slacking. 
+Another evidence of differential effort choice is the increasing likelihood for the learned students to give up. Because the guess rate is effectively zero, the learners who correctly answers the pre-test question must master the knowledge point. If they exert full effort, the true effect is zero, thus the placebo group. Table 4.5 describes their effort level choice in the training practice and the post-test. There is a slight uptick in the giveup rate for the treatment group. 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "", fig.align='center',out.height='8cm',out.width='8cm'}
 placebo=  data %>%filter(is_placebo==1)%>% group_by(qtype, group) %>% summarize(gpct=mean(giveup)*100)
@@ -333,70 +396,132 @@ qplot(data=all, x=seq_id, y =gpct, geom='line', col=group,linetype=group) + ggti
 
 
 #### The MCMC results
+The MCMC constrains all the items to have the same observational proability. 
 
-Figure 4.7 compares the parameters estimated by a model without effort choice with that by a model with effort choice. Both the downward bias and the selection bias are manifested in the comparison. The effort choice model almost doubles the estimated pedagogical efficacy compared to the baseline model. In addition, the distributions of the pedagogical efficacy for the different group are almost indistinguishable in the baseline model but are very different in the effort choice model. 
+Figure 4.7 compares the parameters estimated by a model without effort choice with that by a model with effort choice. It shows that even a slight difference in the effort rate leads to a large, although imprecise, difference in the estimated pedagogical efficacy.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate", fig.align='center',out.height='8cm',out.width='8cm'}
-params_effort_man = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual.txt'), sep=',')
-params_no_effort = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort.txt'), sep=',')
+no_param = read.table(paste0(proj_dir,'/_data/03/exp/no_effort.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='no effort')
 
-lrate = params_no_effort %>% select(V2,V3,V4)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m1 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man %>% select(V2,V3,V4)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m2 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
+manual_param = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='manual coding')
+param = rbind(no_param, manual_param)
+param$model = factor(param$model, levels=c('no effort','manual coding'))
+qplot(data=param, x=val, col=group, geom='density', facets=.~model)
+```
 
-grid.arrange(m1,m2)
+Now decouple the three steps. Identify shape, calculate circumference and calculate area. There is a slightly edge for the treatment group in identifying the shape, but a hudge edge in calculating the circumference. Moreover, since the three answers are correlated, the difference observed in the other can be just spill-over from the gain in circumference.
 
-params_effort_man_3 = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_with_effort_manual_y3.txt'), sep=',')
-params_no_effort_3 = read.table(paste0(proj_dir,'/_data/03/chp3_parameter_chain_no_effort_y3.txt'), sep=',')
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate of Shape Identification", fig.align='center',out.height='8cm',out.width='8cm'}
+no_param = read.table(paste0(proj_dir,'/_data/03/exp/no_effort_0.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='no effort')
 
-params_effort_man_3_0 = params_effort_man_3 %>% select(V1,V3,V5,V7,V9)
-params_effort_man_3_1 = params_effort_man_3 %>% select(V2,V4,V6,V8,V10)
+manual_param = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_0.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='manual coding')
+param = rbind(no_param, manual_param)
+param$model = factor(param$model, levels=c('no effort','manual coding'))
+qplot(data=param, x=val, col=group, geom='density', facets=.~model)
+```
 
-params_no_effort_3_0 = params_no_effort_3 %>% select(V1,V3,V5,V7,V9)
-params_no_effort_3_1 = params_no_effort_3 %>% select(V2,V4,V6,V8,V10)
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate of Circumference", fig.align='center',out.height='8cm',out.width='8cm'}
+no_param = read.table(paste0(proj_dir,'/_data/03/exp/no_effort_1.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='no effort')
 
-names(params_effort_man_3_0) = c('pre','no','vocabulary','video','post')
-names(params_effort_man_3_1) = c('pre','no','vocabulary','video','post')
-names(params_no_effort_3_0) = c('pre','no','vocabulary','video','post')
-names(params_no_effort_3_1) = c('pre','no','vocabulary','video','post')
-
-lrate = params_no_effort_3_0 %>% select(-pre,-post)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m3 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man_3_0 %>% select(-pre,-post)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m4 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort ')+xlim(c(0,1))
-
-grid.arrange(m3,m4)
-
-lrate = params_no_effort_3_1 %>% select(-pre,-post)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m5 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('No Effort')+xlim(c(0,1))
-lrate = params_effort_man_3_1 %>% select(-pre,-post)%>% gather(group,val)
-lrate$group = factor(lrate$group)
-m6 = qplot(data=lrate, x=val, col=group, linetype=group, geom='density')+ggtitle('With Effort')+xlim(c(0,1))
-
-grid.arrange(m5,m6)
+manual_param = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_1.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='manual coding')
+param = rbind(no_param, manual_param)
+param$model = factor(param$model, levels=c('no effort','manual coding'))
+qplot(data=param, x=val, col=group, geom='density', facets=.~model)
 ```
 
 
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Learning Rate of Area", fig.align='center',out.height='8cm',out.width='8cm'}
+no_param = read.table(paste0(proj_dir,'/_data/03/exp/no_effort_2.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='no effort')
 
-
-
-
-## Discussion and Future Work
-
-The state-dependent effort choice does not generate the clustering of effort. 
-
+manual_param = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_2.txt'),sep=',') %>%
+  select(V2,V3) %>% rename(control=V2,treatment=V3) %>%
+  gather(group,val) %>%
+  mutate(model='manual coding')
+param = rbind(no_param, manual_param)
+param$model = factor(param$model, levels=c('no effort','manual coding'))
+qplot(data=param, x=val, col=group, geom='density', facets=.~model)
+```
 
 ## Appendix
 
-### 1. Derivation of the Multiple item bias.
+### Theorem 1
 
-**TODO**
+Let it be three items. The pre-test and the post-test items are the same, while the training item differs. Let the item id for pre-test, post-test, training and control to be $0,1,T,C$ respectively. Let the group status be $D$.
+
+When there is no effort choice, the first difference within each group is 
+
+$$
+\begin{aligned}
+\delta_D&=P(Y_1=1,Y_0=1|D)-P(Y_1=1,Y_0=1|D) \\
+&= (1-\pi)(1-\ell_0)(1-\ell_D)(c_1^{1,0}-c_0^{1,0})+((1-\pi)[(1-\ell_0)\ell_D+\ell_0])(c_1^{1,1}-c_0^{1,0})+(1-\pi)(c_1^{1,1}-c_0^{1,1})
+\end{aligned}
+$$
+The second difference is
+
+$$
+\delta =\delta_T-\delta_C = (\ell_T-\ell_C)(1-\pi)(1-\ell_0)(c_1^{1,1}-c_1^{1,0})
+$$
+It is thus easy to see that DID estimator is a strictly monotone function of $\ell_T-\ell_C$ if $\ell_0<1$, $\pi<1$, and $c_1^{1,1}>c_1^{1,0}$.
+
+Now, if there exists effort choice, the first difference is
+
+$$
+\begin{aligned}
+\tilde{\delta}_D&=P(O_0=0,O_1=1|D)-P(O_0=1,O_1=0|D) \\
+&=P(E_0=0,E_1=1,Y_1=1|D)+P(E_0=1,E_1=1,Y_0=0,Y_1=1|D)-P(E_0=1,E_1=0,Y_0=1|D)-P(E_0=1,E_1=1,Y_0=1,Y_1=0|D)\\
+&= (1-\pi)(1-\ell_0e^0_0)(1-\ell_De_D)(c_1^{1,0}e^0_1-c_0^{1,0}e^0_0)+((1-\pi)[(1-\ell_0e^0_0)\ell_De^0_D+\ell_0e^0_0])(c_1^{1,1}e^1_1-c_0^{1,0}e^0_0)+(1-\pi)(c_1^{1,1}e^1_1-c_0^{1,1}e^0_0)
+\end{aligned}
+$$
+
+The second difference is
+$$
+\tilde{\delta} = \tilde{\delta}_T-\tilde{\delta}_C = (\ell_Te^0_T-\ell_Ce^0_C)(1-\pi)(1-\ell_0e^0_0)(c_1^{1,1}e_1^1-c_1^{1,0}e_1^0)
+$$
+To keep monotoncity, in addition to the previous conditions, it is sufficient and necessary to have
+
+$$
+(\ell_Te^0_T-\ell_Ce^0_C)(c_1^{1,1}e_1^1-c_1^{1,0}e_1^0)>0
+$$
+
+
+### Lemma 1
+The analysis is almost the same as in theory except for the initial state density is $P(X_0=1|E_D=1)$. It can be shown that
+$$
+\tilde{\pi}_D=P(X_0=1|E_D=1) = \frac{\pi e^1_D}{[(1-\pi)(1-\ell_0)e_0+(1-\pi)(1-e_0)]e^0_D+[(1-\pi)\ell_0e_0+\pi]e_D^1}
+$$
+
+Now 
+
+$$
+\tilde{\delta} = \tilde{\delta}_T-\tilde{\delta}_C = [\ell_T(1-\tilde{\pi_T})-\ell_C(1-\tilde{\pi_T})](1-\ell_0e^0_0)(c_1^{1,1}e^1_1-c_1^{1,0}e^0_1)+(\tilde{\pi_T}-\tilde{\pi_C})(c_1^{1,1}-c_0^{1,1})e^1_1
+$$
+Even under the favorable condition that $c_1^{1,1}=c_0^{1,1}$, the monotonicity requires
+
+$$
+(\ell_T-\ell_C)(\frac{\ell_T}{\ell_c}-\frac{1-\tilde{\pi}_T}{1-\tilde{\pi}_C})>0
+$$
+In general, the inequality is not true. Thus the difference in difference estimator is not a consistent estimator of the true pedagogical efficacy difference. 
 
 
 ### 2. Breakdown of the answer category
@@ -419,9 +544,10 @@ ans_stat = merge(type_ans_stat, type_stat) %>% mutate(pct=n/N) %>%
 ```
 
 
+
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-knitr::kable(
+kable(
   ans_stat %>% filter(ans_type=='non-blank ans')%>% select(-ans_type) , booktabs = TRUE,
   caption = 'Answer Breakdown: Nonblank Answer'
 )
@@ -430,7 +556,8 @@ knitr::kable(
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-knitr::kable(
+
+kable(
   ans_stat %>% filter(ans_type=='wrong shape') %>% select(-ans_type) , booktabs = TRUE,
   caption = 'Answer Breakdown: Wrong Shape'
 )
@@ -439,7 +566,7 @@ knitr::kable(
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-knitr::kable(
+kable(
   ans_stat %>% filter(ans_type=='right area') %>% select(-ans_type) , booktabs = TRUE,
   caption = 'Answer Breakdown: Right Area'
 )
@@ -448,7 +575,7 @@ knitr::kable(
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-knitr::kable(
+kable(
   ans_stat %>% filter(ans_type=='right circumference') %>% select(-ans_type) , booktabs = TRUE,
   caption = 'Answer Breakdown: Right Circumference'
 )
@@ -457,7 +584,7 @@ knitr::kable(
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
-knitr::kable(
+kable(
   ans_stat %>% filter(ans_type=='slip') %>% select(-ans_type) , booktabs = TRUE,
   caption = 'Answer Breakdown: Slip'
 )
