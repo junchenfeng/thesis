@@ -163,7 +163,7 @@ identify_giveup <- function(data, target_eid){
     right_2_idx = grep('80', data$ans2)
 
     both_right_idx = intersect(right_1_idx, right_2_idx)
-    is_slip = append(unique(data$raw_ans[both_right_idx]), c('[["4280",""]]','[["80","42"]]'))
+    is_slip = append(unique(data$raw_ans[both_right_idx]), c('[["4280",""]]','[["80","42"]]','[["41","80"]]','[["42","90"]]','[["42","08"]]'))
     circ_right = setdiff(unique(data$raw_ans[right_1_idx]), is_slip)
     # copy the same answer from q1 is not a valid attempt
     area_right = setdiff(unique(data$raw_ans[right_2_idx]), append(is_slip, c('[["36","80"]]')))
@@ -199,7 +199,8 @@ post_data = identify_giveup(work_data %>%filter(eid=='Q_10201056666357'), 'Q_102
 
 data = rbind(pre_data, control_data, treat1_data, treat2_data, post_data)
 
-
+# convert slip to correct
+data$score[data$is_slip==1]=1
 
 
 # first_step_success_idx = which((treat1_data$sans1=='8'&treat1_data$sans2=='6')|(treat1_data$sans1=='6'&treat1_data$sans2=='8'))
@@ -320,108 +321,7 @@ data$is_retain = 0
 data$is_retain[data$uid %in% unique(retain_status$uid)] = 1
 
 
-################
-# diagnostics
-###############
 
-
-ans_composition = data %>% group_by(group, qtype) %>%
-  summarize(blank = mean(blank_ans),
-            slip=mean(is_slip),
-            wrongshape=mean(wrong_shape),
-            nonblank=mean(nonblank),
-            rightcirc=mean(circ_right),
-            rightarea=mean(area_right),
-            correct=mean(score==1))
-
-ans_composition %>% arrange(qtype,group)
-
-
-
-# do a breakdown analysis
-
-type_ans_stat = data %>% group_by(qtype, eid, ans_type, raw_ans) %>% summarize(n=n()) %>%
-  group_by(qtype,eid,ans_type) %>% arrange(desc(n))
-
-
-type_stat = data %>% group_by(qtype,eid, ans_type) %>% summarize(N=n())
-
-ans_stat = merge(type_ans_stat, type_stat) %>% mutate(pct=n/N) %>%
-  filter(ans_type %in% c('wrong shape', 'non-blank ans', 'right area','right circumference')) %>%
-  group_by(qtype,eid, ans_type) %>% arrange(qtype, eid, ans_type, desc(pct)) %>%
-  mutate(cpct = cumsum(pct)) %>%
-  mutate(idx = row_number()) %>% filter(idx<=5) %>%
-  select(qtype,eid, ans_type, raw_ans,n, pct, cpct, idx)
-
-#write.csv(ans_stat, paste0(proj_dir,'/_data/03/ans_stat.csv'), row.names = F, quote=FALSE)
-
-###############
-# mark giveup #
-###############
-
-# Check the sequence dependence
-wide_data=  data %>%
-  select(uid,group,type,seq_id,giveup) %>%
-  spread(seq_id,giveup)
-names(wide_data) = c('uid','group','type','t1','t2','t3')
-
-effort_persistence = merge(wide_data %>% group_by(group,type,t1,t2,t3) %>% summarize(n=n()),
-                           wide_data %>% group_by(group,type) %>% summarize(N=n())) %>%
-  mutate(pct=n/N)
-
-effort_persistence$pattern = '0,0,0'
-effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3 &effort_persistence$type=='Pretest'] = '1,1,0'
-effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&!effort_persistence$t3&effort_persistence$type=='Pretest'] = '1,0,0'
-effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3 &effort_persistence$type=='Pretest'] = '1,0,1'
-effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&effort_persistence$t3  &effort_persistence$type=='Pretest'] = '1,1,1'
-effort_persistence$pattern[!effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3&effort_persistence$type=='Pretest'] = '0,0,1'
-effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3&effort_persistence$type=='Pretest'] = '0,1,0'
-effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&effort_persistence$t3 &effort_persistence$type=='Pretest'] = '0,1,1'
-
-effort_persistence$pattern[effort_persistence$t2 &effort_persistence$t3  &effort_persistence$type=='No Pretest'] = '1,1'
-effort_persistence$pattern[effort_persistence$t2 &!effort_persistence$t3 &effort_persistence$type=='No Pretest'] = '1,0'
-effort_persistence$pattern[!effort_persistence$t2&effort_persistence$t3  &effort_persistence$type=='No Pretest'] = '0,1'
-effort_persistence$pattern[!effort_persistence$t2&!effort_persistence$t3 &effort_persistence$type=='No Pretest'] = '0,0'
-
-
-effort_persistence$pattern = factor(effort_persistence$pattern)
-
-effort_persistence_3 = effort_persistence %>% filter(type=='Pretest')
-effort_persistence_2 = effort_persistence %>% filter(type=='No Pretest')
-
-
-m1 = ggplot(data=effort_persistence_3, aes(x=pattern,y=pct, fill=group)) +
-  geom_bar(stat = "identity",position="dodge")+
-  ggtitle('Pretest')+
-  theme(legend.position = "bottom") + ylim(c(0,1))
-
-m2 = ggplot(data=effort_persistence_2, aes(x=pattern,y=pct, fill=group)) +
-  geom_bar(stat = "identity",position="dodge")+
-  ggtitle('No Pretest')+
-  theme(legend.position = "bottom") + ylim(c(0,1))
-
-grid.arrange(m1,m2,ncol=2)
-
-
-#
-#
-#
-# # the other way is to verify the anomaly in 010 and 011
-# examine_users = wide_data %>% filter(!t1&t2&!t3)
-# deeplook = merge(data %>% filter(uid %in% examine_users$uid, seq_id==2) %>% group_by(raw_ans,group) %>% summarize(n=n()),
-#                   data %>% filter(uid %in% examine_users$uid, seq_id==2) %>% group_by(group) %>% summarize(N=n())) %>%
-#             mutate(pct=n/N) %>% select(group, raw_ans, pct) %>% spread(group,pct, fill=0) %>%
-#             mutate(diff = treat1-(ctrl+treat2)*0.5)
-#
-# head(deeplook %>% arrange(desc(diff)),20)
-#
-# # check the trend of learning
-# data %>%group_by(qtype,gid) %>% summarize(N=sum(score<1),n=sum(wrong_shape)) %>% mutate(n/N)
-#
-# data$wrong_shape_1st = 0
-# data$wrong_shape_1st[data$uid %in% pre_data$uid[pre_data$wrong_shape==T]] = 1
-#
-# data %>% group_by(qtype,wrong_shape_1st) %>% summarize(mean(wrong_shape))
 
 
 # check the response time
