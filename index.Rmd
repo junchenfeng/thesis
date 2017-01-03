@@ -1,11 +1,11 @@
 --- 
-title: "Essays on A General Model of Learning Through Practices"
+title: "Essays on Learning Through Practices"
 author: "Junchen Feng"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
-bibliography: [ref01.bib,ref02.bib,ref03.bib]
+bibliography: [ref01.bib,ref02.bib,ref03.bib,ref04.bib]
 biblio-style: apalike
 link-citations: yes
 description: "Junchen Feng's dissertation."
@@ -15,11 +15,15 @@ description: "Junchen Feng's dissertation."
 
 The age of digital education is dawning. With ubiquitous high-speed internet access and smart devices comes the blossom of digital learning service and learning data. Not only do we collect more quantity of data, but also higher quality data. Yet our understanding of the learning data lags the progress in the collection of data. This dissertation aims to provide a framework that takes advantage of the user engagement data to help identify the latent knowledge mastery of the learner and the pedagogical efficacy of the learning material.
 
-Chapter Two establishes the general model of learning through practices. Building on the backbone of a hidden Markov model of latent knowledge mastery evolution, the general model also characterizes the stop decision and the effort choice that are dependent on the learner's knowledge mastery. The chapter lists the identification assumption to uniquely identify all parameters of the general model. The chapter details how parameters can be identified by the A Markov Chain Monte Carlo algorithm, combining the backward recursion forward sampling for data augmentation, Gibbs sampling for the conjugate posterior update, and the adaptive rejection sampling for the non-conjugate posterior update.
+Chapter one establishes the general model of learning through practices. Extending the Bayesian Knowledge Tracing model beyond binary latent state and binary response, the general model articulates the assumptions that justify the simplification of the learning process to a first order Markov process. In addition, the general model also characterizes the exit decision and the effort choice.
 
-Chapter three characterizes the selection bias in the pedagogical efficacy estimation if the stop decision is not modeled. If the hazard rate depends on and differs between the latent knowledge mastery states, the estimated pedagogical efficacy is biased with a model that does not model the practice persistence. In particular, if the mastered learner is less likely to quit than the unmastered, the estimated pedagogical efficacy is biased upwards. The chapter applies the general model to both simulation and real dataset, whose result supports the theory.
+Chapter two deals with the identification and the estimation of the general model. In addition to user homogeneity and rank order conditions to prevent label switching, the thesis derives a necessary condition for the local identification of the general learning model, which limits the complexity of the learning model given the data structure. The general model is estimated with MCMC algorithm. The general strategy is to first augment the latents then update the parameter by Gibbs Sampler. When the posterior distribution is hard to sample from, the adaptive rejection sampling algorithm is used to reduce the computational cost. 
 
-Chapter four characterizes the selection bias in the pedagogical efficacy estimation if the effort choice is not modeled. If the effort choice depends on and differs between the latent knowledge mastery states, the estimated pedagogical efficacy is biased with a model that does not model the practice concentration. In particular, if the unmastered learner is not always on task, the estimated pedagogical efficacy is biased downwards. The chapter applies the general model to both simulation and real dataset, whose result supports the theory.
+Chapter three and chapter four are two applications of the general learning model, with focus on the exit decision and the effort choice.
+
+Chapter three characterizes the dynamci selection bias in the estimated pedagogical efficacy by the Bayesian Knowledge Tracing model due to the exit decision. If the hazard rate depends on and differs between the latent knowledge mastery states, the BKT model is biased. In particular, if the mastered learner is less likely to quit than the unmastered, the estimated pedagogical efficacy is biased upwards. 
+
+Chapter four explains why the difference in difference estimator does not lead to correct inference in a randomized control trial when the effort induced measurement error is present. If the effort choice depends on and differs between the latent knowledge mastery states, the DID estimator is not a monotonic function of the true difference of the pedagogical efficacy. In addition, the direction of the bias is not determined in general. 
 
 
 

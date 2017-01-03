@@ -1,0 +1,745 @@
+# Effort Choice and the Efficacy Evaluation in the Low Stake Learning Environment {#effort}
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H')
+options(digits=3)
+```
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stargazer)
+library(gridExtra)
+library(knitr)
+
+proj_dir = 'C:\\Users\\junchen\\Documents\\GitHub\\thesis'
+input_file_path = paste0(proj_dir,'/_data/03/paper_data.RData')
+load(input_file_path)
+
+# filter out vocab
+
+data = data%>%  filter(group %in% c('No-3','Video'))
+data$group = factor(as.character(data$group), levels=c( "No-3","Video"), labels=c('Control','Treatment'))
+
+data = data %>% mutate(effort=1-giveup, correct=as.numeric(score==1), ec_status=effort+correct)
+
+data$effort = factor(data$effort,labels=c('No Effort','Effort'))
+data$correct = factor(data$correct, labels=c('Incorrect','Correct'))
+data$ec_status = factor(data$ec_status, labels=c('Give-up','Honest Error','Correct'))
+```
+
+
+
+## Efficacy Vesus Effectiveness
+
+Eric Talyor[-@taylor2015new] surveyed the evaluation of new education technology and concluded that the education technologies are generally pedagogical ineffective in raising the test score. There are two competing hypotheses in explaining the observation: 
+
+1. The new technology does not improve teaching/learning productivity even under the ideal conditions.
+2. The new technology improves productivity under ideal conditions but fails to do so in practical settings.
+
+The medical literature makes a clear distinction between the two hypotheses[@flay1986efficacy]. Efficacy is "whether a technology, treatment, procedure, or program does more good than harm when delivered under optimum conditions". Effectiveness is "whether a technology, treatment, procedure, intervention, or program does more good than harm when delivered under real-world conditions". Following this terminology, the first hypothesis is a test on efficacy, while the second hypothesis is a test on effectiveness.
+
+In medical literature, the difference between efficacy and effectiveness are often illustrated by the observation that the patient does not adhere to the dosage and timing prescribed the doctor. Similarly, in low stake learning environment, the learners have considerable latitude in when and how they do the learning activities instructed by the teacher or suggested by the intelligent tutor. If the learner does not exert effort in learning, even efficacious intervention is rendered ineffective. As the proverb "No pain no gain" suggests, some efficacious pedagogical method may elicit the least amount of effort if the learner is unwilling to struggle.
+
+The evaluation literature does not usually make the distinction between efficacy and the effectiveness. This makes sense because the program evaluation is usually performed in the dissemination stage [@flay2005standards] where the effectiveness is the key measurement of performance. However, from the perspective of product development via rapid iteration, the distinction is important. If the proposed pedagogical technology is not efficacious, the developer shall stop iterating and cut losses. If the proposed pedagogical technology is efficacious but ineffective, iteration can improve the effectiveness by either adapting the technology to the user behavior or modifying the user's behavior to best leverage the technology.
+
+
+To this end, the paper proposes a new estimator, the extended Bayesian Knowledge Tracing(BKT) model, to conduct efficacy evaluation in the randomized control trials. In the presence of differential effort choice, the more popular difference in difference estimator does not guarantee to make correct rank order inference of the efficacies of two pedagogies, but the extended BKT estimator is if the data generating process is correctly characterized by the extended BKT model.
+
+
+The paper is organized as the following: The first section discuss the role of randomized control trials and the role of Effort choice in low stake learning environment. The next two sections describe the difference in difference estimator as the effectiveness evaluation and the extended Bayesian Knowledge Tracing estimator as the efficacy evaluation. The last two section provides empirical evidence with both simulation and the actual experimental data. 
+
+## Ideal Evaluation Condition and Ideal Implementation Condition
+
+The paper distinguishes between the ideal evaluation conditions and the ideal implementation conditions. 
+
+In the program evaluation literature, the ideal evaluation condition is equivalent to no selection bias. If the sample is representative of the population of interest, it is a bonus have good external validity. The randomized control trials (RCT), when properly executed, provides the theoretical guarantee that selection bias is not an issue in expectation. The checklist of proper execution includes random assignment of the treatment status and sample attrition at random. The randomized control trial justify the argument that the treatment and the control group are similar in observed and unobserved characteristics, thus lead to the following two assumptions:
+
+- For the Difference in Difference estimator
+
+**Assumption 4.1(a)**: The treatment group and the control group are valid counterfactuals. 
+
+- For the Extended Bayesian Knowledge Tracing estimator
+
+**Assumption 4.1(b)**: The treatment group and the control group are homogeneous and thus share identical parameters.
+
+
+However, the ideal evaluation condition is not equivalent to ideal implementation conditions. In the context of learning through practices, the ideal implementation condition essentially requires the learner to be passionate about the learning and be preserving in against failures and repetitions[@duckworth2007grit;@ericsson2016peak]. Being gritty is not on the checklist of properly randomized control trials. In reality, the learners cannot all be a paragon of grit. In low stake learning environment where success has tiny immediate reward and failure has tiny immediate punishment, the learners are less prone to "stick to the bitter end".
+
+This paper describes the result of grit in the name of effort. If the learner does not exert effort, he does not learn and he always produces an incorrect response. The two assumptions will be developed formally in section 4.3 and play important role in identification of the efficacy. Under this construction, the ideal implementation condition is that learners always exert effort. If the condition is met, the response alone is sufficient to infer the efficacy. If the condition is not met, response alone only characterizes the effectiveness and is not sufficient to infer the efficacy.
+
+In the next two sections, this paper develops an extended Bayesian Knowledge Tracing model to consistently infer the relative efficacy of two pedagogies from both the response and the effort. The paper also argues that difference in difference estimator consistently estimate the relative effectiveness but does not guarantee to produce correct inference on the relative efficacy if the ideal implementation condition is not met.
+
+
+## The Extended Bayesian Knowledge Tracing Estimator
+
+This section extends the classical Bayesian Knowledge Tracing model to incorporate the state dependent effort choice.
+
+### Efficacy and Latent Mastery
+
+If the efficacy in the medical experiment is to move patients from ill to heal, the efficacy in the pedagogical research is to move learners from ignorance to mastery. However, unlike most of the modern medical research that can directly observe the health state of patient(such as if the virus is cleansed from the body), the pedagogical research cannot directly observe the mastery status but only infer it from the responses (symptoms in the analogy). Therefore, the evaluation of the pedagogy efficacy requires the inference of the latent mastery as the pre-requisite.
+
+
+### The Bayesian Knowledge Tracing Model
+
+The classical bayesian knowledge tracing(BKT) model is the most parsimonious model that characterizes the latent mastery status and the learning process based on the observed response.
+
+The BKT model assumes a binary latent mastery ($X_t$) where 1 stands for mastery and a binary observed response($Y_t$) where 1 stands for a correct response. Conditional on the latent mastery, the observed response is generated by a Bernoulli distribution. Traditionally, the two Bernoulli distributions are described by the parameter of slip($s=P(Y_t=0|X_t=1)$) and guess($g=P(Y_t=1|X_t=0)$). 
+
+At each practice opportunity, if the learners have not reached mastery ($X_t=0$), they learn (reach mastery) with a probability ($\ell=P(X_t=1|X_{t-1}=0)$). In this context, $\ell$ is defined as the efficacy of the pedagogy. If the learners have already reached mastery, they never forget($P(X_t=0|X_{t-1}=1)=0$). This assumption rules out negative efficacy.
+
+### The Effort Choice Extention
+
+The extended model infers the latent mastery from both the observed response and the effort level. The critical assumption on how effort affects the learning process is:
+
+
+**Assumption 4.2: (No pain no gain)**: If the learners do not exert effort at the practice, they learn with probability 0. ($P(X_t=1|X_{t-1}=0,E_t=0)=0$)
+
+Assumption 4.2 is the driving force of the difference between the efficacy and the effectiveness. Because the paper adopts a loose definition of effort in the empirical part, the no effort response quite literally makes no effort in understanding the question or solving it. For example, in the training question, the no effort group spent on average less than 10 seconds on the question while the median time spent on producing a correct response is more than 50 seconds. This "placebo" like exposure justifies the seemingly strong assumption 4.2
+
+**Assumption 4.3**: If the learners do not exert effort at the practice, they produce the correct response with probability 0 regardless of the latent mastery ($P(Y_t=1|E_t=0)=0$). 
+
+Assumption 4.3 is not valid for all question types. For example, if the test instrument is a multiple choice problem, it is possible to make a lucky guess without any thinking. However, if the test instrument is a fill-in-the-blank problem, the probability of a blind correct guess is almost zero and the Assumption 4.2 is validated. 
+
+**Assumption 4.4**: The effort choice is I.I.D conditional on the current mastery. ($P(E_t=1|X_t=k)=P(E_t=1|X_m=k) \quad \forall t,m$)
+
+The assumption 4.4 reflects the empirical observation that learners with higher success rate are more likely to exert effort. Although it looks like an innocuous regularity assumption, it imposes a very strong structure on the grit distribution.  It states that the grit level is a characteristic of the latent state rather than the learner. Conditional on the latent mastery, the grit level and the probability of exerting effort is identical across learners. Moreover, if the learner switches from low mastery to high mastery, the grit level also changes. This description does not square with common sense that grit is a personal trait that changes slowly. The paper justifies the assumption by arguing it reflects two different aspects of the grit. In low mastery, it is the perseverance against failures. In high mastery, it is the perseverance against boredom. 
+
+### Model Estimation
+
+The extended BKT model is estimated with MCMC algorithm. The MCMC algorithm first augments the latent state given the observed data and parameter by $P(X_1,\dots,X_t|Y_1,\dots,Y_t,E_1,\dots,E_t,\Theta)$, then updates the parameter given the latent states and the observed data by $P(\Theta|Y_1,\dots,Y_t,E_1,\dots,E_t,X_1,\dots,X_t)$.
+
+To augument the latent state, the joint likelihood of  $\{X_t,Y_t,E_t\}$ needs to calculated as the following:
+
+$$
+P(Y1,\dots, Y_t,E_1\dots,E_t,X_1,\dots,X_t) =[\prod_{t} P(Y_t|X_t,E_t)P(X_1,\dots,X_t,E_1\dots,E_t) 
+$$
+
+The likelihood of the joint latent state($\{X_t,E_t\}$) is
+
+$$
+P(X_1,\dots,X_t,E_1\dots,E_t) =P(X_1)P(E_1|X_1)\prod_{t=2}^TP(X_t|X_{t-1},E_{t-1})P(E_t|X_t)
+$$
+After obtaining the joint likelihood of  $\{X_t,Y_t,E_t\}$, the conditional probability of $P(X_t|Y_1,\dots,Y_T,E_1,\dots,E_T)$ and $P(X_t,X_{t-1}|Y_1,\dots,Y_T,E_1,\dots,E_T)$ can be calculated as 
+
+$$
+\begin{aligned}
+P(X_t|Y_1,\dots,Y_T,E_1,\dots,E_T) &= \frac{\sum_{X_1=0}^1\dots\sum_{X_{t-1}=0}^1\sum_{X_{t+1}=0}^1\dots\sum_{X_t=0}P(Y1,\dots, Y_t,E_1\dots,E_t,X_1,\dots,X_t) }{\sum_{X_1=0}^1\dots\sum_{X_t=0}^1 P(Y_1, \dots, Y_t, E_1, \dots,E_t,X_1,\dots,X_t)}\quad \text{(4.3)}\\
+P(X_t,X_{t-1}|Y_1,\dots,Y_T,E_1,\dots,E_T) &= \frac{\sum_{X_1=0}^1\dots\sum_{X_{t-2}=0^1}\sum_{X_{t+1}=0}^1\dots\sum_{X_t=0}P(Y1,\dots, Y_t,E_1\dots,E_t,X_1,\dots,X_t) }{\sum_{X_1=0}^1\dots\sum_{X_t=0}^1 P(Y_1, \dots, Y_t, E_1, \dots,E_t,X_1,\dots,X_t)}\\
+P(X_{t-1}|X_t,Y_1,\dots,Y_T,E_1,\dots,E_T) &= \frac{P(X_t,X_{t-1}|Y_1,\dots,Y_T,E_1,\dots,E_T)}{P(X_t|Y_1,\dots,Y_T,E_1,\dots,E_T)} \quad \text{(4.4)}
+\end{aligned}
+$$
+Equation (4.3)is used to draw the latent state at the last period from Bernoulli distribution with mean $(P(X_T|Y_1,\dots,Y_T,E_1,\dots,E_T))$. Equaltion (4.4) is used to draw the latent state backward given the latent state in the next sequence. 
+
+After the latent states are sampled, the parameter update is carried out by the Gibbs sampler. The prior distribution of all parameters are beta distribution and thus the posterior distribution of all parameters are beta distribution as well.
+
+All models are estimated with 4 chains of 1000 iterations. The first 300 iterations are burn-in and the posterior distribution is sampled every 10 iterations from the remainder of the chain. 
+
+### Consistent Estimation of the Relative Efficacy  
+
+```{theorem}
+The point estimation of the efficacy of the extended BKT model is a consistent estimator of the true efficacy.
+```
+
+```{proof}
+The point estimation of the efficacy of the extended BKT model is 
+
+$$
+\begin{aligned}
+\hat{\ell} &= \frac{\sum_t\sum_iI(X_{i,t}=1,X_{i,t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)+\alpha}{\sum_t\sum_iI(X_{i,t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)+\alpha+\beta}\\
+&= \frac{\sum_t\frac{\sum_iI(X_{i,t}=1,X_{i,t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}{N}+\frac{\alpha}{N}}{\sum_t\frac{\sum_iI(X_{i,t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}{N}+\frac{\alpha+\beta}{N}}
+\end{aligned}
+$$
+
+In large sample, the probability limit of the point estimation is 
+
+$$
+\begin{aligned}
+\lim_{N \rightarrow \infty} \hat{\ell} &\rightarrow \frac{\sum_{t=1}^T P(X_t=1,X_{t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}{\sum_{t=1}^T P(X_{t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}\\
+&= \frac{\sum_{t=1}^T \ell  P(X_{t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}{\sum_{t=1}^T P(X_{t-1}=0|Y_1,\dots,Y_T,E_1,\dots,E_T)}\\
+&=\ell
+\end{aligned}
+$$
+```
+
+```{lemma}
+In the randomized control trial, the difference between point estimations of the efficacy is a consistent estimator of the true relative efficacy
+```
+
+```{proof}
+
+Because assumption 4.1(b), the treatment group and the control group share the same parameter set and can be estimated jointly. In the joint estimation, the lemma is a straight foward application of the theorem 4.1:
+
+$$
+\lim_{N \rightarrow \infty} \hat{\ell}_{D=1} - \hat{\ell}_{D=0} \rightarrow \ell_{D=1} - \ell_{D=0}
+$$
+```
+
+
+
+
+## The Difference in Difference Estimator
+
+
+Econometricians use the difference in difference (DID) to estimate the average treatment effect from the RCT design. Let $Y$ be the response. $Y=1$ is a correct response, $Y=0$ the incorrect response. Let $D$ be the group assignment.$D=1$ is the control group, $D=0$ the control group. Let $t$ mark the experiment phase. $t=0$ is the pre-test phase and $t=1$ is the post-test phase. Under the assumption 4.1(a), the average treatment effect can be defined as 
+
+$$
+ATE = [E(Y|D=1,t=1)-E(Y|D=0,t=1)]-[E(Y|D=1,t=0)-E(Y|D=0,t=0)] \quad \text(4.1)
+$$
+
+The DID estimator corrects for common growth between pre-test and post-test period ($\beta_t$) and potential difference in the correct rate between the treatment and control groups in the pre-test period($\beta_D$). Let $\beta_0$ be the average correct rate for the control group at the pre-test period. Let $\gamma$ denote the average treatment effect. The four components in equation (4.1) can be expressed as:
+
+$$
+\begin{aligned}
+E(Y|D=0,t=0) &= \beta_0\\
+E(Y|D=1,t=0) &= \beta_0\quad\quad+\beta_D\\
+E(Y|D=0,t=1) &= \beta_0+\beta_t\\
+E(Y|D=1,t=1) &= \beta_0+\beta_t+\beta_D+\gamma
+\end{aligned}
+$$
+
+Let $i$ be the learner id, $D_i$ be the group assignment for the learner and $Y_{i,t}$ be the response of the learner in either pre-test or post-test period. Econometricians estimate the average treatment effect($\gamma$) with the following linear regression: 
+
+
+$$
+Y_{i,t} = \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t} \quad{(4.2)}
+$$
+
+
+### DID Estimator as Effectiveness Evaluation
+
+Regression (4.2) does not take into account the effort choice. Under imperfect implementation condition where learners do not always exert effort, the average treatment effect is a measure of effectiveness, rather than a measure of efficacy.
+
+When compare the target pedagogy to a placebo that has null efficacy, as it is customary in the medical research, the estimated effectiveness shrinks the efficacy toward 0. When the efficacy is positive but fails to induce effort from the learner, the empirical effectiveness is biased toward null effect because those who do not exert effort become de facto placebo taker. Similarly, if the pedagogy has negative efficacy, the lack of effort also shrinks the estimated effectiveness toward zero. 
+
+However, when compare the target pedagogy to another pedagogy with likely positive efficacy, as it is usually the case in the education research, one cannot infer the relative efficacy from the estimated relative effectiveness. Consider the special case where the two pedagogy has identical efficacy, thus a true relative efficacy of ZERO. Differential effort choice induced by the two pedagogies can lead to both a positive relative effectiveness and a negative one. If the pedagogy A makes all learners exert effort while the pedagogy B make none of them exert effort, the relative effectiveness estimated by the DID regression is positive. In reverse, if the pedagogy A induces zero effort, but the pedagogy B induces full effort, the DID estimator produces a negative relative effectiveness.
+
+The next two subsections develop this argument more formally under the assumption that true data generating process is described by the extended Bayesian Knowlege Tracing model.
+
+### Non-monotonicity of the DID Estimator
+
+In general, the response and the latent mastery is not a linear function. The non-linearity is not a feature of the Bayesian Knowledge Tracing model, but a common assumption in the psychometric literature, see, for example, the item response theory. Therefore, the average treatment effect estimated by the regression (4.2) is not a consistent estimator of the relative efficacy because of the functional form misspecification. However, if the analyst only wishes to rank the two pedagogical methods by the randomized control trial, the DID estimator can still be useful if it is a monotonic estimator of the relative efficacy even it is not consistent.Therefore, to argue that DID estimator is invalid is equivalent to prove that it is not a monotonic function of the efficacy difference.
+
+#### Notation
+
+Let  $J$ denote the item sequence each group received. In the context of random control trials, the item sequence has the generic form of (pre-test, training, post-test). Let the pre-test be 0, the post-test be 1, the treatment training be $T$, and the control training be $C$. In short, the treatment group receives the item sequence $J_T=(0,T,1)$ and the control group receives the item sequence $J_C=(0,C,1)$.
+
+Let the correct rate of item $j$ conditional on the latent state $k$ be $c_j^{k}$. Let the effort rate of the item $j$ conditional on the latent state $k$ be $e_j^{k}$. Let the pedagogical efficacy of the item $j$ be $\ell_j$. Let the initial probability of being mastered be $\pi$. For simplicity, assume the effort rates only differs for the unmastered learner($X_t=0$) between the treatment group and control group. Further, assume the effort rate is increasing with respect to the latent mastery for all items($e_j^0<e_j^1$).
+
+
+#### The Monotonicity of DID Estimator Unser Ideal Implementation Conditions
+
+Under ideal implementation conditions where the learners always exert effort, it can be proved that the DID estimator is a monotonic function of the true relative pedagogical efficacy. The rank order inference based on the effectiveness is consistent in the large sample.
+
+```{theorem}
+The DID estimator is a monotone function of the pedagogical efficacy difference if and only if there is unmastered learner before the experiment($\pi<1$), the pre-test item does not convert the learner to the mastery status for sure($\ell_0<1$), and the post-test item discriminates between two latent states($c_1^1 \geq c_1^0$).
+```
+
+```{proof}
+Let it be three items. The pre-test and the post-test items are the same, while the training item differs. Let the item id for pre-test, post-test, training and control to be $0,1,T,C$ respectively. Let the group status be $D$.
+
+When there is no effort choice, the first difference within each group is 
+
+$$
+\begin{aligned}
+\delta_D&=P(Y_1=1,Y_0=1|D)-P(Y_1=1,Y_0=1|D) \\
+&= (1-\pi)(1-\ell_0)(1-\ell_D)(c_1^0-c_0^{1,0})+((1-\pi)[(1-\ell_0)\ell_D+\ell_0])(c_1^1-c_0^{1,0})+(1-\pi)(c_1^1-c_0^{1,1})
+\end{aligned}
+$$
+The second difference is
+
+$$
+\delta =\delta_T-\delta_C = (\ell_T-\ell_C)(1-\pi)(1-\ell_0)(c_1^1-c_1^0)
+$$
+
+If $\ell_0<1$, $\pi<1$, and $c_1^1>c_1^0$, $\delta>0$. If $\delta>0$, $c_1^1>c_1^0$ because $0\leq\ell_0,\pi\leq1$.
+```
+
+Although the DID estimator is a monotonic function of the relative efficacies, it is attenuated by the relative difference between the success rates of the mastered and the un-mastered. If the difference is small, the item has really low differentiating power and the DID estimator requires more data to obtain the same precision. However, this problem also plagues the BKT model because its inference also relies on the differentiating power of the pre-test and post-test item. Therefore, although the DID estimator is less efficient than the ideal but infeasible estimator that directly compares the unobservable latent mastery, its power is comparable to the extended BKT estimator.
+
+
+#### The Non-monotonicity of the DID estimator with Effort Choice
+
+However, if there is effort choice, a stronger assumption is required to establish the monotonicity.
+
+
+```{theorem}
+With the effort choice, the DID estimator is a monotone function of the pedagogical efficacy difference if and only if $\pi<1$ and $\ell_0<1$, and 
+
+$$
+(\ell_T-\ell_C)(\frac{\ell_T}{\ell_C}-\frac{e^0_C}{e^0_T}) > 0
+$$
+```
+
+```{proof}
+Now, if there exists effort choice, the first difference is
+
+$$
+\begin{aligned}
+\tilde{\delta}_D&=P(O_0=0,O_1=1|D)-P(O_0=1,O_1=0|D) \\
+&=P(E_0=0,E_1=1,Y_1=1|D)+P(E_0=1,E_1=1,Y_0=0,Y_1=1|D)\\
+&\quad-P(E_0=1,E_1=0,Y_0=1|D)-P(E_0=1,E_1=1,Y_0=1,Y_1=0|D)\\
+&= (1-\pi)(1-\ell_0e^0_0)(1-\ell_De_D)(c_1^0e^0_1-c_0^{1,0}e^0_0)+((1-\pi)[(1-\ell_0e^0_0)\ell_De^0_D+\ell_0e^0_0])(c_1^1e^1_1-c_0^{1,0}e^0_0)+(1-\pi)(c_1^1e^1_1-c_0^{1,1}e^0_0)
+\end{aligned}
+$$
+
+The second difference is
+$$
+\tilde{\delta} = \tilde{\delta}_T-\tilde{\delta}_C = (\ell_Te^0_T-\ell_Ce^0_C)(1-\pi)(1-\ell_0e^0_0)(c_1^1e_1^1-c_1^0e_1^0)
+$$
+To keep monotoncity, in addition to the previous conditions, it is sufficient and necessary to have
+
+$$
+(\ell_Te^0_T-\ell_Ce^0_C)(c_1^1e_1^1-c_1^0e_1^0)>0
+$$
+```
+
+For example, when $\ell_T>\ell_C$, DID estimator is monotone if $\frac{\ell_T}{\ell_C}>\frac{e^0_C}{e^0_T}$. Intuitively, it means that the more pedagogical effective item cannot be too discouraging for the unmastered learners. This is not always the case.
+
+#### The Non-monotonicity of the DID estimator Conditional on Effort
+
+One intuitive correction technique is to condition the analysis on the subset of learners who exert efforts on the training question. However, the conditional DID estimator does not guarantee the monotonicity either.
+
+```{theorem}
+Conditioning on the effort on the training question is not a sufficient condition of the DID estimator being a monotone function of the pedagogical efficacy difference.
+```
+
+```{proof}
+The analysis is almost the same as in theory except for the initial state density is $P(X_0=1|E_D=1)$. It can be shown that
+$$
+\tilde{\pi}_D=P(X_0=1|E_D=1) = \frac{\pi e^1_D}{[(1-\pi)(1-\ell_0)e_0+(1-\pi)(1-e_0)]e^0_D+[(1-\pi)\ell_0e_0+\pi]e_D^1}
+$$
+
+Now 
+
+$$
+\tilde{\delta} = \tilde{\delta}_T-\tilde{\delta}_C = [\ell_T(1-\tilde{\pi_T})-\ell_C(1-\tilde{\pi_T})](1-\ell_0e^0_0)(c_1^1e^1_1-c_1^0e^0_1)+(\tilde{\pi_T}-\tilde{\pi_C})(c_1^1-c_0^{1,1})e^1_1
+$$
+Even under the favorable condition that $c_1^1=c_0^{1,1}$, the monotonicity requires
+
+$$
+(\ell_T-\ell_C)(\frac{\ell_T}{\ell_c}-\frac{1-\tilde{\pi}_T}{1-\tilde{\pi}_C})>0
+$$
+In general, the inequality is not true. Thus the difference in difference estimator is not a consistent estimator of the true pedagogical efficacy difference.
+```
+
+The key insight is that conditioning on the effort is a selection process. Such selection breaks the balance assumption granted by the random assignment, as presented in assumption 4.1(a). 
+
+$$
+\tilde{\pi}_D=P(X_0=1|E_D=1) = \frac{\pi e^1_D}{[(1-\pi)(1-\ell_0)e_0+(1-\pi)(1-e_0)]e^0_D+[(1-\pi)\ell_0e_0+\pi]e_D^1}
+$$
+
+Unless $e_D^1=e_D^0$, $\tilde{\pi}_T \neq \tilde{\pi}_C$.  If $\tilde{\pi}_T \neq \tilde{\pi}_C$, $E(Y|D=1,t=0,E_T=1)\neq E(Y|D=0,t=0,E_C=1)$. Therefore, equation (4.1) does not hold and the DID estimator is not consistent estimator of the average treatment effect.
+
+However, one can argue that biased estimator of the effectiveness is not a sufficient condition to conclude that the difference of two biased estimators is not a monotonic function of the true relative pedagogical efficacy. The author wishes to point out that it is easy to construct a counterexample where such bias leads to non-monotonic function.
+
+
+
+## Simulation Study
+
+The simulation demonstrates theorem 4.2 and theorem 4.3 in the previous section. The simulation parameters are in Appendix D. 
+
+The true efficacy difference is set to be 0.4. Without effort choice, the true effectiveness difference for the DID estimator is 0.176. With effort choice, the true effectiveness difference for the DID estimator is 0, where the differential effort choices offset the efficacy difference entirely.
+
+Table 4.1 shows the simulation result. First examine the columns of true effectiveness, true efficacy and the point estimation of the model. The Extended BKT estimator recovers the true efficacy while the DID estimator recovers the effectiveness. Because they are estimating different quantity, they cannot be compared directly. However, their rank order inference can be compared. Let the rank decision be made based on 95% confidence/credibility interval. If the interval contains 0, the conclusion is that they two pedagogies may have same efficacy. If the lower bound is above 0, the conclusion is that the treatment pedagogy has stronger efficacy. The truth for both scenarios is that the treatment is superior. Without the effort choice, both estimators arrive at the right conclusion, which echoes theorem 4.2. With the effort choice, the DID estimator arrives at the wrong conclusion while the extended BKT estimator arrives at the right conclusion, which echoes theorem 4.3.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+data_dir = paste0(proj_dir, '/_data/03/sim/')
+
+exp1_data = read.table(paste0(data_dir, 'exp1.txt'),sep=',',col.names=c('i','t','j','y'))
+treat_status = exp1_data %>% filter(t==1) %>% mutate(D=j-1) %>% select(i,D)
+analysis_data = merge(exp1_data %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,y), treat_status)
+mod1 = lm(data=analysis_data, y~t*D)
+se <- sqrt(diag(vcov(mod1)))
+mcmc_param1 =  read.table(paste0(data_dir, 'exp1_param.txt'),sep=',') %>% select(V2,V3) %>% rename(l0=V2,l1=V3) %>% mutate(ldif=l0-l1)
+
+
+exp3_data = read.table(paste0(data_dir, 'exp3.txt'),sep=',',col.names=c('i','t','j','y','h','e'))
+treat_status = exp3_data %>% filter(t==1) %>% mutate(D=j-1) %>% select(i,D)
+analysis_data = merge(exp3_data %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,y), treat_status)
+mod3 = lm(data=analysis_data, y~t*D)
+se <- sqrt(diag(vcov(mod3)))
+mcmc_param3 =  read.table(paste0(data_dir, 'exp3_param.txt'),sep=',') %>% select(V2,V3) %>% rename(l0=V2,l1=V3) %>% mutate(ldif=l0-l1)
+
+
+sim_param = data.frame(dgp=c('Without Effort','Without Effort','With Effort','With Effort'),
+                       model=c('RCT','Extended BKT','RCT','Extended BKT'),
+                       true_efficacy=c(0.4,0.4,0.4,0.4),
+                       true_effective=c(0.176,0.176,0.0,0.0),
+                       point_est = as.numeric(0),
+                       lower = as.numeric(0),
+                       upper = as.numeric(0)
+                       )
+
+sim_param$point_est[1] = - mod1$coefficients[4]
+sim_param$lower[1] = - mod1$coefficients[4] - 1.96*se[4]
+sim_param$upper[1] = - mod1$coefficients[4] + 1.96*se[4]
+
+sim_param$point_est[3] = - mod3$coefficients[4]
+sim_param$lower[3] = - mod3$coefficients[4] - 1.96*se[4]
+sim_param$upper[3] = - mod3$coefficients[4] + 1.96*se[4]
+
+sim_param$point_est[2] = mean(mcmc_param1$ldif)
+sim_param$lower[2] = quantile(mcmc_param1$ldif, prob=0.05)
+sim_param$upper[2] = quantile(mcmc_param1$ldif, prob=0.95)
+
+sim_param$point_est[4] = mean(mcmc_param3$ldif)
+sim_param$lower[4] = quantile(mcmc_param3$ldif, prob=0.05)
+sim_param$upper[4] = quantile(mcmc_param3$ldif, prob=0.95)
+
+kable(
+  sim_param, booktabs = TRUE,
+  col.names=c('D.G.P.','Model','Rel. Efficacy','Rel. Effectiveness','Point Est.','95% CI(L)','95% CI(H)'),
+  align='c',
+  caption = 'Simulation Result'
+)
+
+```
+
+## Case Study
+
+This section applies the extended Bayesian Knowledge Tracing Model to a Randomized Control Trial. The section first describes the data collection process of the experiment, then describes the identification of the effort choice, and finally shows the distribution of estimated parameters from different model and effort specification.
+
+
+### The Learning Environment
+
+The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is used after school, rather than in the classroom. The product is framed as a role-playing game where the learner clears a level to claim the reward. The screen shots of the selection, the practice and the completion of a level are shown in Figure 1.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Level Initiation", fig.align='center'}
+include_graphics("fig/practice_screenshot.png")
+```
+
+
+The product is a low stake learning environment because it offers a small monetary incentive to good performance and no direct punishment for poor performance. If the learners correctly answer the question, they receive xuedou, an in-game virtual currency, that can buy in-game gears or real world gifts.During the experiment, the reward for each correct response is about  a tenth of a penny in RMB (or $0.00014). If the learners answer the question wrong, they receive nothing and lose nothing at the spot but are offered a second chance later to try again for a smaller reward. Because the learning environment is at low stake, it does not inspire the learners to struggle when challenged with difficult questions. In addition, because each correct answer is worth the same regardless of the item difficulty, some students develop the strategy of picking the easy item and skipping the hard item. Both the low incentive and the deliberate system gaming lead to learners withholding full effort observed in the data.
+
+
+### The Design and the Implementation of The Experiment 
+
+The experiment is administrated from June 9th to June 10th 2016 to third-grade students whose parents paid for the learning product. By then, all learners should have been taught the required knowledge in the school, the formula of circumference and area of a rectangle. 
+
+Each group receives three items, the pre-test item, the training item and the post-test item, as shown in Figure 2. All items ask the learner to calculate the circumference and the area of two identical rectangles joined by one side given the length and width of the small rectangle. The pre-test item and the training item are rectangles joined by length but have different values. The pre-test and post-test item share the same value but joined by different sides. A highly similar yet not identical item aim to increase the measurement validity while prevents student memorizing the answer.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "The Item Description", fig.align='center'}
+include_graphics("fig/item.png")
+```
+
+
+The learners are randomly assigned to the treatment group and the control group by the user id, which is randomly generated. The treatment and the control group differ in the pedagogical methods.The control group does not receive any tutoring except for a practice question with different values. The treatment group receives the same practice question plus a link to an animated video tutorial containing the following scaffolding:
+
+
+1. Calculate the circumference and the area of the small rectangle
+2. To get the circumference of the large rectangle, multiply the circumference of the small rectangle by two and subtract two times of the length of the joined side.
+3. To get the area of the large rectangle,  multiply the area of the small rectangle by two
+
+
+The learner can choose to skip the video tutorial. Unfortunately, the log does not track if the learner watches the video or not. On aggregate, the video is played about 800 times. If count each view as a different user , the maximum exposure to the treatment is about 30%. The video tutorial is 67 seconds long. The average watch time is about 47 seconds.
+
+
+### Differential Effort Choice 
+
+The identification of the model hinges on the identification of the effort level. The effort level is not directly observed but has to be inferred from the log data. A description and example of the log are available in appendix E. 
+
+#### Effort Classification
+
+The paper identifies the effort from the actual text response student submitted. A correct response or an honest error is labeled as "effort" while a blank answer or a non-blank but also the non-sense answer is labeled as "no-effort"/"give-up". In the context of this experiment, there are only four honest mistakes:
+
+1. Wrong shape: The learner calculates correctly either the circumference or the area of the small rectangle
+2. Wrong circumference: The learner correctly calculates the area but not the circumference
+3. Wrong area: The learner correctly calculates the circumference but not the area
+4. Slip:  The answer is correctly calculated but the learner inputs in a wrong way (for example an extra trailing 0)
+
+The following table shows a breakdown of the answer classification. The classification issue is discussed in details in appendix F.
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+# the four groups are noefforts, honest errors and correct response
+ans_composition = data  %>%
+  mutate(subscore=score0+score1+score2) %>%
+  group_by(group, qtype) %>% 
+  summarize(n=n(),
+            noeffort = mean(subscore==0),
+            se_noeffort = sqrt((1-noeffort)*noeffort/n),
+            honesteror=mean(subscore>0&score<1),
+            se_honesteror = sqrt((1-honesteror)*honesteror/n),
+            corret=mean(score==1),
+            se_corret = sqrt((1-corret)*corret/n))%>%
+ select(-n) %>%
+    mutate(noeffort=noeffort*100,
+           honesteror=honesteror*100,
+           corret=corret*100,
+           se_noeffort=se_noeffort*100,
+           se_honesteror=se_honesteror*100,
+           se_corret=se_corret*100)
+
+kable(
+  ans_composition %>% arrange(qtype,group), booktabs = TRUE,
+  col.names=c('Group','Task','No Effort(%)','No Effort(SE)','Honest Error (%)','Honest Error (SE)', 'Correct(%)','Correct(SE)'),
+  align='c',
+  caption = 'Answer Composition - All Wrong'
+)
+```
+
+
+#### Robustness Check of the Effort Classification
+
+Time spent on the item is suggestive of the learner's effort input. The time spent on the item is defined as the time between the time the server receives the learner's item request and the time the server receives the learner's answer submit. It does not guarantee that the learner is actively engaged between the two events. Although there are 4% of the observations logged response time longer than 2 minutes, the majority of the response time falls within a reasonable time range.
+
+Figure 3 shows the distribution of time spent on the item. The honest error is very similar to the correct answer. However, the give-up answers have a very distribution of time spent. The median time spent on the honest error and the correct answer is about 47 seconds while that on the give-up is about 10 seconds. The first quartile of the response time of the honest error and the correct answer is about 34 seconds, which is higher than the third quartile of the response time of give-up answer, 29 seconds. The similarity between the honest error and the correct answer and the difference of the two from the give-up answer support the validity of the effort classification. 
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE,, fig.cap = "Boxplot of Time Spent By Effort and Response", fig.align='center',out.height='8cm',out.width='8cm'}
+
+qplot(data=data,x=ec_status,y=cmt_timelen,geom='boxplot') + ylab('Time Spent on Item(Sec)') + xlab('Answer Type')
+```
+
+
+The reader may argue the classification strategy underestimate the level of effort because it is possible that learner types in non-sense answer or leave it blank after some serious thought. Although it is an issue for the pre-test item, such miscoding is less problematic for the training item and the post-test item. Figure 4 shows the distribution of response time when submitting a give-up answer. Compared to the pre-test item, the response time distribution of the training item and the post-test item shifts and skews toward 0. The learners are spending less time on the problem, so little that it may not allow for a careful reading of the question. Therefore, the effort identification is likely to be more accurate in the next two items. 
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item without Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
+qplot(data=data %>% filter(cmt_timelen<=120&giveup), x=cmt_timelen, geom='density', col=etype, linetype=etype, facets=group~qtype)+xlab('Time Spent on Task (Seconds)')
+```
+
+In contrast, the answers with effort do not demonstrate the same shift. Figure 5 shows the distribution of response time when submitting a valid answer.The honest error and the correct answer tax the mind and take time, while the decision of giving up is made on the fly. The comparison of response time distribution between effort and no effort further supports the validity of the classification.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item With Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
+qplot(data=data %>% filter(cmt_timelen<=120&!giveup), x=cmt_timelen, geom='density', col=ec_status, linetype=ec_status,facets=group~qtype) + xlab('Time Spent on Task (Seconds)')
+```
+
+
+#### Differential Effort Level Choice
+
+Table 4.3 lists the summary statistics of the effort rate group by the experiment sequence and the group assignment. The treatment group exerts less effort compared to the control group in the pre-test period and the training period, the difference of which is statistically significant. The effort gap closes in the post-test period. Ideally, the two groups will have the same effort rate in the pre-test period but different effort rate in the training session. The different effort rates in the pre-test period suggest that the randomization is not perfect. However, the effort rate gap widens from 2.3% in the pre-test period to 3.4% in the training session. Although the difference is not statistically significant, it suggests that treatment pedagogy elicits less effort from the learners.
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+effort_rate_stat = data %>% group_by(group,qtype) %>% summarize(pct=1-mean(giveup), se=(1-pct)*pct/sqrt(n())) %>% select(qtype,group,pct,se) %>% arrange(qtype,group)
+
+kable(effort_rate_stat, 
+      booktabs = TRUE,
+      col.names = c('Period','Group','Mean Effort Rate','Standard Error'),
+      align='c',
+      caption = 'Effort Rate Choices - All'
+      ) 
+```
+
+
+
+Further, the paper wants to disentangle the effort gap among the mastered learners and the unmastered learners. From the data, one can only observe the effort rate depends on the response, but not on the mastery status. Without invoking the inference from the extended BKT model, the mastery status is approximated by the response in the pre-test item. Because all the items are fill in the blanks, the probability of making a correct guess even though the learner has not mastered the knowledge point is very small. Therefore, if the learner correctly answers the question, he must have mastered the knowledge point. If the learner incorrectly answers the question, it is unclear whether it is because he has not mastered it or because he does not want to exert effort. 
+
+Table 4.4 reports the effort rates for the learners separated by the response in the pre-test item. Although there is a statistically significant difference (1.6%) in the presumably mastered learners in the training session, the effort rate gap is much wider(4%) for the learners who incorrectly answers the pre-test. Because the learners whose first  response  is incorrect is a mixture of the mastered and unmastered learner and the mastered learner has 1.6% effort rate gap, the gap for the unmastered learners is large than 4%. Because the proportion of the unmastered learner is smaller than the proportion of learners who fail the first item(54%), at the minimum, about 7% more of the unmastered learners in the treatment group is not exposed to the pedagogy they are assigned to. 
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+effort_rate_stat_1 = data %>% filter(is_placebo==1)%>% group_by(group,qtype) %>% summarize(pct_1=1-mean(giveup), se_1=(1-pct_1)*pct_1/sqrt(n()))
+effort_rate_stat_0 = data %>% filter(is_placebo==0)%>% group_by(group,qtype) %>% summarize(pct_0=1-mean(giveup), se_0=(1-pct_0)*pct_0/sqrt(n()))
+
+effort_rate_stat_placebo = merge(effort_rate_stat_1,effort_rate_stat_0) %>% select(qtype,group,pct_0,se_0,pct_1,se_1) %>% arrange(qtype,group)
+
+kable(effort_rate_stat_placebo, 
+      booktabs = TRUE,
+      col.names = c('Period','Group','Mean Effort Rate(Y=1)','S.E(Y=1)','Mean Effort Rate(Y=0)','S.E(Y=0)'),
+      align='c',
+      caption = 'Effort Rate Choice - By Response in the Pre-test'
+      ) 
+```
+
+The previous analysis established the basic fact that the treatment group exerts less effort than the control group and the difference comes mainly from the unmastered learners. However, the reader may worry about selection bias based on two observations. For one reason, the effort rate already differs in the pre-test item, suggesting that assumption 4.1(a) and 4.1(b) may fail. For another reason, if the analysis conditions on the effort at any period of the experiment, it will create selection bias. Although the author cannot defend against the first objection, the validity of the second critique depends on the validity of assumption 4.4. If the assumption 4.4 stands, conditional on the latent mastery does not create additional selection bias. That said, the author acknowledges the potential bias in the following analysis.
+
+
+### The result
+
+This section compares the DID estimator to the extended Bayesian Knowledge Tracing model estimator. It demonstrates how differential effort rate can lead to different inferences of the pedagogical efficacy rank order. A priori, the pedagogical experts agreed that the presence of a video scaffolding tutorial shall increase the pedagogical efficacy of the treatment. Especially, because the circumference of the large rectangle is not simply double that of the small rectangle, they expect that the special trick in the video leads to larger gains in the knowledge component of the circumference. The extended BKT model confirms the prior expectation of the domain experts, while the DID estimator does not.
+
+
+#### Aggregate Effectiveness and Efficacy
+
+Both the DID estimator and the Extended BKT estimator are applied to the aggregate score. The point estimation of the effectiveness given the DID estimator is close to 0 and the 95 confidence interval also contains 0. Therefore, the DID estimator suggests that the two pedagogy have the same effectiveness.The point estimation of the efficacy given by the extended RCT is different from 0 and the 95% credible interval excludes 0. Therefore, the extended BKT estimator suggests that the video scaffolding has better efficacy.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+y0data = data %>% filter(eid=='Q_10201056649366') %>% mutate(t=0)
+y1data = data %>% filter(eid=='Q_10201056666357') %>% mutate(t=1)
+
+ydata = rbind(y0data,y1data)
+ydata = ydata %>% transform(d=as.numeric(gid!=0))
+
+mod = lm(data=ydata,y~d*t)
+se <- sqrt(diag(vcov(mod)))
+
+no_param = read.table(paste0(proj_dir,'/_data/03/exp/no_effort.txt'),sep=',') %>%
+  mutate(ldif=V3-V2) %>% select(ldif) %>%
+  mutate(model='response only')
+
+manual_param = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort.txt'),sep=',') %>%
+  mutate(ldif=V3-V2) %>% select(ldif) %>%
+  mutate(model='effort choice')
+
+param_data = data.frame(model=c('DID','Extended BKT'), effectivness=NA, efficacy = NA, lower=as.numeric(0), upper=as.numeric(0))
+param_data$effectivness[1] =mod$coefficients[4] 
+param_data$lower[1] =mod$coefficients[4] - 1.96*se[4]
+param_data$upper[1] =mod$coefficients[4] + 1.96*se[4]
+
+# param_data$point_est[2] =mean(no_param$ldif) 
+# param_data$lower[2] = quantile(no_param$ldif, 0.05)
+# param_data$upper[2] = quantile(no_param$ldif, 0.95)
+
+param_data$efficacy[2] =mean(manual_param$ldif) 
+param_data$lower[2] = quantile(manual_param$ldif, 0.05)
+param_data$upper[2] = quantile(manual_param$ldif, 0.95)
+param_data$rank = c('N','Y')
+
+param_data = param_data%>% arrange(model)
+
+kable(
+  param_data, booktabs = TRUE,
+  col.names=c('Model','Est. Rel  Effectivness','Est. Rel  Efficacy','95% CI(L)','95% CI(H)','Treatment Better?'),
+  align='c',
+  caption = 'Effectiveness and Efficacy in Aggregate Score'
+)
+
+```
+
+#### Effectiveness and Efficacy By Knowledge Components 
+
+To correctly solve the problem, the learner must master three knowledge components: shape identification, circumference calculation, and area calculation. Therefore, it is possible to score each knowledge components and analyze the pedagogical efficacy difference separately. The effort choice is inherited from the aggregate score and is not redefined. For example, if the learner leaves a blank for circumference but fills in the area, the response is considered a valid effort for all three components, rather than treating it as a give-up for the circumference due to the blank answer.
+
+
+According to the prior expectation of the pedagogical experts, the video scaffolding is likely to be more effective in teaching the learners how to calculate the circumference, because it introduces a new method to calculate the circumference that is less likely to cause confusion. Table 4.5 reports the estimated effectiveness(By DID) and the estimated efficacy(by Extended BKT) on three knowledge components. The breakdown analysis indeed shows that the video scaffolding has stronger pedagogical efficacy in the knowledge component of the circumference, rather than the rest two components. This finding lends support to the plausibility of the claim that the extended BKT estimator is truly estimating the pedagogical efficacy.
+
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+
+data_0 = read.csv(paste0(proj_dir,'/_data/03/output/exp_output_0.csv'), sep=',', header=T)
+group_assignment = data_0 %>% filter(t==1) %>% mutate(d=j-1) %>% select(i,d)
+ydata_0 = merge(data_0 %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,score0) %>% rename(y=score0),group_assignment)
+mod_0 = lm(data=ydata_0,y~d*t)
+beta_0 = mod_0$coefficients[4]
+se_0 <- sqrt(diag(vcov(mod_0)))[4]
+
+data_1 = read.csv(paste0(proj_dir,'/_data/03/output/exp_output_1.csv'), sep=',', header=T)
+group_assignment = data_1 %>% filter(t==1) %>% mutate(d=j-1) %>% select(i,d)
+ydata_1 = merge(data_1 %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,score1) %>% rename(y=score1),group_assignment)
+mod_1 = lm(data=ydata_1,y~d*t)
+beta_1 = mod_1$coefficients[4]
+se_1 <- sqrt(diag(vcov(mod_1)))[4]
+
+data_2 = read.csv(paste0(proj_dir,'/_data/03/output/exp_output_2.csv'), sep=',', header=T)
+group_assignment = data_2 %>% filter(t==1) %>% mutate(d=j-1) %>% select(i,d)
+ydata_2 = merge(data_2 %>% filter(t!=1) %>% mutate(t=t/2) %>% select(i,t,score2) %>% rename(y=score2),group_assignment)
+mod_2 = lm(data=ydata_2,y~d*t)
+beta_2 = mod_2$coefficients[4]
+se_2 <- sqrt(diag(vcov(mod_2)))[4]
+
+
+did_param_data = data.frame(kp=c('Shape','Circumference','Area'), model='DID', effective=as.numeric(0), efficacy = NA, lower=as.numeric(0), upper=as.numeric(0))
+did_param_data$effective[1] = beta_0
+did_param_data$lower[1] =beta_0 - 1.96*se_0
+did_param_data$upper[1] =beta_0 + 1.96*se_0
+
+did_param_data$effective[2] = beta_1
+did_param_data$lower[2] =beta_1 - 1.96*se_1
+did_param_data$upper[2] =beta_1 + 1.96*se_1
+
+
+did_param_data$effective[3] = beta_2
+did_param_data$lower[3] =beta_2 - 1.96*se_2
+did_param_data$upper[3] =beta_2 + 1.96*se_2
+
+manual_param_0 = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_0.txt'),sep=',') %>%
+  mutate(ldif=V3-V2) %>% select(ldif) %>%
+  mutate(model='effort choice')
+
+manual_param_1 = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_1.txt'),sep=',') %>%
+  mutate(ldif=V3-V2) %>% select(ldif) %>%
+  mutate(model='effort choice')
+
+manual_param_2 = read.table(paste0(proj_dir,'/_data/03/exp/manual_effort_2.txt'),sep=',') %>%
+  mutate(ldif=V3-V2) %>% select(ldif) %>%
+  mutate(model='effort choice')
+
+bkt_param_data = data.frame(kp=c('Shape','Circumference','Area'), model='Extended BKT',effective=NA,efficacy = as.numeric(0), lower=as.numeric(0), upper=as.numeric(0))
+bkt_param_data$efficacy[1] =mean(manual_param_0$ldif) 
+bkt_param_data$lower[1] = quantile(manual_param_0$ldif, 0.05)
+bkt_param_data$upper[1] = quantile(manual_param_0$ldif, 0.95)
+
+bkt_param_data$efficacy[2] =mean(manual_param_1$ldif) 
+bkt_param_data$lower[2] = quantile(manual_param_1$ldif, 0.05)
+bkt_param_data$upper[2] = quantile(manual_param_1$ldif, 0.95)
+
+bkt_param_data$efficacy[3] =mean(manual_param_2$ldif) 
+bkt_param_data$lower[3] = quantile(manual_param_2$ldif, 0.05)
+bkt_param_data$upper[3] = quantile(manual_param_2$ldif, 0.95)
+
+
+param_data = rbind(bkt_param_data, did_param_data) %>% arrange(kp,model)
+
+kable(
+  param_data, booktabs = TRUE,
+  col.names=c('Knowledge Component','Model','Est. Rel  Effectiveness','Est. Rel  Efficacy','95% CI(L)','95% CI(H)'),
+  align='c',
+  caption = 'Effectiveness and Efficacy by Knowledge Components'
+)
+
+
+```
+
+
+
+
+## Discussion
+
+This paper distinguishes between the evaluation of the efficacy and the evaluation of the effectiveness. An accurate inference of the relative efficacy of two pedagogical methods is important in the context of product iteration. The paper shows that difference in difference is not the only, or the best, estimator to analyze data generated by the randomized control trial. When learners do not always exert full effort, the DID estimator does not guarantee a consistent rank order inference on the relative pedagogical efficacy. In contrast, the extended Bayesian Knowledge Tracing model with state dependent effort choice produces a consistent estimation of the relative pedagogical efficacy. The paper provides suggestive evidence from both simulation data and a field experiment to support the previous claims.
+
+One problem of the analysis is the heavy reliance on the manual text analysis for effort identification. It is time-consuming and not scalable. To automatically code the effort choice, future models need to incorporate other information, such as time, cursor movement, and auxiliary sensor data. Another problem is the knowledge component efficacy analysis does not account for the dependence among the factors. It is easy to verify that the three factors are not independent but they are treated as such in the paper. Future works need to extend the single factor latent variable model to the coupled factor latent variable model. 
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+# # Check the sequence dependence
+# wide_data=  data %>%
+#     mutate(effort=1-giveup)%>%
+#   select(uid,group,seq_id,effort) %>%
+#   spread(seq_id,effort)
+# names(wide_data) = c('uid','group','t1','t2','t3')
+# 
+# effort_persistence = merge(wide_data %>% group_by(group,t1,t2,t3) %>% summarize(n=n()), wide_data %>% group_by(group) %>% summarize(N=n())) %>% mutate(pct=n/N)
+# 
+# effort_persistence$pattern = '0,0,0'
+# effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '1,1,0'
+# effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&!effort_persistence$t3] = '1,0,0'
+# effort_persistence$pattern[effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '1,0,1'
+# effort_persistence$pattern[effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '1,1,1'
+# effort_persistence$pattern[!effort_persistence$t1&!effort_persistence$t2&effort_persistence$t3] = '0,0,1'
+# effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&!effort_persistence$t3] = '0,1,0'
+# effort_persistence$pattern[!effort_persistence$t1&effort_persistence$t2&effort_persistence$t3] = '0,1,1'
+# 
+# 
+# effort_persistence$pattern = factor(effort_persistence$pattern)
+# 
+# ggplot(data=effort_persistence, aes(x=pattern,y=pct, fill=group))+ 
+#     geom_bar(stat = "identity",position="dodge") +
+#     xlab('Slack Pattern') + ylab('Frequency') + ggtitle('Joint Distribution of Efforts') 
+# 
+# 
+# # read in the data
+# effort_fit_dist = read.table(paste0(proj_dir,'/data/exp/effort_dist.txt'),sep='\t', col.names = c('pattern','fC','fT'))
+# effort_fit_dist =  effort_fit_dist %>% group_by(pattern) %>% summarize(fC=mean(fC),fT=mean(fT))
+# 
+# ctrl_effort_data = effort_persistence %>% filter(group=='Control')%>% select(pattern, pct)
+# treat_effort_data = effort_persistence %>% filter(group=='Treatment')%>% select(pattern, pct)
+# 
+# ctrl_effort = merge(ctrl_effort_data, effort_fit_dist%>% select(pattern,fC)) %>% gather(type,val,-pattern) %>% mutate(group='control')
+# ctrl_effort$type = factor(ctrl_effort$type, levels=c('pct','fC'), labels=c('data','fitted'))
+# treat_effort = merge(treat_effort_data, effort_fit_dist%>% select(pattern,fT))  %>% gather(type,val,-pattern) %>% mutate(group='treatment')
+# treat_effort$type = factor(treat_effort$type, levels=c('pct','fT'), labels=c('data','fitted'))
+# 
+# effort_dist = rbind(ctrl_effort, treat_effort)
+# 
+# m1= ggplot(data=effort_dist, aes(x=pattern,y=val, fill=type))+ 
+#     geom_bar(stat = "identity",position="dodge") +
+#     xlab('Slack Pattern') + ylab('Frequency') + ggtitle('Joint Distribution of Efforts') 
+# 
+# m2= ggplot(data=effort_dist %>% filter(group=='treatment'), aes(x=pattern,y=val, fill=type))+ 
+#     geom_bar(stat = "identity",position="dodge") +
+#     xlab('Slack Pattern') + ylab('Frequency') + ggtitle('Joint Distribution of Efforts') 
+# grid.arrange(m1,m2)
+
+```
+

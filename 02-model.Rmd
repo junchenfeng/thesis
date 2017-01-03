@@ -1,0 +1,213 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=FALSE}
+library(knitr)
+proj_dir = getwd()
+```
+
+# A General Model of Learning Through Practice {#model}
+
+
+The chapter builds the general model in two steps. It first describes the learning process with a hidden Markov model, from which the Bayesian Knowledge Tracing model is a special case. The engagement factor, the stop decision, and the effort decision, is then added to the learning process and the model.
+
+## Notation
+
+This section introduces the symbols used for the remainder of the thesis. Appendix A lists a full reference of symbols in this thesis.
+
+The practice item id is noted as $j\in\{1,2,\dots,J\}$.The practice sequence id is noted as $t \in \{1,2,\dots,T\}$. The learning is not timed by the calendar time but by the number of practices done. In the following analysis, "time" and "sequence" are used interchangeably.
+ 
+The assignment of an item to the practice sequence is defined as $A_t$. The latent mastery at each practice opportunity is noted as $X_t$. The observed response at each practice opportunity is noted as $Y_t$. The effort decision at each practice opportunity is noted as $E_t$. The exit decision at each practice opportunity is noted as $H_t$.
+
+For a particular practice sequence with length $T$, denote the joint responses as$\mathbf{Y}_{1,T} = (Y_1,\dots,Y_T)$. Similarly,  $\mathbf{X}_{1,T}$ is the joint latent masteries, $\mathbf{E}_{1,T}$  the joint effort decisions, $\mathbf{H}_{1,T}$  the joint stop decisions, and $\mathbf{A}_{1,T}$  the joint item compositions.Let $\mathbf{y}_{1,T}=(y_1,\dots, y_T)$ be the realized response sequence and $P()$ denotes the probability mass function where$P(\mathbf{Y}_{1,T}=\mathbf{y}_{1,T}) = P(Y_1=y_1,\dots, Y_T=y_T)$.Similary, $\mathbf{x}_{1,T}$ is the realized joint latent masteries, $\mathbf{e}_{1,T}$  the realized joint effort decisions, $\mathbf{h}_{1,T}$  the realized joint stop decisions, and $\mathbf{a}_{1,T}$  the realized joint item compositions.For simplicity, when referring to the whole practice sequence, the under label $1,T$ is dropped throughout the thesis.
+
+
+
+## Learning Through Practices Without Engagement Factor
+
+
+### Event Sequence
+
+1. The learner is presented with a practice problem.
+
+2. The learner produces a response according to the latent mastery.
+
+3. The learner receives feedback. 
+
+3. The learner learns (elevates latent mastery) probabilistically.
+
+4. Repeat from 1.
+
+The current event sequence places the learning after the response is produced. Alternatively, one can assume the learning happens before the response during the process of solving the problem. The order has critical implication in inference. If the learning happens after the response/feedback, the next item response, rather than the current item response, measures the efficacy of the current item because the latent mastery for solving the current item is not affected the current item. If the learning happens before the response/feedback, the current item response measures its own efficacy. The thesis chooses to place the learning after the response/feedback because they are complementary and thus shall be measured as a whole. 
+
+### Assumption for the Learning Process
+
+This section discusses the assumptions needed to represent the learning processing as a single dimensional first order Markov process.
+
+
+**Assumption 1**:  $X_t$ is a unidimenstional discrete variable with $M_x$ number of states.
+
+The unidimensionality assumption avoids the complexity of characterizing the response as a function of multiple inputs. If there is only one solution with multiple steps of sequential reasoning, the probability of correctly answer the question is the product of the probabilities of correctly perform each step conditional on the mastery of the respective knowledge component. In contrast, if there are multiple solutions, the probabilities of correct answer between solutions are additive but the probabilities of correctly performing each step within each solution are multiplicative. In addition, if the latent states are multi-dimensional, the state transition matrix of one dimension is unlikely to be independent of all other dimensions. The number of the transition matrix explodes exponentially, which may result in infeasible parameter estimation. 
+
+Readers familiar with the literature of Item Response Theory (IRT) may wonder why the latent mastery is not continuous. The different choice of the state specification is reflected in the item characteristic curve(ICC). With two latent states, the ICC of the learning model is a (poor) approximation to a two-parameter IRT model where the distinguishing parameter is infinity. When the number of states increases, the ICC curve of the learning model can better approximate the ICC of IRT, if it is the true data generating process. However, the discrete state model has better flexibility in approximating other data generating process. For example, if the ICC is a mixture of two single component IRT ICCs with a large distinguishing parameter, the learning model may fit the ICC better than the IRT model. Therefore, assuming the latent mastery is a discrete state is less restrictive if the number of states is allowed to vary. However, the identification of the model imposes an upper limit of the model complexity dependent on the data. 
+
+
+Define the general pedagogical efficacy as the probability of practice item $j$ moving the learner's knowledge mastery status from $m$ to $n$ ($m\leq n$), after exposing to a sequence of items and feedbacks.
+
+$$
+\ell^{m,n}_{\mathbf{Y}_{1,t};\mathbf{A}_{1,t-1},j;t} = P(X_t=m|X_{t-1}=n,\mathbf{Y}_{1,t}, \mathbf{A}_{1,t-1},A_t=j,t)
+$$
+
+**Assumption 2**: Learning does not dependent on the result of the response.
+
+Previous failures do not disencourage the learner and previous successes do not stimulate learning either. The pedagogical efficacy reduces to 
+$$
+\ell^{m,n}_{\mathbf{A}_{1,t-1},j;t} = P(X_t=m|X_{t-1}=n, \mathbf{A}_{1,t-1},A_t=j,t)
+$$
+
+**Assumption 3**: There is no complementarity or substitution effect in the sequence item composition.
+
+Assumption 3 mainly rules out scaffolding item sequences where a string of easy items builds up to the final difficult item. It also rules out the possibility of naive repetition has a decreasing pedagogical efficacy:  If the sequence of items are nearly identical and the learner does not learn from the first attempt, it is reasonable to assume that the learner is unlikely to learn in the subsequence opportunities, but A2 says the learner has constant probability of learning. The pedagogical efficacy can be reduced to 
+
+
+$$
+\ell^{m,n}_{j;t} = P(X_t=m|X_{t-1}=n,A_t=j, t)
+$$
+
+
+**Assumption 4**: The pedagogical efficacy is independent of the sequence position.
+
+A3 assumes that the learner has the same probability of learning if the item is the first encounter and if the item is the 10th encounter in the sequence. It further reduces the pedagogical efficacy to
+
+$$
+\ell^{m,n}_{j} = P(X_t=m|X_{t-1}=n,j)
+$$
+
+A2 to A4 essentially assumes that the learner is the paragon of grit and positive psychology. They are never frustrated by failures, never bored by repetition and can concentrate as long as it takes. These are very strong assumptions. The latter half of this chapter attempts to make them more plausible by modeling the learner's behavior pattern.
+
+The thesis is mainly interested in describing the short-term mastery in intense practices, which lends extra structural assumption on the general learning process described above. Under such circumstances, one can argue that there is no forgetting between practice opportunities. In addition, it is reasonable to assume that no practices that make learners forget what they have already mastered. In another word 
+
+
+**Assumption 5**: The latent state never regresses.
+
+$$
+p(X_t=m|X_{t-1}=n, j)=0 \quad \forall t,j \quad\text{where} \quad m < n
+$$
+
+
+### The Observed Response
+
+Conditioning on the latent mastery $X_t$ and the item assignment $A_t$, the response is generated by a multinomial distribution with probability mass function
+
+$$
+P(Y_{t}=r|X_t=k,A_t=j) = c^{r,k}_j
+$$
+
+### Example: Bayesian Knowledge Tracing Model
+
+The classical Bayesian Knowledge Tracing (BKT) model is a special case of the response-only learning through practice model. $M_x=M_y=2$ and $N_j=1$. Therefore, the system is described by the following four parameters: initial mastery($\pi$), the learning rate($\ell$), the guess rate($g$), and the slip rate($s$)
+
+$$
+\begin{aligned}
+\pi &= P(X_1=1)\\
+\ell &= P(X_t=1|X_{t-1}=0)\\
+g &= P(Y_t=1|X_t=0)\\
+s &= P(Y_t=0|X_t=1)
+\end{aligned}
+$$
+
+In the notation of this chapter, $s=1-c^{1,1}$ and $g=c^{1,0}$.
+
+### Example: Reinforcement Learning
+
+**TO be written**
+
+
+
+## The General Model of Learning Through Practice With Engagement Factor
+
+The previous section implicitly assumes that the learner can engage in learning as long and as focused as the instructor wish. Both the duration and the intensity of the user engagement vary in a realistic learning environment. This section uses stop decision to describe the learner's engagement length and the effort decision to describe the learner's engagement intensity. The learning model from the previous section is extended to incorporate these decisions.
+
+### Event Sequence
+
+1. The learner is presented with a practice question.
+
+2. The learner decides the effort level depends on their latent mastery state
+
+3. The learner produces a response according to the effort level and the latent mastery. 
+
+4. The learner receives the feedback.
+
+5. If the learner exerts effort, he learns probabilistically. Otherwise, there is no learning.
+
+6. The learner can choose or be forced to exit. If the learner continues, repeat from (1); else data collection stops.
+
+
+
+### The Effort Decision
+
+**Assumption 6:** The effort is a Binary Choice with value 0 and 1 where $E_t=0$ is not exerting effort and $E_t=1$ is exerting effort.
+
+**Assumption 7:** Conditioning on the latent mastery and the item, the effort choice is independent.
+
+$$
+P(E_t=1|X_t=k, A_t=j) = \gamma_j^k
+$$
+
+
+The effort level is important because it shapes the learning gain and the observed response. Motivated by the intuition of "no pain no gain", if the learner does not exert effort, the pedagogical efficacy is always zero. 
+
+**Assumption 8**: $P(X_t=m|X_{t-1}=n, A(t)=j, E_t=0) = 0 \quad \forall j, m > n$
+
+Furthermore, assume that if the learner does not exert effort, the response is always completely incorrect. 
+
+**Assumption 9**: $P(Y_t=0|E_t=0,A_t=j) = 1  \quad \forall j$
+
+It shall be noticed that assumption 7 and assumption 8 generate positive autocorrelation in the effort choice unconditionally if the probability of exerting effort positively correlated with the latent mastery. Because learner with lower mastery exerts less effort, they are less likely to learn and thus continue to exert less effort. The clustering of effort in the practice sequence is a salient feature in the empirical data. 
+
+
+
+### The Stop Decision
+
+The hazard rate at sequence $t$ is the probability of exit conditioning on continue at sequence $t-1$. 
+
+**Assumption 10**: Exit decision is independent of item characteristics
+
+Whether the differential hazard rate depends on the response or the state merits a brief discussion. The issue is examined in details in Chapter 3. If the difference in the hazard rates depends on the response, a model without the exit decision consistently estimates the pedagogical efficacy. However, if the differential sample attrition depends on the state, a model without the exit decision introduces selection bias into other parameters. Both dependence structures can happen in reasonable scenarios. "X-Strike" rule is an example of the response dependent exit decision. If the learner always keeps going unless he is forced to stop after accumulating X failures, the exit decision is a function of the responses. In contrast, the differential attrition caused by boredom or frustration is likely a case of state dependent hazard model. If the learner has already mastered, further practices produce no learning gain and they are bored. If the learner hasn't mastered after a few exercises, further practices produce no learning gain and they are frustrated. This may cause the differential hazard rate.
+
+
+Furthermore, the functional form of hazard rate curve can be specified as parametric or nonparametric. Continue with the previous two examples. If the hazard rate is driven by boredom or frustration, it is reasonable to model the duration dependence as a proportional hazard model with a time trend. Thus the hazard rate can be expressed as:
+
+$$
+P(H_t=1|H_{t-1}=0,X_t=k) = \lambda_k e^{\beta_k t} 
+$$
+
+However, if the hazard rate is driven by the X-strike rule, then the hazard rate is likely to be non-monotonic in time. It is reasonable to specify a discrete cell estimator on the hazard rate
+$$
+ P(H_t=1|H_{t-1}=0,Y_t=r)= h_t^r
+$$
+
+If the data generating process of exit decision is response-dependent, both function form specifications are consistent but the parametric specification is efficient. Otherwise, the non-parametric specification is consistent but the parametric specification is not.
+
+### Example: Zone of Proximal Development
+
+Because the constraints of binary states imposed by the BKT model are relaxed, the general model can have an arbitrary representation of the learning process, to the extent that the data allows for unique identification. To avoid abusing the general model as pure data mining exercises, some guidance from a learning theory is required to specify the model parameter structure. Here presents the modeling of Vygotsky's theory of the zone of proximal development[@vygotsky1978interaction] as an example.
+
+
+The zone of proximal development postulates three types of relationship between the mental development of the learner and the mental requirement of the learning task. If the learner's mental development lags the mental requirement of the learning task, the learning is slow, the engagement is low, and the performance is poor. If the learner falls shorts of the requirement of the learning task if done independently but within his reach under the guidance or in collaboration, a.k.a. the zone of proximal development, the learning speeds up, the engagement is high, and the performance improves. If the learner's mental development exceeds the requirement of the practices, the performance is high albeit there is no learning.
+
+This theory naturally calls for a three state latent mastery($M_x=3$) and imposes some structure on the observed response and observed effort rate.
+
+$$
+\begin{aligned}
+P(Y_t=0|X_t=0) &\approx 1\\
+P(E_t=0|X_t=0) &\approx 1\\
+P(Y_t=0|X_t=2) &\approx 0\\
+P(Y_t=0|X_t=2) &\approx 0\\
+\end{aligned}
+$$
+
+These are empirically testable implications if one believes the data generating process of learning is consistent with Vygotsky's zone of proximal development. 

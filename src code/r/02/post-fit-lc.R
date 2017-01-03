@@ -97,6 +97,21 @@ kpids = c('87','138')
 kpnames = c('Two Digit Multiplication', 'Vertical Division')
 maxT= 4
 
+fit_log1 = read.table(paste0(proj_dir,'/_data/02/spell_data_87.csv'),sep=',',col.names=c('uid','t','y','h'))
+fit_log1$kp=kpnames[1]
+fit_log2 = read.table(paste0(proj_dir,'/_data/02/spell_data_138.csv'),sep=',',col.names=c('uid','t','y','h'))
+fit_log2$kp=kpnames[2]
+fit_log = rbind(fit_log1, fit_log2)
+
+pred_log1 = read.table(paste0(proj_dir,'/_data/02/spell_data_87_outsample.csv'),sep=',',col.names=c('uid','t','y','h'))
+pred_log1$kp=kpnames[1]
+pred_log2 = read.table(paste0(proj_dir,'/_data/02/spell_data_138_outsample.csv'),sep=',',col.names=c('uid','t','y','h'))
+pred_log2$kp=kpnames[2]
+pred_log = rbind(pred_log1,pred_log2)
+
+########
+# Proportional
+########
 for (i in seq(2)){
   # read in data
   file_path = paste0(proj_dir,'/_data/02/res/',kpids[i],'/yh.txt')
@@ -216,8 +231,25 @@ qplot(data=all_data, x=t,y=pmean,geom='line') +  facet_grid(kp~type)+
   geom_line(aes(x=t,y=p),linetype='dashed')+
   theme(legend.position="top")+ggtitle('Proportional Hazard Model')
 
+pred_param = all_data %>% select(kp,type,t,pmean)
 
 
+pred_data = merge(pred_param, pred_log)
+pred_rmse = pred_data %>% group_by(kp,type,t) %>% summarize(rmse=sqrt(mean((y-pmean)^2)))
+pred_rmse$sample = 'outsample'
+
+
+fit_data = merge(pred_param, fit_log)
+fit_rmse = fit_data %>% group_by(kp,type,t) %>% summarize(rmse=sqrt(mean((y-pmean)^2)))
+fit_rmse$sample = 'insample'
+
+
+rmse = rbind(pred_rmse,fit_rmse)
+qplot(data=rmse,x=t,y=rmse,col=type,facets=kp~sample,geom='line')
+
+########
+# Nonparametric
+########
 
 for (i in seq(2)){
   # read in data
@@ -336,3 +368,20 @@ qplot(data=all_data, x=t,y=pmean,geom='line') +  facet_grid(kp~type)+
   geom_errorbar(aes(x=t, ymin=pmin, ymax=pmax), width=0.1) +  facet_grid(kp~type)+
   geom_line(aes(x=t,y=p),linetype='dashed')+
   theme(legend.position="top")+ggtitle('Non-parametric Hazard Model')
+
+
+pred_param = all_data %>% select(kp,type,t,pmean)
+
+
+pred_data = merge(pred_param, pred_log)
+pred_rmse = pred_data %>% group_by(kp,type,t) %>% summarize(rmse=sqrt(mean((y-pmean)^2)))
+pred_rmse$sample = 'outsample'
+
+
+fit_data = merge(pred_param, fit_log)
+fit_rmse = fit_data %>% group_by(kp,type,t) %>% summarize(rmse=sqrt(mean((y-pmean)^2)))
+fit_rmse$sample = 'insample'
+
+
+rmse = rbind(pred_rmse,fit_rmse)
+qplot(data=rmse,x=t,y=rmse,col=type,facets=kp~sample,geom='line')

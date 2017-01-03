@@ -1,0 +1,318 @@
+# Model Estimation {#estimation}
+
+
+This section describes the Markov Chain Monte Carlo algorithm. The general strategy of estimating HMM with MCMC is to first augment the hidden state then update the model parameter with Gibbs sampler. 
+
+## Prior
+
+The initial state density distribution $\{\pi_0,\dots,\pi_{M_x-1}\}$, the correct rate of each item conditional on the latent state $\{c_j^{0,k},\dots,c_j^{M_y-1,k}\}$, and the effort rate of each item $\{\gamma_j^1,\dots,\gamma_j^{M_x}\}$ all have non-informative dirichelet distribution $Dir(1,\dots,1)$. 
+
+The prior of the hazard model depends on the functional form of the hazard rate curve. If the hazard rate curve is modeled as non-parametric, the hazard rate has noninformative beta prior $B(1,1)$. If the hazard rate curve is modeled as proportional hazard, the prior distribution of the baseline hazard rate and the time trend is uniform distribution. However, the range of distribution cannot be set a prior because the hazard rate at the end of the sequence must be no larger than 1. The thesis returns to this issue in detail when describing the Adaptive Rejection Sampling (ARS) algorithm.
+
+## Likelihood
+
+The likelihood of $(\mathbf{Y}, \mathbf{A}, \mathbf{H}, \mathbf{E})$ is the sum of all augmented likelihood
+$$
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{A}|\Theta) \propto \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)
+$$
+
+For a particular state augmentation , factor the likelihood according to the model
+
+$$
+\begin{aligned}
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)
+&= P(\mathbf{H}|\mathbf{X},\mathbf{Y},\Theta)P(\mathbf{Y}|\mathbf{X},\mathbf{A},\mathbf{E},\Theta)P(\mathbf{E},\mathbf{X}|\mathbf{A},\Theta)
+\end{aligned}
+$$
+
+The conditional likelihood of observed response
+
+$$
+\begin{aligned}
+P(\mathbf{Y}|\mathbf{X},\mathbf{E},\mathbf{A},\Theta) &= \prod_{t=1}^{T} \prod_{k=0}^{M_x-1}\prod_{j=1}^J[ \prod_{r=0}^{M_y-1} (c_j^{r,k})^{I(A(t)=j,Y_t=r,X_t=k,E_t=1)}\prod_{r=1}^{M_y-1}0^{I(A(t)=j,Y_t=r,X_t=k,E_t=0)}]
+\end{aligned}
+$$
+
+The joint likelihood of effort and state is
+
+$$
+\begin{aligned}
+P(\mathbf{X},\mathbf{E}|\mathbf{A},\Theta) &= P(X_1)P(E_1|X_1)\prod_{t=2}^{T}P(X_t|X_{t-1},E_{t-1})P(E_t|X_t)\\
+P(X_1) &= \prod_{k=0}^{M_x-1}(\pi^k)^{I(X_1=k)}\\
+P(E_t|X_t) &=\prod_{j=1}^J(\gamma_j^k)^{I(A(t)=j,X_t=k,E_t=1)}(1-\gamma_j^k)^{I(A(t)=j,X_t=k,E_t=0)}\\
+P(X_t|X_{t-1},E_{t-1})&=\prod_{j=1}^J\{[\prod_{k=1}^{M_x-2} (1-\sum_{n=k+1}^{M_x-1} \ell^{k,n}_j)1^{I(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}]\\
+&[\prod_{m=1}^{M_x-2}\prod_{n=k+1}^{M_x-1}(\ell^{m,n}_j)^{I(A(t)=j,X_{t-1}=m,X_t=n,E_t=1)}]\}
+\end{aligned}
+$$
+
+The conditional hazard rate depends on the dependence structure and the functional form. If the exit decision depends on the state, the proportional hazard rate model is 
+
+$$
+P(\mathbf{H}|\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_x-1}(\lambda_ke^{\beta_kt})^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
+$$
+
+The nonparametric hazard rate model is
+$$
+P(\mathbf{H}|\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_x-1}(h_t^k)^{1(H_t=1,X_t=k)}(1-h_t^k)^{1(H_t=0,X_t=k)}
+$$
+Similarly, if the exit decision depends on the response, the parametric and nonparametric hazard rate are 
+
+$$
+\begin{aligned}
+P(\mathbf{H}|\mathbf{Y},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_y-1}(\lambda_ke^{\beta_kt})^{1(H_t=1,Y_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,Y_t=k)}\\
+P(\mathbf{H}|\mathbf{Y},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_y-1}(h_t^k)^{1(H_t=1,Y_t=k)}(1-h_t^k)^{1(H_t=0,Y_t=k)}
+\end{aligned}
+$$
+
+
+## Algorithm
+
+### State Augmentation
+
+This subsection describes two ways of augmenting the latent states. THe brute force algorithm calculates the likelihood of the augmented data, marginalizes over the nuance states, imputes the conditional state transition probability, and draws states accordingly. In contrast, the forward recursion and backward sampling algorithm calculates the local conditional state transition probability recursively and samples the state accordingly. Both methods sample the states backward for better state mixture[@scott2002bayesian].
+
+
+#### The Brute Force Algorithm
+
+Given parameters $\Theta$, the joint likelihood $P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)$ can be calculated. Thus it is trivial to calculate the following quantities:
+
+$$
+\begin{aligned}
+P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=\sum_{X_1}\dots\sum_{X_t=n}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)\\
+P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=\sum_{X_1}\dots\sum_{X_{t-1}=m}\sum_{X_t=n}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)
+\end{aligned}
+$$
+With the joint probability, calculate the conditional probability used in sampling
+
+$$
+\begin{aligned}
+P(X_T=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=  \frac{P(X_T=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}{\sum_{k=0}^{M_x-1}P(X_T=k,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}\\
+P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta) &= \frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)} \quad (1)
+\end{aligned}
+$$
+The state is sampled by the following steps:
+
+1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_{T}=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)$
+2. Given the state drew at next sequence ($t+1$), draw the current state from from a multinomial distribution with probability mass function $P(X_t=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)$
+
+
+
+#### The Forward Recursion and Backward Sampling Algorithm
+
+In essence, the forward recursion and backward sampling algorithm is identical to the brute force algorithm. However, instead of exhausting all the state combinations and marginalizing at each sequence, the FRBS algorithm uses a recursive formula and the first order markov chain independence to reduce the computation complexity. 
+
+The key observations is that it is not necessary to condition on all observed variables in equation (1). Because of the first order markov independence, 
+
+$$
+X_t\perp\!\!\!\perp \mathbf{X}_{t+2,T}|X_{t+1}
+$$
+Therefore
+$$
+X_t\perp\!\!\!\perp \mathbf{Y}_{t+2,T},\mathbf{E}_{t+2,T},\mathbf{H}_{t+2,T}|X_{t+1},H_t
+$$
+
+Therefore 
+$$
+P(X_t|X_{t+1},\mathbf{Y},\mathbf{E},\mathbf{H},\Theta) = P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)
+$$
+
+it is sufficient to sample backward according to 
+
+$$
+P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta) = \frac{P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)}{\sum_{X_{t+1}}P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)} \quad(2)
+$$
+Therefore the key is to calculate the partial conditional joint state density $P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)$. This quantity can be calculated by recursive method. Define the partial conditional marginal state  density $\tilde{\pi}^k_t$ and  the partial conditional joint state density $\tilde{p}^{m,n}_t$.
+
+$$
+\begin{aligned}
+\tilde{\pi}^k_t & =P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,\mathbf{H}_{1,t}, \Theta)\\
+\tilde{p}^{m,n}_{t+1}&=P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1} ,\mathbf{H}_{1,t+1}, \Theta)
+\end{aligned}
+$$
+The recursive algorithm is:
+
+1. Given $\tilde{\pi}^m_t$, calculate the partial conditional joint density
+
+$$
+\tilde{p}^{m,n}_{t+1} = \tilde{\pi}_t^m P(X_{t+1}=n|X_{t-1}=k,E_{t-1})P(Y_{t+1}|X_{t+1},E_{t+1})P(E_{t+1}|X_{t+1})P(H_{t+1}|X_{t+1},H_t=0)
+$$
+
+2. Given $\tilde{p}^{m,n}_{t+1}$, calculate the partial conditional marginal density
+
+$$
+\tilde{\pi}_{t+1}^n=\sum_{k=0}^{M_x-1}\tilde{p}^{m,n}_{t+1}
+$$
+
+The sampling algorithm is:
+
+1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_T=k)=\tilde{\pi}_T^k$
+
+2. Given the state drew at next sequence ($t+1$), draw the current state from from a multinomial distribution with probability mass function $P(X_t=m) = \frac{\tilde{p}^{m,n}_{t+1}}{\sum_{n=1}^{M_x} \tilde{p}^{m,n}_{t+1}}$ given $X_{t+1}=n$
+
+
+### Parameter Update
+The parameters are updated by the Gibbs sampler. Other than the parameters of the parametric hazard model, the conjugate posterior distribution for all parameters is the dirichelet distribution, which is easy to sample from. Although the parameters of the parametric hazard model cannot be sampled easily, it can still be drawn from the marginal conditional distribution by the adaptive rejection sampling.
+
+
+#### Conjugate Posterior 
+The initial state density is drawn from the posterior distribution $Dir(a_{X_0},\dots,a_{X_{M_x-1}})$ where $a_{X_k} = 1+\sum_{i=1}^N I(X^i_1=k)$.
+
+The Effort rates conditional on the latent state mastery ($X=k$) are drawn from the posterior distribution $Beta(a_{E_0},a_{E_1})$ where $a_{E_e} = 1+\sum_{t=1}^T\sum_{i=1}^N I(E_t=e, X^i_1=k)$.
+
+The correct rates conditional on the latent state mastery ($X=k$) are drawn from the posterior distribution $Dir(a_{Y_0},\dots,a_{Y_{M_y-1}})$ where $a_{Y_r} = 1+\sum_{t=1}^T\sum_{i=1}^N I(Y^i_t=r,X^i_t=k,E_t=1)$.
+
+When the hazard rate curve is specified as non-parametric, the hazard rate conditional on the source $(Z_t\in\{X_t,Y_t\}$ are drawn from the posterior distribution $Beta(a_{H_{t,0}},a_{H_{t,1}})$ where $a_{H_{t,h}} = 1+\sum_{i=1}^N I(Z^i_t=k,H_t=h)$.
+
+
+#### Adaptive Rejection Sampling (ARS)
+
+It is expensive to sample from the posterior distribution of the parameters when the model is the discrete time proportional hazard model with time varying covariates. This problem is first solved by Dellaportas and Smith[-@dellaportas1993bayesian] with the adaptive rejection sampling algorithm(ARS)[@gilks1992adaptive]. As long as the target likelihood function is log-concave, one can sample the posterior disribution by drawing from the interval of two piecewise spline functions. By constructing an upper hull and a lower hull to sandwich the true posterior distribution, the ARS algorithm reduces the computational cost to draw from a non-standard distribution, compared to the standard rejection method. 
+
+Here is a short description of the ARS algorithm.
+
+1. Choose a few values $x_j$ from the domain. Construct the upper hull and the lower hull of the target distribution function $f(x)$ by piecewise linear functions of 
+
+$$
+\begin{aligned}
+u(x) &= f(x_j)+f'(x_j)(x-x_j)\\
+l(x) &= \frac{(x_{j+1}-x)f(x_j)+(x-x_j)f(x_{j+1})}{x_{j+1}-x_j}
+\end{aligned}
+$$
+
+defined over intervals $x\in(z_{j-1},z_j)$ where 
+
+$$
+z_j = \frac{f(x_j)-f(x_{j+1})-x_{j+1}f'(x_{j+1})+x_jf'(x_j)}{f'(x_j)-f'(x_{j+1})}
+$$
+
+2. Sample new value of $x^*$ by the probability of $s(x)$ where
+
+$$
+s(x) =\frac{exp(u(x))}{\int_{D_x} exp(u(x)) dx} 
+$$
+
+3. Sample $w$ independently from uniform(0,1). Accept the new value$x^*$ if
+
+$$
+w \leq e^{l(x^*)-u(x^*)}
+$$
+Otherwise, accept the new value$x^*$ if 
+$$
+w \leq e^{f(x^*)-u(x^*)}
+$$
+Otherwise reject $x^*$ and draw again.
+
+4. If $x^*$ is accepted, add to the list of $x_j$ for the next draw.
+
+Because the target distribution function is concave, it follows that $f'(x_1)>0$ and $f'(x_J)<0$. The initial value thus cannot be sampled randomly.
+
+
+The following theorem proves that the augmented data likelihood is log-concave. Therefore, the adaptive rejection sampling algorithm can be applied to update the parameter.
+
+
+```{theorem}
+The full conditional likelihood function is log-concave
+```
+
+```{proof}
+
+For $\lambda$
+
+$$
+\begin{aligned}
+\frac{\partial \ell}{\partial \lambda_k} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{\beta_kt}}{1-\lambda_k e^{\beta_kt}}+\frac{H_{i,t}}{\lambda_k}]\\
+\frac{\partial^2 \ell}{\partial \lambda_k^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{2\beta_kt}}{(1-\lambda_k e^{\beta_kt})^2}-\frac{H_{i,t}}{\lambda_k^2}]
+\end{aligned}
+$$
+
+Because $H_{i,t}\geq 0$, $1-H_{i,t}\geq 0$, $e^{\beta_k}\geq0$. Therefore, $\frac{\partial^2 \ell}{\partial \lambda_k^2} <0$.
+
+For $\beta_k$
+$$
+\begin{aligned}
+\frac{\partial \ell}{\partial \beta_k} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})\lambda_k e^{\beta_k}}{1-\lambda_k e^{\beta_k}}+H_{i,t}]t\\
+\frac{\partial^2 \ell}{\partial \beta_k^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i}-I(X_t^i=k)[\frac{1}{1-\lambda e^{\beta_kt}}+\frac{e^{\beta_kt}\lambda_k}{(1-\lambda e^{\beta_kt})^2}]e^{\beta_k}t^2(1-H_{i,t})\lambda_k
+\end{aligned}
+$$
+Because $\lambda e^{\beta_kt}<1$ by definition and $\lambda_k\geq 0$, $\frac{1}{1-\lambda e^{\beta_kt}}+\frac{e^{\beta_kt}\lambda_k}{(1-\lambda e^{\beta_kt})^2}>0$. Futhermore, $1-H_{i,t}> 0 \quad \text{for some i}$, $\frac{\partial^2 \ell}{\partial \beta_k^2} <0$.
+```
+
+However, there are two additional issues. First, the range of $\lambda_k$ and $\beta_k$ is constrained because the hazard rate is strictly less than 1 for sequence max to $T$. Given $T$ and $\lambda_k$, $\beta_k\in(-\infty,\frac{log(\lambda_k)}{T})$; Given $T$, $\lambda_k\in(0,\frac{1}{e^{\beta_kT}})$. The range is then passed into the ARS algorithm to ensure that parameters drawn are always valid. Second, when number of observations grow, the algorithm may experience numerical overflow. To prevent this, scale the log likelihood to be larger than -3000. 
+
+The prior distribution of the parameters are chosen to be uniform distribution to facilitate the posterior draw and justify assigning zero mass to certain interval on the parameter space to enforce the range constraints. Unfortutely, the lower bound only exits for the $\lambda_k$. Set the lower bound of $\beta_k$ to be -1. Start the draw from the $\epsilon$ from the boundary, where $\epsilon=0.01$. If the initial draws produces numerical overflow, symmetrically narrow the bound by a step size of 0.1 until a valid draw occured.  
+
+
+
+## Simulation
+
+This section provides a simulation study on the parameter convergence. 
+
+### The data generating process
+
+To demonstrate the model's ability to identify beyond the binary states, the simulation set $M_x = 3$ and $M_y =3$. The initial learner mastery heavily clustered in the lower state. 
+
+To demonstrate the multiple-item identification, the simulation has two items $J=2$. The first item has a low transition rate from low mastery($X=0$) to high mastery($X=2$) but high transition rate from medium mastery($X=1$) to high mastery. The second item has the reverse pattern. The first item has a low half-correct rate in the low mastery and high half-correct rate in the medium mastery. The second item has the reverse pattern. The first item appears 30% of the time.
+
+Both effort decision and exit decision are present in the simulation. The effort rate is positively correlated with mastery level for the two items, with the second item has slightly higher effor rate at every level. The hazard rate is state dependent. The baseline hazard rate is 0.1 for all states but the hazard rate grows faster for the low mastery than for the high mastery.
+
+The numeric value of simulation parameters are in Appendix B. 1000 learners are simulated. The longest practice streak is 6. 
+
+### Parameter Estimation
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H')
+options(digits=3)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+library(knitr)
+
+proj_dir = getwd()
+data_dir = paste0(proj_dir,'/_data/02/sim/')
+
+prop_param = read.table(paste0(data_dir, 'model_fit_demo_prop.txt'), sep=',')
+prop_param$spec='parametric'
+cell_param = read.table(paste0(data_dir, 'model_fit_demo_cell.txt'), sep=',')
+cell_param$spec='non-parametric'
+
+
+l_param_1 = rbind(prop_param%>%select(V1,V2,V3,spec), cell_param%>%select(V1,V2,V3,spec))
+names(l_param_1)[1:3]=c('l01','l02','l12')
+l_param_1 = l_param_1%>% gather(param,val,-spec)
+l_param_1$item = '1'
+
+l_param_2 = rbind(prop_param%>%select(V4,V5,V6,spec), cell_param%>%select(V4,V5,V6,spec))
+names(l_param_2)[1:3]=c('l01','l02','l12')
+l_param_2 = l_param_2%>% gather(param,val,-spec)
+l_param_2$item = '2'
+l_param = rbind(l_param_1,l_param_2) 
+
+#qplot(data=l_param, x=val, col=param, facets=spec~item,geom='density')
+
+l_param_stat = l_param %>% group_by(param, item, spec) %>% summarize(pe=mean(val), lower=quantile(val,prob=0.05), upper=quantile(val,prob=0.95))
+l_param_stat$true = 0
+l_param_stat$true[l_param_stat$param=='l01'&l_param_stat$item=='1'] = 0.3
+l_param_stat$true[l_param_stat$param=='l02'&l_param_stat$item=='1'] = 0.2
+l_param_stat$true[l_param_stat$param=='l12'&l_param_stat$item=='1'] = 0.6
+l_param_stat$true[l_param_stat$param=='l01'&l_param_stat$item=='2'] = 0.3
+l_param_stat$true[l_param_stat$param=='l02'&l_param_stat$item=='2'] = 0.5
+l_param_stat$true[l_param_stat$param=='l12'&l_param_stat$item=='2'] = 0.3
+```
+
+This section only reports the estimated pedagogical efficacy. Both parametric and non-parametric specifications are fit to the model. Both specifications reports reasonably good point estimation. The parametric model has slightly tight 95% credible interval, confirming that it is more efficient when the model specification is right.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+kable(l_param_stat %>% select(spec,param,item,true,pe,lower,upper)%>% arrange(spec,item,param), 
+      col.names=c('Specification','Parameter','Item','True','Point Estimation','95%CI(L)','95%CI(H)'),
+      caption = 'Estimated Pedagogical Efficacy of the Parametric Model'
+)
+```
+
+
+
+
+
