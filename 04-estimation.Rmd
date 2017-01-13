@@ -1,27 +1,41 @@
 # Model Estimation {#estimation}
+```{r, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H')
+options(digits=3)
+```
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+library(knitr)
+```
 
-This section describes the Markov Chain Monte Carlo algorithm. The general strategy of estimating HMM with MCMC is to first augment the hidden state then update the model parameter with Gibbs sampler. 
+This section describes the Markov Chain Monte Carlo (MCMC) algorithm. The general strategy of estimating a hidden Markov model (HMM) with MCMC is to first augment the observed data with latent states given parameters then update parameters with Gibbs sampler given the augmented data. 
 
 ## Prior
 
-The initial state density distribution $\{\pi_0,\dots,\pi_{M_x-1}\}$, the correct rate of each item conditional on the latent state $\{c_j^{0,k},\dots,c_j^{M_y-1,k}\}$, and the effort rate of each item $\{\gamma_j^1,\dots,\gamma_j^{M_x}\}$ all have non-informative dirichelet distribution $Dir(1,\dots,1)$. 
+The prior distribution for parameters that follow a multinomial distribution is the non-informative Dirichelet distribution $Dir(1,\dots,1)$. The Dirichelet distribution is favored because it is conjugate to the multinomial distribution. Such parameters include the initial state density distribution ($\pi_0,\dots,\pi_{M_X-1}$), the mixture density of learner's type ($\alpha_1,\dots,\alpha_{M_Z}$), the probability of responses conditional on the latent mastery of state $k$ ($c_j^{0,k},\dots,c_j^{M_Y-1,k}$) and the practice efficacy given previous latent mastery state $k$ of learner type $z$  
+($\ell^{z;k,k+1}_j,\dots,\ell^{z;k,M_X-1}_j$).
 
-The prior of the hazard model depends on the functional form of the hazard rate curve. If the hazard rate curve is modeled as non-parametric, the hazard rate has noninformative beta prior $B(1,1)$. If the hazard rate curve is modeled as proportional hazard, the prior distribution of the baseline hazard rate and the time trend is uniform distribution. However, the range of distribution cannot be set a prior because the hazard rate at the end of the sequence must be no larger than 1. The thesis returns to this issue in detail when describing the Adaptive Rejection Sampling (ARS) algorithm.
+The prior distribution for parameters that follow a Bernoulli distribution is the non-informative Beta distribution $Beta(1,1)$. The Beta distribution is favored because it is conjugate to the Bernoulli distribution. Such parameters include the nonparametric hazard rate at sequence position $t$ conditional on the latent mastery $k$ of learner type z ($h_t^{z;k}$) or the response of state $r$ ($h_t^r$), and the effort rate of item $j$ given the latent mastery of state $k$ of learner type $z$ ($\gamma_j^{z,k}$).
+
+The prior distribution of the proportional hazard model parameters, i.e. the baseline hazard rate and the duration dependence, is the uniform distribution. The range of distribution cannot be set *a priori* because the hazard rate at the end of the sequence must be no larger than 1. This chapter revisits this issue in details when describing the Adaptive Rejection Sampling (ARS) algorithm.
 
 ## Likelihood
 
 The likelihood of $(\mathbf{Y}, \mathbf{A}, \mathbf{H}, \mathbf{E})$ is the sum of all augmented likelihood
 $$
-P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{A}|\Theta) \propto \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}|\mathbf{A},\Theta) \propto \sum_{Z=1}^{M_Z}(P(Z) \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|Z，\mathbf{A},\Theta))
 $$
 
-For a particular state augmentation , factor the likelihood according to the model
+Conditional on the learner type, for a particular state augmentation, factor the likelihood according to the LTP model
 
 $$
 \begin{aligned}
-P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)
-&= P(\mathbf{H}|\mathbf{X},\mathbf{Y},\Theta)P(\mathbf{Y}|\mathbf{X},\mathbf{A},\mathbf{E},\Theta)P(\mathbf{E},\mathbf{X}|\mathbf{A},\Theta)
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|Z,\mathbf{A},\Theta)
+&= P(\mathbf{H}|Z,\mathbf{X},\mathbf{Y},\Theta)P(\mathbf{Y}|Z,\mathbf{X},\mathbf{A},\mathbf{E},\Theta)P(\mathbf{E},\mathbf{X}|Z,\mathbf{A},\Theta)
 \end{aligned}
 $$
 
@@ -29,104 +43,106 @@ The conditional likelihood of observed response
 
 $$
 \begin{aligned}
-P(\mathbf{Y}|\mathbf{X},\mathbf{E},\mathbf{A},\Theta) &= \prod_{t=1}^{T} \prod_{k=0}^{M_x-1}\prod_{j=1}^J[ \prod_{r=0}^{M_y-1} (c_j^{r,k})^{I(A(t)=j,Y_t=r,X_t=k,E_t=1)}\prod_{r=1}^{M_y-1}0^{I(A(t)=j,Y_t=r,X_t=k,E_t=0)}]
+P(\mathbf{Y}|Z,\mathbf{X},\mathbf{E},\mathbf{A},\Theta) &= \prod_{t=1}^{T} \prod_{k=0}^{M_X-1}\prod_{j=1}^J[ \prod_{r=0}^{M_Y-1} (c_j^{r,k})^{I(A_t=j,Y_t=r,X_t=k,E_t=1)}\prod_{r=1}^{M_Y-1}0^{I(A_t=j,Y_t=r,X_t=k,E_t=0)}]
 \end{aligned}
 $$
 
-The joint likelihood of effort and state is
+The joint conditional likelihood of effort and latent mastery is
 
 $$
 \begin{aligned}
-P(\mathbf{X},\mathbf{E}|\mathbf{A},\Theta) &= P(X_1)P(E_1|X_1)\prod_{t=2}^{T}P(X_t|X_{t-1},E_{t-1})P(E_t|X_t)\\
-P(X_1) &= \prod_{k=0}^{M_x-1}(\pi^k)^{I(X_1=k)}\\
-P(E_t|X_t) &=\prod_{j=1}^J(\gamma_j^k)^{I(A(t)=j,X_t=k,E_t=1)}(1-\gamma_j^k)^{I(A(t)=j,X_t=k,E_t=0)}\\
-P(X_t|X_{t-1},E_{t-1})&=\prod_{j=1}^J\{[\prod_{k=1}^{M_x-2} (1-\sum_{n=k+1}^{M_x-1} \ell^{k,n}_j)1^{I(A(t)=j,X_{t-1}=k,X_t=k,E_t=1)}]\\
-&[\prod_{m=1}^{M_x-2}\prod_{n=k+1}^{M_x-1}(\ell^{m,n}_j)^{I(A(t)=j,X_{t-1}=m,X_t=n,E_t=1)}]\}
+P(\mathbf{X},\mathbf{E}|\mathbf{A},\Theta,Z) &= P(X_1|Z)P(E_1|X_1,Z)\prod_{t=2}^{T}P(X_t|X_{t-1},Z,E_{t-1})P(E_t|X_t,Z)\\
+P(X_1|Z) &= \prod_{k=0}^{M_X-1}(\pi^{z;k})^{I(X_1=k,Z=z)}\\
+P(E_t|X_t,Z,\mathbf{A}) &=\prod_{j=1}^J(\gamma_j^{z;k})^{I(A_t=j,Z=z,X_t=k,E_t=1)}(1-\gamma_j^{z;k})^{I(A_t=j,Z=z,X_t=k,E_t=0)}\\
+P(X_t|X_{t-1},E_{t-1},Z,\mathbf{A})&=\prod_{j=1}^J\{[\prod_{k=1}^{M_X-2} (1-\sum_{n=k+1}^{M_X-1} \ell^{z;k,n}_j)1^{I(A_{t-1}=j,X_{t-1}=k,X_t=n,Z=z,E_t=1)}]\\
+&[\prod_{m=1}^{M_X-2}\prod_{n=k+1}^{M_X-1}(\ell^{z;m,n}_j)^{I(A_{t-1}=j,X_{t-1}=m,X_t=n,Z=z,E_t=1)}]\}
 \end{aligned}
 $$
 
-The conditional hazard rate depends on the dependence structure and the functional form. If the exit decision depends on the state, the proportional hazard rate model is 
+The conditional hazard rate depends on the dependence structure and the functional form. If the stop decision depends on the latent mastery, the proportional hazard rate model is 
 
 $$
-P(\mathbf{H}|\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_x-1}(\lambda_ke^{\beta_kt})^{1(H_t=1,X_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,X_t=k)}
+P(\mathbf{H}|Z,\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_X-1}(\lambda_{z;k}e^{\beta_{z;k}t})^{I(H_t=1,X_t=k,Z=z)}(1-\lambda_{z;k}e^{\beta_{z;k}t})^{I(H_t=0,X_t=k,Z=z)}
 $$
 
 The nonparametric hazard rate model is
 $$
-P(\mathbf{H}|\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_x-1}(h_t^k)^{1(H_t=1,X_t=k)}(1-h_t^k)^{1(H_t=0,X_t=k)}
+P(\mathbf{H}|Z,\mathbf{X},\Theta) =  \prod_{t=1}^{T}\prod_{k=0}^{M_X-1}(h_t^{z;k})^{I(H_t=1,X_t=k,Z=z)}(1-h_t^{z;k})^{I(H_t=0,Z=z,X_t=k)}
 $$
-Similarly, if the exit decision depends on the response, the parametric and nonparametric hazard rate are 
+Similarly, if the stop decision depends on the response, the nonparametric hazard rate are 
 
 $$
 \begin{aligned}
-P(\mathbf{H}|\mathbf{Y},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_y-1}(\lambda_ke^{\beta_kt})^{1(H_t=1,Y_t=k)}(1-\lambda_ke^{\beta_kt})^{1(H_t=0,Y_t=k)}\\
-P(\mathbf{H}|\mathbf{Y},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_y-1}(h_t^k)^{1(H_t=1,Y_t=k)}(1-h_t^k)^{1(H_t=0,Y_t=k)}
+P(\mathbf{H}|\mathbf{Y},\Theta) &=  \prod_{t=1}^{T}\prod_{r=0}^{M_Y-1}(h_t^r)^{I(H_t=1,Y_t=r)}(1-h_t^r)^{I(H_t=0,Y_t=r)}
 \end{aligned}
 $$
 
 
 ## Algorithm
 
-### State Augmentation
+### Latent Mastery Augmentation
 
-This subsection describes two ways of augmenting the latent states. THe brute force algorithm calculates the likelihood of the augmented data, marginalizes over the nuance states, imputes the conditional state transition probability, and draws states accordingly. In contrast, the forward recursion and backward sampling algorithm calculates the local conditional state transition probability recursively and samples the state accordingly. Both methods sample the states backward for better state mixture[@scott2002bayesian].
+This subsection describes two ways of augmenting the state of latent mastery. The brute force algorithm computes the likelihood of the augmented data, marginalizes over the nuance states, imputes the conditional state transition probability, and draws states accordingly. In contrast, the forward recursion and backward sampling algorithm computes the local conditional state transition probability recursively and samples the state accordingly. Both methods sample the states backward for better state mixture [@scott2002bayesian].
 
 
 #### The Brute Force Algorithm
 
-Given parameters $\Theta$, the joint likelihood $P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta)$ can be calculated. Thus it is trivial to calculate the following quantities:
+Given parameters $\Theta$, the joint likelihood $P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|\mathbf{A},\Theta,Z)$ can be calculated. Thus it is trivial to calculate the following quantities:
 
 $$
 \begin{aligned}
-P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=\sum_{X_1}\dots\sum_{X_t=n}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)\\
-P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=\sum_{X_1}\dots\sum_{X_{t-1}=m}\sum_{X_t=n}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)
+P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-1}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)\\
+P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-2}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) \quad \text{(4.1)}
 \end{aligned}
 $$
+
 With the joint probability, calculate the conditional probability used in sampling
 
 $$
 \begin{aligned}
-P(X_T=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)&=  \frac{P(X_T=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}{\sum_{k=0}^{M_x-1}P(X_T=k,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}\\
-P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta) &= \frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)} \quad (1)
+P(X_T=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=  \frac{P(X_T=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}{\sum_{k=0}^{M_X-1}P(X_T=k,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}\\
+P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) &= \frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}
 \end{aligned}
 $$
 The state is sampled by the following steps:
 
-1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_{T}=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)$
-2. Given the state drew at next sequence ($t+1$), draw the current state from from a multinomial distribution with probability mass function $P(X_t=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta)$
+1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_{T}=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)$
+2. Given the state drew at next sequence ($t+1$), draw the current state from a multinomial distribution with probability mass function $P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)$
 
 
 
 #### The Forward Recursion and Backward Sampling Algorithm
 
-In essence, the forward recursion and backward sampling algorithm is identical to the brute force algorithm. However, instead of exhausting all the state combinations and marginalizing at each sequence, the FRBS algorithm uses a recursive formula and the first order markov chain independence to reduce the computation complexity. 
+In essence, the Forward Recursion Backward Sampling (FRBS) algorithm is identical to the brute force algorithm. However, instead of exhausting all the state combinations and marginalizing at each sequence, the FRBS algorithm uses a recursive formula and the conditional independence property of first-order Markov chain to reduce the computation complexity. 
 
-The key observations is that it is not necessary to condition on all observed variables in equation (1). Because of the first order markov independence, 
+The key observations is that it is not necessary to condition on all observed variables in equation (4.1). Because of the first order markov independence, 
 
 $$
-X_t\perp\!\!\!\perp \mathbf{X}_{t+2,T}|X_{t+1}
+X_t\perp\!\!\!\perp \mathbf{X}_{t+2,T}|X_{t+1},Z
 $$
 Therefore
+
 $$
-X_t\perp\!\!\!\perp \mathbf{Y}_{t+2,T},\mathbf{E}_{t+2,T},\mathbf{H}_{t+2,T}|X_{t+1},H_t
+X_t\perp\!\!\!\perp \mathbf{Y}_{t+2,T},\mathbf{E}_{t+2,T},\mathbf{H}_{t+2,T}|X_{t+1},H_t,Z
 $$
 
 Therefore 
+
 $$
-P(X_t|X_{t+1},\mathbf{Y},\mathbf{E},\mathbf{H},\Theta) = P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)
+P(X_t|X_{t+1},\mathbf{Y},\mathbf{E},\mathbf{H},Z,\Theta) = P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},Z,\Theta)
 $$
 
 it is sufficient to sample backward according to 
 
 $$
-P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta) = \frac{P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)}{\sum_{X_{t+1}}P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)} \quad(2)
+P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},Z,\Theta) = \frac{P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},Z,\Theta)}{\sum_{X_{t+1}}P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},Z,\Theta)} 
 $$
-Therefore the key is to calculate the partial conditional joint state density $P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)$. This quantity can be calculated by recursive method. Define the partial conditional marginal state  density $\tilde{\pi}^k_t$ and  the partial conditional joint state density $\tilde{p}^{m,n}_t$.
+The key is to calculate the partial conditional joint state density $P(X_t,X_{t+1}|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},Z,\Theta)$. This quantity can be calculated by recursive method. Define the partial conditional marginal state  density $\tilde{\pi}^{z;k}_t$ and  the partial conditional joint state density $\tilde{p}^{z;m,n}_t$.
 
 $$
 \begin{aligned}
-\tilde{\pi}^k_t & =P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,\mathbf{H}_{1,t}, \Theta)\\
-\tilde{p}^{m,n}_{t+1}&=P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1} ,\mathbf{H}_{1,t+1}, \Theta)
+\tilde{\pi}^{z;k}_t & =P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,\mathbf{H}_{1,t}, Z,\Theta)\\
+\tilde{p}^{z;m,n}_{t+1}&=P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1} ,\mathbf{H}_{1,t+1}, Z,\Theta)
 \end{aligned}
 $$
 The recursive algorithm is:
@@ -134,39 +150,52 @@ The recursive algorithm is:
 1. Given $\tilde{\pi}^m_t$, calculate the partial conditional joint density
 
 $$
-\tilde{p}^{m,n}_{t+1} = \tilde{\pi}_t^m P(X_{t+1}=n|X_{t-1}=k,E_{t-1})P(Y_{t+1}|X_{t+1},E_{t+1})P(E_{t+1}|X_{t+1})P(H_{t+1}|X_{t+1},H_t=0)
+\begin{aligned}
+\tilde{p}^{z;m,n}_{t+1} &= \tilde{\pi}_t^{z;m} P(X_{t+1}=n|X_t=m,E_{t-1},Z)\\
+&\quad P(Y_{t+1}|X_{t+1},E_{t+1})P(E_{t+1}|X_{t+1}=m,Z)P(H_{t+1}|X_{t+1}=m,Z,H_t=0)
+\end{aligned}
 $$
 
-2. Given $\tilde{p}^{m,n}_{t+1}$, calculate the partial conditional marginal density
+2. Given $\tilde{p}^{z;m,n}_{t+1,Z}$, calculate the partial conditional marginal density
 
 $$
-\tilde{\pi}_{t+1}^n=\sum_{k=0}^{M_x-1}\tilde{p}^{m,n}_{t+1}
+\tilde{\pi}_{t+1}^{z;n}=\sum_{m=0}^{M_X-1}\tilde{p}^{z;m,n}_{t+1}
 $$
 
 The sampling algorithm is:
 
-1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_T=k)=\tilde{\pi}_T^k$
+1. Draw the state at the end of the sequence ($T$) from a multinomial distribution with probability mass function $P(X_T=k|Z)=\tilde{\pi}_{T}^{z;k}$
 
-2. Given the state drew at next sequence ($t+1$), draw the current state from from a multinomial distribution with probability mass function $P(X_t=m) = \frac{\tilde{p}^{m,n}_{t+1}}{\sum_{n=1}^{M_x} \tilde{p}^{m,n}_{t+1}}$ given $X_{t+1}=n$
+2. Given the state of the next sequence position ($t+1$), draw the current state from from a multinomial distribution with probability mass function $P(X_t=m|Z=z) = \frac{\tilde{p}^{z;m,n}_{t+1}}{\sum_{n=0}^{M_X-1} \tilde{p}^{z;m,n}_{t+1}}$ given $X_{t+1}=n$ of learner type $Z$.
 
+### Learner Type Augmentation
+
+As long as the conditional likelihood of the observed data can be computed, augment the learner type is trivial, because it merely samples from a multinomial distribution with probability mass function:
+
+$$
+P(Z=z|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta) = \frac{\alpha_zP(\mathbf{Y},\mathbf{E},\mathbf{H}|\mathbf{A}Z=z,\Theta)}{\sum_{w=1}^{M_Z}(\alpha_wP(\mathbf{Y},\mathbf{E},\mathbf{H}|\mathbf{A},Z=w,\Theta))}
+$$
 
 ### Parameter Update
-The parameters are updated by the Gibbs sampler. Other than the parameters of the parametric hazard model, the conjugate posterior distribution for all parameters is the dirichelet distribution, which is easy to sample from. Although the parameters of the parametric hazard model cannot be sampled easily, it can still be drawn from the marginal conditional distribution by the adaptive rejection sampling.
+The parameters are updated by the Gibbs sampler. Other than parameters of the parametric hazard model, the conjugate posterior distribution for all parameters is the Dirichlet distribution, from which it is easy to sample. Although the parameters of the parametric hazard model cannot be sampled easily, it can still be drawn from the marginal conditional distribution by the adaptive rejection sampling.
 
 
 #### Conjugate Posterior 
-The initial state density is drawn from the posterior distribution $Dir(a_{X_0},\dots,a_{X_{M_x-1}})$ where $a_{X_k} = 1+\sum_{i=1}^N I(X^i_1=k)$.
 
-The Effort rates conditional on the latent state mastery ($X=k$) are drawn from the posterior distribution $Beta(a_{E_0},a_{E_1})$ where $a_{E_e} = 1+\sum_{t=1}^T\sum_{i=1}^N I(E_t=e, X^i_1=k)$.
+The mixture density is drawn from the posterior distribution $Dir(a_{Z_1},\dots,a_{Z_{M_Z}})$ where $a_{Z_k} = 1+\sum_{i=1}^N I(Z^i_1=k)$.
 
-The correct rates conditional on the latent state mastery ($X=k$) are drawn from the posterior distribution $Dir(a_{Y_0},\dots,a_{Y_{M_y-1}})$ where $a_{Y_r} = 1+\sum_{t=1}^T\sum_{i=1}^N I(Y^i_t=r,X^i_t=k,E_t=1)$.
+The initial state density of learner type $z$ is drawn from the posterior distribution $Dir(a_{X_0;z},\dots,a_{X_{M_X-1};z})$ where $a_{X_k;z} = 1+\sum_{i=1}^N I(X^i_1=k,Z^i=z)$.
 
-When the hazard rate curve is specified as non-parametric, the hazard rate conditional on the source $(Z_t\in\{X_t,Y_t\}$ are drawn from the posterior distribution $Beta(a_{H_{t,0}},a_{H_{t,1}})$ where $a_{H_{t,h}} = 1+\sum_{i=1}^N I(Z^i_t=k,H_t=h)$.
+The effort rates conditional on the latent state mastery ($X=k$) of learner type $z$ are drawn from the posterior distribution $Beta(a_{E_0;z},a_{E_1;z})$ where $a_{E_e;z} = 1+\sum_{t=1}^T\sum_{i=1}^N I(E_t=e, X^i_t=k,Z^i=z)$.
+
+The response rates conditional on the latent state mastery ($X=k$) are drawn from the posterior distribution $Dir(a_{Y_0},\dots,a_{Y_{M_Y-1}})$ where $a_{Y_r} = 1+\sum_{t=1}^T\sum_{i=1}^N I(Y^i_t=r,X^i_t=k,E_t=1)$.
+
+When the hazard rate curve is specified as non-parametric, the hazard rate conditional on the latent mastery $k$ of learner type $z$ is drawn from the posterior distribution $Beta(a_{H^{z;k}_{t,0}},a_{H^{z;k}_{t,1}})$ where $a_{H^{z;k}_{t,h}} = 1+\sum_{i=1}^N I(X^i_t=k,Z^i=z,H_t=h)$. Similarly,  the hazard rate conditional on the response $r$ is drawn from $Beta(a_{H^{r}_{t,0}},a_{H^{r}_{t,1}})$ where $a_{H^{r}_{t,h}} = 1+\sum_{i=1}^N I(Y^i_t=r,H_t=h)$
 
 
 #### Adaptive Rejection Sampling (ARS)
 
-It is expensive to sample from the posterior distribution of the parameters when the model is the discrete time proportional hazard model with time varying covariates. This problem is first solved by Dellaportas and Smith[-@dellaportas1993bayesian] with the adaptive rejection sampling algorithm(ARS)[@gilks1992adaptive]. As long as the target likelihood function is log-concave, one can sample the posterior disribution by drawing from the interval of two piecewise spline functions. By constructing an upper hull and a lower hull to sandwich the true posterior distribution, the ARS algorithm reduces the computational cost to draw from a non-standard distribution, compared to the standard rejection method. 
+It is expensive to sample from the posterior distribution when the model is the discrete-time proportional hazard model with time-varying covariates. This problem is first solved by Dellaportas and Smith[-@dellaportas1993bayesian] with the Adaptive Rejection Sampling algorithm(ARS)[@gilks1992adaptive]. As long as the target likelihood function is log-concave, one can sample the posterior distribution by drawing from the interval of two piecewise spline functions. By constructing an upper hull and a lower hull to sandwich the true posterior distribution, the ARS algorithm reduces the computational cost to draw from a non-standard distribution, compared to the standard rejection method. 
 
 Here is a short description of the ARS algorithm.
 
@@ -215,69 +244,86 @@ The full conditional likelihood function is log-concave
 ```
 
 ```{proof}
-
 For $\lambda$
 
 $$
 \begin{aligned}
-\frac{\partial \ell}{\partial \lambda_k} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{\beta_kt}}{1-\lambda_k e^{\beta_kt}}+\frac{H_{i,t}}{\lambda_k}]\\
-\frac{\partial^2 \ell}{\partial \lambda_k^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{2\beta_kt}}{(1-\lambda_k e^{\beta_kt})^2}-\frac{H_{i,t}}{\lambda_k^2}]
+\frac{\partial \ell}{\partial \lambda_{z,k}} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{\beta_{z,k}t}}{1-\lambda_{z,k} e^{\beta_{z,k}t}}+\frac{H_{i,t}}{\lambda_{z,k}}]\\
+\frac{\partial^2 \ell}{\partial \lambda_{z,k}^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})e^{2\beta_{z,k}t}}{(1-\lambda_{z,k} e^{\beta_{z,k}t})^2}-\frac{H_{i,t}}{\lambda_{z,k}^2}]
 \end{aligned}
 $$
 
-Because $H_{i,t}\geq 0$, $1-H_{i,t}\geq 0$, $e^{\beta_k}\geq0$. Therefore, $\frac{\partial^2 \ell}{\partial \lambda_k^2} <0$.
+Because $H_{i,t}\geq 0$, $1-H_{i,t}\geq 0$, $e^{\beta_{z,k}}\geq0$. Therefore, $\frac{\partial^2 \ell}{\partial \lambda_{z,k}^2} <0$.
 
-For $\beta_k$
+For $\beta_{z,k}$
 $$
 \begin{aligned}
-\frac{\partial \ell}{\partial \beta_k} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k)[-\frac{(1-H_{i,t})\lambda_k e^{\beta_k}}{1-\lambda_k e^{\beta_k}}+H_{i,t}]t\\
-\frac{\partial^2 \ell}{\partial \beta_k^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i}-I(X_t^i=k)[\frac{1}{1-\lambda e^{\beta_kt}}+\frac{e^{\beta_kt}\lambda_k}{(1-\lambda e^{\beta_kt})^2}]e^{\beta_k}t^2(1-H_{i,t})\lambda_k
+\frac{\partial \ell}{\partial \beta_{z,k}} &= \sum_{i=1}^N \sum_{t=1}^{T_i} I(X_t^i=k,Z^i=z)[-\frac{(1-H_{i,t})\lambda_{z,k} e^{\beta_{z,k}}}{1-\lambda_{z,k} e^{\beta_{z,k}}}+H_{i,t}]t\\
+\frac{\partial^2 \ell}{\partial \beta_{z,k}^2} &= \sum_{i=1}^N \sum_{t=1}^{T_i}-I(X_t^i=k,Z^i=z)[\frac{1}{1-\lambda e^{\beta_{z,k}t}}+\frac{e^{\beta_{z,k}t}\lambda_{z,k}}{(1-\lambda e^{\beta_{z,k}t})^2}]e^{\beta_{z,k}}t^2(1-H_{i,t})\lambda_{z,k}
 \end{aligned}
 $$
-Because $\lambda e^{\beta_kt}<1$ by definition and $\lambda_k\geq 0$, $\frac{1}{1-\lambda e^{\beta_kt}}+\frac{e^{\beta_kt}\lambda_k}{(1-\lambda e^{\beta_kt})^2}>0$. Futhermore, $1-H_{i,t}> 0 \quad \text{for some i}$, $\frac{\partial^2 \ell}{\partial \beta_k^2} <0$.
+
+Because $\lambda e^{\beta_{z,k}t}<1$ by definition and $\lambda_{z,k}\geq 0$, $\frac{1}{1-\lambda e^{\beta_{z,k}t}}+\frac{e^{\beta_{z,k}t}\lambda_{z,k}}{(1-\lambda e^{\beta_{z,k}t})^2}>0$. Futhermore, $1-H_{i,t}> 0 \quad \text{for some i}$, $\frac{\partial^2 \ell}{\partial \beta_{z,k}^2} <0$.
 ```
 
-However, there are two additional issues. First, the range of $\lambda_k$ and $\beta_k$ is constrained because the hazard rate is strictly less than 1 for sequence max to $T$. Given $T$ and $\lambda_k$, $\beta_k\in(-\infty,\frac{log(\lambda_k)}{T})$; Given $T$, $\lambda_k\in(0,\frac{1}{e^{\beta_kT}})$. The range is then passed into the ARS algorithm to ensure that parameters drawn are always valid. Second, when number of observations grow, the algorithm may experience numerical overflow. To prevent this, scale the log likelihood to be larger than -3000. 
+However, there are two additional issues. First, the range of $\lambda_{z,k}$ and $\beta_{z,k}$ is constrained because the hazard rate is strictly less than 1 for sequence max to $T$. Given $T$ and $\lambda_{z,k}$, $\beta_{z,k}\in(-\infty,\frac{log(\lambda_{z,k})}{T})$; Given $T$, $\lambda_{z,k}\in(0,\frac{1}{e^{\beta_{z,k}T}})$. The range is then passed into the ARS algorithm to ensure that parameters drawn are always valid. Second, when the number of observations grows, the algorithm may experience numerical overflow. To prevent this, scale the log likelihood to be larger than -3000. 
 
-The prior distribution of the parameters are chosen to be uniform distribution to facilitate the posterior draw and justify assigning zero mass to certain interval on the parameter space to enforce the range constraints. Unfortutely, the lower bound only exits for the $\lambda_k$. Set the lower bound of $\beta_k$ to be -1. Start the draw from the $\epsilon$ from the boundary, where $\epsilon=0.01$. If the initial draws produces numerical overflow, symmetrically narrow the bound by a step size of 0.1 until a valid draw occured.  
+The prior distribution of the parameters is chosen to be the uniform distribution to facilitate the posterior draw and justify assigning zero mass to a certain interval of the parameter space to enforce the range constraints. Unfortunately, the lower bound only exists for the $\lambda_{z,k}$. Set the lower bound of $\beta_{z,k}$ to be -1. Start the draw from the $\epsilon$ from the boundary, where $\epsilon=0.01$. If the initial draws produce a numerical overflow, symmetrically narrow the bound by a step size of 0.1 until a valid draw occurred.  
+
+## Posterior Inference
+
+After the parameters are estimated ($\hat{\Theta}$), The major interest of posterior inference of the LTP model is the posterior distribution of the type ($\alpha^z_t$) and the latent mastery ($\pi^{z}_t$) of ONE learner at sequence $t$ given the posterior distribution of learner's type ($\alpha^z_{t-1}$) and latent mastery ($\pi^z_{t-1}$) at sequence $t-1$, the observed response ($Y_t$), the stop decision($H_t$), and the effort decision($E_t$). This problem can be solved by the following iterative formula through tracking the posterior distribution of latent mastery for each learner type:
+
+(1) For given learner type $z$, the posterior distribution of latent mastery after at least one observation is 
+
+$$
+\pi^{z;k}_t = \frac{P(X_t=k,Y_t,E_t,H_t|\hat{\Theta},\pi^{z}_{t-1},Z=z,)}{\sum_{m=0}^{M_X-1}P(X_t=m,Y_t,E_t,H_t|\hat{\Theta},\pi^{z}_{t-1},Z=z)}
+$$
+(2) Given the updated posterior distribution of latent mastery, update the posterior distribution of learner type
+
+$$
+\alpha^z_t=\frac{\alpha^z_{t-1}P(Y_t,E_t,H_t|\hat{\Theta},\pi^z_t,Z=z)}{\sum_{w=1}^{M_Z}\alpha^w_{t-1}P(Y_t,E_t,H_t|\hat{\Theta},\pi^w_t,Z=w)}
+$$
+
+
+The other possible interest of posterior inference is the observed learning curve $P(Y_t=r|H_{t-1}=0)$. This problem is more difficult than the posterior inference on one learner because it needs to marginalize out learner type, preceding responses and preceding effor choices. The problem can be solved by the following iterative formula:
+
+Let $\eta_{r,e,q,h}=P(Y_t=r,E_t=e,H_{t-1}=q,H_t=h|\hat{\Theta},X_t,X_{t-1})$
+
+$$
+\begin{aligned}
+P(X_t=n|H_{t-1}=0,Z) &= \frac{\sum_{r}\sum_e\sum_m\sum_h\eta_{r,e,0,h}P(X_t=n|\hat{\Theta},X_{t-1}=m,Z)P(X_{t-1}=m|Z,H_{t-2}=0)}{\sum_r\sum_e\sum_m\sum_h\sum_q\eta_{r,e,q,h}P(X_t=n|\hat{\Theta},X_{t-1}=m,Z)P(X_{t-1}=m|Z,H_{t-2}=0)}\\
+P(X_t=n|H_{t-1}=0) &= \sum_z \alpha_zP(X_t=n|H_{t-1}=0,Z)\\
+P(Y_t=r|H_{t-1}=0) &= \sum_k P(Y=r|X=k)P(X_t=k|H_{t-1}=0)
+\end{aligned}
+$$
+
+
 
 
 
 ## Simulation
 
-This section provides a simulation study on the parameter convergence. 
+This section provides a simulation study to show the convergence property of the MCMC algorithm. The MCMC algorithm works well with the single learner type, but not so well with multiple types of learners.
 
-### The data generating process
+### Single Learner Type
 
-To demonstrate the model's ability to identify beyond the binary states, the simulation set $M_x = 3$ and $M_y =3$. The initial learner mastery heavily clustered in the lower state. 
+To demonstrate the model's ability to identify beyond the binary states, the simulation set $M_X = 3$ and $M_Y =3$. The initial learner mastery heavily clustered in the lower state. 
 
-To demonstrate the multiple-item identification, the simulation has two items $J=2$. The first item has a low transition rate from low mastery($X=0$) to high mastery($X=2$) but high transition rate from medium mastery($X=1$) to high mastery. The second item has the reverse pattern. The first item has a low half-correct rate in the low mastery and high half-correct rate in the medium mastery. The second item has the reverse pattern. The first item appears 30% of the time.
+To demonstrate the multiple-item efficacy identification, the simulation has two items $J=2$. The first item has a low transition rate from low mastery($X=0$) to high mastery($X=2$) with $\ell_1^{0,2}=0.3$ but high transition rate from medium mastery($X=1$) to high mastery with $\ell_1^{1,2}=0.6$. The second item has the reverse pattern with $\ell_2^{0,2}=0.5$ and $\ell_2^{1,2}=0.3$. The first item appears 30% of the time.
 
-Both effort decision and exit decision are present in the simulation. The effort rate is positively correlated with mastery level for the two items, with the second item has slightly higher effor rate at every level. The hazard rate is state dependent. The baseline hazard rate is 0.1 for all states but the hazard rate grows faster for the low mastery than for the high mastery.
+The first item has a low half-correct rate in the low mastery and high half-correct rate in the medium mastery. The second item has the reverse pattern. Both effort decision and exit decision are present in the simulation. The effort rate is positively correlated with mastery state for the two items. The hazard rate is mastery-dependent. The baseline hazard rate is 0.1 for all states but the hazard rate grows faster for the low mastery than for the high mastery. The values of all simulation parameters are in Appendix B.1 
 
-The numeric value of simulation parameters are in Appendix B. 1000 learners are simulated. The longest practice streak is 6. 
-
-### Parameter Estimation
-
-```{r, include=FALSE}
-knitr::opts_chunk$set(fig.pos = 'H')
-options(digits=3)
-```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(gridExtra)
-library(knitr)
 
 proj_dir = getwd()
 data_dir = paste0(proj_dir,'/_data/02/sim/')
 
 prop_param = read.table(paste0(data_dir, 'model_fit_demo_prop.txt'), sep=',')
-prop_param$spec='parametric'
+prop_param$spec='proportional hazard'
 cell_param = read.table(paste0(data_dir, 'model_fit_demo_cell.txt'), sep=',')
-cell_param$spec='non-parametric'
+cell_param$spec='non-parametric hazard'
 
 
 l_param_1 = rbind(prop_param%>%select(V1,V2,V3,spec), cell_param%>%select(V1,V2,V3,spec))
@@ -303,16 +349,77 @@ l_param_stat$true[l_param_stat$param=='l02'&l_param_stat$item=='2'] = 0.5
 l_param_stat$true[l_param_stat$param=='l12'&l_param_stat$item=='2'] = 0.3
 ```
 
-This section only reports the estimated pedagogical efficacy. Both parametric and non-parametric specifications are fit to the model. Both specifications reports reasonably good point estimation. The parametric model has slightly tight 95% credible interval, confirming that it is more efficient when the model specification is right.
+Table 4.1 only reports the estimated pedagogical efficacy. Both parametric and non-parametric specifications are fit to the model. Both specifications report reasonably good point estimation. The parametric model has slightly tight 95% credible interval, confirming that it is more efficient when the model specification is right.
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 kable(l_param_stat %>% select(spec,param,item,true,pe,lower,upper)%>% arrange(spec,item,param), 
       col.names=c('Specification','Parameter','Item','True','Point Estimation','95%CI(L)','95%CI(H)'),
-      caption = 'Estimated Pedagogical Efficacy of the Parametric Model'
+      booktabs=T,align='c',format='pandoc',
+      caption = 'Estimated Pedagogical Efficacy of the LTP Models'
 )
 ```
 
 
+### Multiple Learner Types
+
+The current rank order conditions are insufficient for the MCMC algorithm to converge to the true parameters in a mixture model with multiple types of learners. The second simulation demonstrates that the point estimation of the MCMC algorithm fails to converge because of the bimodal posterior distribution of the parameters.
+
+The second simulation does not include the learner engagement. The number of states of latent mastery and the observed response is both two ($M_X=M_Y=2$). There are two items and two learner types. For all learner types, the second item has much higher efficacy than the first item ($\ell_2^{z;0,1}>\ell_1^{z;0,1}$). The first item has higher efficacy for the type 1 learner ($\ell_1^{1;0,1}>\ell_1^{2;0,1}$) while the second item has higher efficacy for the type 2 learner ($\ell_2^{2;0,1}>\ell_2^{1;0,1}$). Both items are a relatively clean measure of the latent mastery. The numeric values of all simulation parameters are in Appendix B.2.
+
+Table 4.2 reports the global point estimations. The efficacies to the type 1 learner are estimated with precision. However, the efficacies to the type 2 learner and the mixture density are not precisely measured. The point estimation of the mixture density is close to the true value by coincidence.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+data_dir = paste0(proj_dir,'/_data/01/mixture/')
+
+raw_param = read.table(paste0(data_dir,'user_heter_param.txt'),sep=',')
+names(raw_param) = c('l0','l1','l2','l3','pi0','pi1','c0','c1','c2','c3','p0')
+
+global_param = raw_param
+part1_param = raw_param %>% filter(p0>0.4)
+part2_param = raw_param %>% filter(p0<=0.4)
+
+global_stat = global_param %>% select(p0,l0,l1,l2,l3) %>% gather(param,val) %>% group_by(param) %>% summarize(pe=mean(val), lower=quantile(val,prob=0.05), upper=quantile(val,prob=0.95))
+global_stat$param = factor(global_stat$param, levels=c('p0','l0','l2','l1','l3'),
+                           labels=c('mixture density','Item 1 Efficacy Type 1','Item 1 Efficacy Type 2','Item 2 Efficacy Type 1','Item 2 Efficacy Type 2'))
+
+global_stat$true = c(0.3,0.7,0.2,0.8,0.6)
+
+kable(global_stat %>% select(param,true,pe,lower,upper), 
+      col.names=c('Parameter','True','Point Estimation','95%CI(L)','95%CI(H)'),
+      booktabs=T,align='c',format='pandoc',
+      caption = 'Estimated Parameter of the Mixture Model (Global)'
+)
+
+```
+
+The posterior distribution of the mixture density is bimodal. The higher mode centers around 0.7. The lower mode centers around 0.2. Table 4.3 and 4.4 separately report the point estimations of the parameters for each mode. The posterior distribution of the efficacies of the type 2 learner is almost flat in the higher mode. In contrast, the posterior distribution of the efficacies of the type 1 learner is almost flat in the lower mode while that of the type 2 learner are better estimated. A closer look that posterior distribution mix shows that the higher mode comes from three chains while the lower mode comes from one chain. It appears that MCMC algorithm is trapped in a local optimal where one type is precisely estimated while the other type remains obscure.
 
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
+higher_stat = part1_param %>% select(p0,l0,l1,l2,l3) %>% gather(param,val) %>% group_by(param) %>% summarize(pe=mean(val), lower=quantile(val,prob=0.05), upper=quantile(val,prob=0.95))
+higher_stat$param = factor(higher_stat$param, levels=c('p0','l0','l2','l1','l3'),
+                           labels=c('mixture density','Item 1 Efficacy Type 1','Item 1 Efficacy Type 2','Item 2 Efficacy Type 1','Item 2 Efficacy Type 2'))
+
+higher_stat$true = c(0.3,0.7,0.2,0.8,0.6)
+
+kable(higher_stat %>% select(param,true,pe,lower,upper), 
+      col.names=c('Parameter','True','Point Estimation','95%CI(L)','95%CI(H)'),
+      booktabs=T,align='c',format='pandoc',
+      caption = 'Estimated Parameter of the Mixture Model (Higher Mode )'
+)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+lower_stat = part2_param %>% select(p0,l0,l1,l2,l3) %>% gather(param,val) %>% group_by(param) %>% summarize(pe=mean(val), lower=quantile(val,prob=0.05), upper=quantile(val,prob=0.95))
+lower_stat$param = factor(lower_stat$param, levels=c('p0','l0','l2','l1','l3'),
+                           labels=c('mixture density','Item 1 Efficacy Type 1','Item 1 Efficacy Type 2','Item 2 Efficacy Type 1','Item 2 Efficacy Type 2'))
+
+lower_stat$true = c(0.3,0.7,0.2,0.8,0.6)
+
+kable(lower_stat %>% select(param,true,pe,lower,upper), 
+      col.names=c('Parameter','True','Point Estimation','95%CI(L)','95%CI(H)'),
+      booktabs=T,align='c',format='pandoc',
+      caption = 'Estimated Parameter of the Mixture Model (Lower Mode)'
+)
+```

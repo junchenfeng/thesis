@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99996 (MiKTeX 2.9) (preloaded format=xelatex 2016.8.1)  2 JAN 2017 21:47
+This is XeTeX, Version 3.14159265-2.6-0.99996 (MiKTeX 2.9) (preloaded format=xelatex 2016.8.1)  13 JAN 2017 17:01
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -6,8 +6,8 @@ LaTeX2e <2016/03/31> patch level 1
 Babel <3.9r> and hyphenation patterns for 75 language(s) loaded.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\book.cls"
 Document Class: book 2014/09/29 v1.4h Standard LaTeX document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\bk10.clo"
-File: bk10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\bk12.clo"
+File: bk12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
 \c@chapter=\count80
@@ -772,16 +772,10 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@example=\count172
 (thesis.aux
 
-LaTeX Warning: Label `tab:unnamed-chunk-17' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-19' multiply defined.
 
 
-LaTeX Warning: Label `tab:unnamed-chunk-17' multiply defined.
-
-
-LaTeX Warning: Label `tab:unnamed-chunk-17' multiply defined.
-
-
-LaTeX Warning: Label `estimation' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-19' multiply defined.
 
 )
 \openout1 = `thesis.aux'.
@@ -835,23 +829,23 @@ ern Roman (RS)
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: twoside 
-* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
-* v-part:(T,H,B)=(72.26999pt, 650.43001pt, 72.26999pt)
+* h-part:(L,W,R)=(72.2698pt, 469.75539pt, 72.2698pt)
+* v-part:(T,H,B)=(72.2698pt, 650.43037pt, 72.2698pt)
 * \paperwidth=614.295pt
 * \paperheight=794.96999pt
-* \textwidth=469.75502pt
-* \textheight=650.43001pt
-* \oddsidemargin=0.0pt
-* \evensidemargin=0.0pt
-* \topmargin=-30.06749pt
+* \textwidth=469.75539pt
+* \textheight=650.43037pt
+* \oddsidemargin=-0.00018pt
+* \evensidemargin=-0.00018pt
+* \topmargin=-31.87398pt
 * \headheight=12.0pt
-* \headsep=18.06749pt
-* \topskip=10.0pt
-* \footskip=25.29494pt
-* \marginparwidth=125.0pt
+* \headsep=19.8738pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=98.0pt
 * \marginparsep=7.0pt
 * \columnsep=10.0pt
-* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -904,11 +898,11 @@ LaTeX Font Info:    Try loading font information for OMX+lmex on input line 3.
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 3.
+(Font)              <12> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 3.
+(Font)              <8> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 3.
+(Font)              <6> on input line 3.
 LaTeX Font Info:    Try loading font information for U+msa on input line 3.
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
@@ -920,334 +914,406 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 3.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\microtype\mt-msb.cfg"
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
-)
-Underfull \vbox (badness 1354) has occurred while \output is active []
-
-[3])
+) [3] [4])
 \tf@toc=\write4
 \openout4 = `thesis.toc'.
 
-[4] [5
+[5] [6
 
-] [6]
+] (thesis.lof)
+\tf@lof=\write5
+\openout5 = `thesis.lof'.
+
+[7] [8
+
+] (thesis.lot
+Underfull \vbox (badness 4266) has occurred while \output is active []
+
+[9])
+\tf@lot=\write6
+\openout6 = `thesis.lot'.
+
+[10] [11
+
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[12] [13] [14
+
+]
 Chapter 1.
-[7
 
-] [8] [9] [10] [11] [12] [13] [14
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-]
+[15]
+Underfull \vbox (badness 1248) has occurred while \output is active []
+
+[16] [17]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[18] [19]
+Underfull \vbox (badness 2165) has occurred while \output is active []
+
+[20] [21] [22]
+Underfull \vbox (badness 2165) has occurred while \output is active []
+
+[23] [24]
 Chapter 2.
-[15] [16] [17]
-Underfull \vbox (badness 1742) has occurred while \output is active []
+[25
 
-[18]
-Overfull \hbox (11.48514pt too wide) has occurred while \output is active
-\EU1/lmr/m/sl/10 2.3.  THE GENERAL MODEL OF LEARNING THROUGH PRACTICE WITH ENGA
-GEMENT FACTOR \EU1/lmr/m/n/10 19
- []
+] [26] [27] [28] [29] [30] [31] [32] [33] [34]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[19] [20]
-Overfull \hbox (11.48514pt too wide) has occurred while \output is active
-\EU1/lmr/m/sl/10 2.3.  THE GENERAL MODEL OF LEARNING THROUGH PRACTICE WITH ENGA
-GEMENT FACTOR \EU1/lmr/m/n/10 21
- []
+[35] [36]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[21]
-LaTeX Font Info:    Try loading font information for EU1+lmtt on input line 850
-.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\euenc\eu1lmtt.fd"
-File: eu1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [22]
-Chapter 3.
-[23
+[37]
+Underfull \vbox (badness 2165) has occurred while \output is active []
+
+[38] [39] [40
 
 ]
-Underfull \vbox (badness 1259) has occurred while \output is active []
+Chapter 3.
+[41]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[24] [25] [26]
-Overfull \hbox (12.41335pt too wide) detected at line 1139
+[42]
+Underfull \vbox (badness 4981) has occurred while \output is active []
+
+[43]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[44]
+Underfull \vbox (badness 6236) has occurred while \output is active []
+
+[45] [46]
+Overfull \hbox (92.77097pt too wide) detected at line 1340
 [] []
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[27] [28]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[29]
-File: thesis_files/figure-latex/unnamed-chunk-15-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-15-1.pdf" >
-File: thesis_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-16-1.pdf" > [30] [31] [32] [33] 
-[34
-
-]
-Chapter 4.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[35] [36] [37]
-Overfull \hbox (8.34154pt too wide) in paragraph at lines 1553--1559
-\EU1/lmr/m/n/10 Therefore the key is to calculate the partial conditional joint
- state density $\OML/lmm/m/it/10 P\OT1/lmr/m/n/10 (\OML/lmm/m/it/10 X[]; X[]\OM
-S/lmsy/m/n/10 j\OT1/lmr/bx/n/10 Y[]\OML/lmm/m/it/10 ; \OT1/lmr/bx/n/10 E[]\OML/
-lmm/m/it/10 ; \OT1/lmr/bx/n/10 H[]\OML/lmm/m/it/10 ; \OT1/lmr/m/n/10 ^^B)$\EU1/
-lmr/m/n/10 .
- []
-
-[38] [39] [40] [41] [42] [43] [44
-
-]
-Chapter 5.
-[45] [46]
-Underfull \vbox (badness 2050) has occurred while \output is active []
-
 [47]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1448) has occurred while \output is active []
 
 [48] [49]
-Underfull \hbox (badness 10000) in paragraph at lines 2113--2114
+File: thesis_files/figure-latex/unnamed-chunk-16-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-16-1.pdf" > [50]
+File: thesis_files/figure-latex/unnamed-chunk-17-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-17-1.pdf" > [51] [52]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
+[53] [54]
+Chapter 4.
+[55
+
+]
+Missing character: There is no ， in font rm-lmr12!
+
+Overfull \hbox (6.72443pt too wide) detected at line 1681
+[] []
  []
 
-[50] [51] [52] [53]
-File: thesis_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-35-1.pdf" >
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[54]
-File: fig/app.png Graphic file (type QTm)
-<use  "fig/app.png" > [55]
-File: thesis_files/figure-latex/unnamed-chunk-37-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-37-1.pdf" >
-File: thesis_files/figure-latex/unnamed-chunk-38-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-38-1.pdf" >
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 [56]
-File: fig/hr_prop.png Graphic file (type QTm)
-<use  "fig/hr_prop.png" >
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 [57]
-File: fig/hr_nonparametric.png Graphic file (type QTm)
-<use  "fig/hr_nonparametric.png" >
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Overfull \hbox (8.90953pt too wide) detected at line 1741
+[] []
+ []
 
 [58]
+Underfull \vbox (badness 2818) has occurred while \output is active []
+
+[59]
+Overfull \hbox (48.14969pt too wide) in paragraph at lines 1798--1803
+\EU1/lmr/m/n/12 The key is to calculate the partial conditional joint state den
+sity $\OML/lmm/m/it/12 P\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 X[]; X[]\OMS/lmsy/m/n
+/12 j\OT1/lmr/bx/n/12 Y[]\OML/lmm/m/it/12 ; \OT1/lmr/bx/n/12 E[]\OML/lmm/m/it/1
+2 ; \OT1/lmr/bx/n/12 H[]\OML/lmm/m/it/12 ; Z; \OT1/lmr/m/n/12 ^^B)$\EU1/lmr/m/n
+/12 .
+ []
+
+[60] [61] [62] [63] [64]
+Overfull \hbox (55.93689pt too wide) detected at line 2084
+[] []
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[65]
+Overfull \hbox (10.98865pt too wide) in alignment at lines 2121--2128
+ [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (10.98865pt too wide) in alignment at lines 2128--2133
+ [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (10.98865pt too wide) in alignment at lines 2133--2159
+ [] [] [] [] [] [] [] 
+ []
+
+[66] [67] [68] [69] [70
+
+]
+Chapter 5.
+[71] [72]
+Underfull \vbox (badness 4752) has occurred while \output is active []
+
+[73]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[74]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[75]
+Overfull \hbox (24.54498pt too wide) detected at line 2457
+[] []
+ []
+
+[76] [77] [78]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[79] [80]
+Overfull \hbox (97.8663pt too wide) has occurred while \output is active
+\EU1/lmr/m/sl/12 5.3.  CORRECT DYNAMIC SELECTION BIAS WITH THE LEARNING THROUGH
+ PRACTICE MODEL \EU1/lmr/m/n/12 81
+ []
+
+[81] [82]
+Overfull \hbox (97.8663pt too wide) has occurred while \output is active
+\EU1/lmr/m/sl/12 5.3.  CORRECT DYNAMIC SELECTION BIAS WITH THE LEARNING THROUGH
+ PRACTICE MODEL \EU1/lmr/m/n/12 83
+ []
+
+[83]
 File: thesis_files/figure-latex/unnamed-chunk-43-1.pdf Graphic file (type QTm)
 <use  "thesis_files/figure-latex/unnamed-chunk-43-1.pdf" >
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[59] [60]
-File: fig/lc_prop.png Graphic file (type QTm)
-<use  "fig/lc_prop.png" >
-File: fig/lc_nonparametric.png Graphic file (type QTm)
-<use  "fig/lc_nonparametric.png" > [61]
-File: fig/rmse_ph.png Graphic file (type QTm)
-<use  "fig/rmse_ph.png" >
+[84]
+File: fig/app.png Graphic file (type QTm)
+<use  "fig/app.png" > [85]
+File: thesis_files/figure-latex/unnamed-chunk-45-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-45-1.pdf" >
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[62]
-File: fig/rmse_nonparam.png Graphic file (type QTm)
-<use  "fig/rmse_nonparam.png" > [63] [64]
+[86] [87]
+File: thesis_files/figure-latex/unnamed-chunk-46-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-46-1.pdf" > [88]
+File: fig/hr-fit.png Graphic file (type QTm)
+<use  "fig/hr-fit.png" > [89]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[90]
+File: fig/lc_fit_efficacy.png Graphic file (type QTm)
+<use  "fig/lc_fit_efficacy.png" >
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[91]
+File: fig/lc_fit_attrition.png Graphic file (type QTm)
+<use  "fig/lc_fit_attrition.png" >
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[92] [93] [94]
 Chapter 6.
-[65
+[95
 
 ]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 66 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
+Underfull \vbox (badness 2165) has occurred while \output is active []
+
+[96] [97]
+Underfull \vbox (badness 2165) has occurred while \output is active []
+
+[98] [99] [100]
+Overfull \hbox (36.61102pt too wide) detected at line 3324
+\OML/lmm/m/it/12 ATE \OT1/lmr/m/n/12 = [\OML/lmm/m/it/12 E\OT1/lmr/m/n/12 (\OML
+/lmm/m/it/12 Y\OMS/lmsy/m/n/12 j\OML/lmm/m/it/12 D \OT1/lmr/m/n/12 = \OML/lmm/m
+/it/12 T; t \OT1/lmr/m/n/12 = 1) \OMS/lmsy/m/n/12 ^^@ \OML/lmm/m/it/12 E\OT1/lm
+r/m/n/12 (\OML/lmm/m/it/12 Y\OMS/lmsy/m/n/12 j\OML/lmm/m/it/12 D \OT1/lmr/m/n/1
+2 = \OML/lmm/m/it/12 C; t \OT1/lmr/m/n/12 = 1)] \OMS/lmsy/m/n/12 ^^@ \OT1/lmr/m
+/n/12 [\OML/lmm/m/it/12 E\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 Y\OMS/lmsy/m/n/12 j\
+OML/lmm/m/it/12 D \OT1/lmr/m/n/12 = \OML/lmm/m/it/12 T; t \OT1/lmr/m/n/12 = 0) 
+\OMS/lmsy/m/n/12 ^^@ \OML/lmm/m/it/12 E\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 Y\OMS/
+lmsy/m/n/12 j\OML/lmm/m/it/12 D \OT1/lmr/m/n/12 = \OML/lmm/m/it/12 C; t \OT1/lm
+r/m/n/12 = 0)] []
  []
 
-[66] [67]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 68 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
+[101]
+Underfull \vbox (badness 1028) has occurred while \output is active []
 
-[68]
-Underfull \vbox (badness 1163) has occurred while \output is active []
-
-[69]
-Overfull \hbox (0.70584pt too wide) in paragraph at lines 2908--2911
-\EU1/lmr/m/n/10 After obtaining the joint likelihood of $\OMS/lmsy/m/n/10 f\OML
-/lmm/m/it/10 X[]; Y[]; E[]\OMS/lmsy/m/n/10 g$\EU1/lmr/m/n/10 , the conditional 
-probability of $\OML/lmm/m/it/10 P\OT1/lmr/m/n/10 (\OML/lmm/m/it/10 X[]\OMS/lms
-y/m/n/10 j\OML/lmm/m/it/10 Y[]; [] ; Y[]; E[]; [] ; E[]\OT1/lmr/m/n/10 )$
- []
-
-
-Overfull \hbox (65.2687pt too wide) detected at line 2918
+[102] [103]
+Overfull \hbox (23.89769pt too wide) detected at line 3461
 [] []
  []
 
 
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 70 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
+Underfull \vbox (badness 1436) has occurred while \output is active []
 
-[70] [71]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 72 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
-
-[72] [73]
-Overfull \hbox (62.03586pt too wide) detected at line 3170
+[104]
+Overfull \hbox (141.9704pt too wide) detected at line 3494
 [] []
  []
 
+[105]
+Underfull \vbox (badness 2717) has occurred while \output is active []
 
-Underfull \vbox (badness 2418) has occurred while \output is active []
+[106] [107]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 74 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
-
-[74] [75]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 76 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
-
-[76]
-Overfull \hbox (18.865pt too wide) in paragraph at lines 3274--3284
- [][] 
- []
-
+[108]
 File: fig/practice_screenshot.png Graphic file (type QTm)
 <use  "fig/practice_screenshot.png" >
-Overfull \hbox (8.26569pt too wide) in paragraph at lines 3305--3306
+Overfull \hbox (8.26532pt too wide) in paragraph at lines 3638--3639
  [][] 
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-[77]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 78 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
+[109]
+Overfull \hbox (42.12865pt too wide) in alignment at lines 3696--3702
+ [] [] [] [] [] [] 
  []
 
-[78]
+
+Overfull \hbox (42.12865pt too wide) in alignment at lines 3702--3707
+ [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (42.12865pt too wide) in alignment at lines 3707--3711
+ [] [] [] [] [] [] 
+ []
+
+[110]
 File: fig/item.png Graphic file (type QTm)
-<use  "fig/item.png" >
+<use  "fig/item.png" > [111] [112]
+Overfull \hbox (136.47264pt too wide) in alignment at lines 3808--3815
+ [] [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (136.47264pt too wide) in alignment at lines 3815--3820
+ [] [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (136.47264pt too wide) in alignment at lines 3820--3833
+ [] [] [] [] [] [] [] [] 
+ []
+
+[113]
+File: thesis_files/figure-latex/unnamed-chunk-70-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-70-1.pdf" >
+File: thesis_files/figure-latex/unnamed-chunk-71-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-71-1.pdf" >
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[79]
-Overfull \hbox (71.095pt too wide) in paragraph at lines 3424--3436
- [][] 
+[114]
+File: thesis_files/figure-latex/unnamed-chunk-72-1.pdf Graphic file (type QTm)
+<use  "thesis_files/figure-latex/unnamed-chunk-72-1.pdf" > [115] [116]
+Overfull \hbox (25.52061pt too wide) in alignment at lines 3961--3968
+ [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 80 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
+Overfull \hbox (25.52061pt too wide) in alignment at lines 3968--3973
+ [] [] [] [] [] [] 
  []
 
-[80]
-File: thesis_files/figure-latex/unnamed-chunk-64-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-64-1.pdf" >
-File: thesis_files/figure-latex/unnamed-chunk-65-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-65-1.pdf" >
+
+Overfull \hbox (25.52061pt too wide) in alignment at lines 3973--3981
+ [] [] [] [] [] [] 
+ []
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[81]
-File: thesis_files/figure-latex/unnamed-chunk-66-1.pdf Graphic file (type QTm)
-<use  "thesis_files/figure-latex/unnamed-chunk-66-1.pdf" >
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 82 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
- []
-
-[82]
-Underfull \vbox (badness 1142) has occurred while \output is active []
-
-[83]
-Overfull \hbox (9.96503pt too wide) in paragraph at lines 3627--3635
- [][] 
+[117]
+Overfull \hbox (22.58466pt too wide) in alignment at lines 4016--4023
+ [] [] [] [] [] [] 
  []
 
 
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 84 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
+Overfull \hbox (22.58466pt too wide) in alignment at lines 4023--4028
+ [] [] [] [] [] [] 
  []
 
-[84]
-Overfull \hbox (34.225pt too wide) in paragraph at lines 3666--3678
- [][] 
+
+Overfull \hbox (22.58466pt too wide) in alignment at lines 4028--4032
+ [] [] [] [] [] [] 
  []
 
-[85]
-Overfull \hbox (100.23294pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 86 \EU1/lmr/m/sl/10 CHAPTER 6.  EFFORT CHOICE AND THE EFFICACY 
-EVALUATION IN THE LOW STAKE LEARNING ENVIRONMENT
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[118]
+Overfull \hbox (51.15666pt too wide) in alignment at lines 4058--4065
+ [] [] [] [] [] [] 
  []
 
-[86]
+
+Overfull \hbox (51.15666pt too wide) in alignment at lines 4065--4070
+ [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (51.15666pt too wide) in alignment at lines 4070--4078
+ [] [] [] [] [] [] 
+ []
+
+[119] [120]
 Appendix A.
-[87
+[121
 
-] [88
-
-]
+] [122]
 Appendix B.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[89] [90]
-Appendix C.
-[91
+[123
 
-] [92
+] [124]
+Underfull \vbox (badness 3872) has occurred while \output is active []
 
-]
-Appendix D.
-[93] [94
 
-]
-Appendix E.
-[95]
-Overfull \hbox (5.02731pt too wide) has occurred while \output is active
-\EU1/lmr/m/n/10 96 \EU1/lmr/m/sl/10 APPENDIX E.  SIMULATION PARAMETERS OF THE E
-FFORT INDUCED MEASUREMENT ERROR
+Overfull \hbox (117.93161pt too wide) has occurred while \output is active
+\EU1/lmr/m/sl/12 B.2.  THE MONTE CARLO MARKOV CHAIN ALGORITHM CONVERGENCE DEMO:
+ MULTIPLE TYPES \EU1/lmr/m/n/12 125
  []
 
-[96
+[125] [126]
+Appendix C.
+[127
 
 ]
-Appendix F.
-[97] [98
+Overfull \hbox (18.41661pt too wide) in paragraph at lines 4369--4381
+ [][] 
+ []
 
-]
-Appendix G.
-[99] [100] [101] (thesis.bbl [102] [103] [104
+[128] [129] [130] (thesis.bbl [131] [132] [133
 
-] [105] [106] [107])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4190.
-[108]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 4190.
+] [134] [135] [136] [137])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 4563.
+[138]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 4563.
 (thesis.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 4190.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 4190.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 4563.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 4563.
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 25261 strings out of 428409
- 443044 string characters out of 3159523
- 513935 words of memory out of 3000000
- 28397 multiletter control sequences out of 15000+200000
- 25212 words of font info for 51 fonts, out of 3000000 for 9000
+ 25280 strings out of 428409
+ 443144 string characters out of 3159523
+ 523051 words of memory out of 3000000
+ 28424 multiletter control sequences out of 15000+200000
+ 25506 words of font info for 50 fonts, out of 3000000 for 9000
  1328 hyphenation exceptions out of 8191
- 52i,9n,68p,10406b,503s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 52i,9n,68p,10406b,521s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on thesis.pdf (108 pages).
+Output written on thesis.pdf (138 pages).

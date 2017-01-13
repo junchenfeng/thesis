@@ -135,9 +135,9 @@ for (i in seq(2)){
                                                    yhmax=quantile(yh,prob=0.95), whmax=quantile(wh,prob=0.95),
                                                    yhmin=quantile(yh,prob=0.05), whmin=quantile(wh,prob=0.05))
   y_h_data = gather_hr(y_hr)
-  y_h_data$type = 'Response Dependent'
+  y_h_data$type = 'BKT'
   xy_h_data = gather_hr(xy_hr)
-  xy_h_data$type = 'State Dependent'
+  xy_h_data$type = 'LTP'
 
   # compute the real data
   emp_h_data = imputate_hazard_rate(kp_spell_data, maxT)
@@ -149,17 +149,14 @@ for (i in seq(2)){
   tmp_data$kp = kpnames[i]
 
   if(i==1){
-    all_data = tmp_data
+    all_data_1 = tmp_data
   }else{
-    all_data = rbind(all_data,tmp_data)
+    all_data_1 = rbind(all_data_1,tmp_data)
   }
 }
 
 
-qplot(data=all_data, x=t,y=h,geom='line', col=res) +  facet_grid(kp~type)+
-  geom_errorbar(aes(x=t, ymin=hmin, ymax=hmax,color=res),width=0.1) +  facet_grid(kp~type)+
-  geom_line(aes(x=t,y=hd,col=res),linetype='dashed')+
-  theme(legend.position="top")
+
 
 
 ## Nonparametric Model
@@ -223,9 +220,9 @@ for (i in seq(2)){
                                                    yhmax=quantile(yh,prob=0.95), whmax=quantile(wh,prob=0.95),
                                                    yhmin=quantile(yh,prob=0.05), whmin=quantile(wh,prob=0.05))
   y_h_data = gather_hr(y_hr)
-  y_h_data$type = 'Response Dependent'
+  y_h_data$type = 'BKT'
   xy_h_data = gather_hr(xy_hr)
-  xy_h_data$type = 'State Dependent'
+  xy_h_data$type = 'LTP'
 
   # compute the real data
   emp_h_data = imputate_hazard_rate(kp_spell_data, maxT)
@@ -237,15 +234,21 @@ for (i in seq(2)){
   tmp_data$kp = kpnames[i]
 
   if(i==1){
-    all_data = tmp_data
+    all_data_2 = tmp_data
   }else{
-    all_data = rbind(all_data,tmp_data)
+    all_data_2 = rbind(all_data_2,tmp_data)
   }
 }
 
 
-qplot(data=all_data, x=t,y=h,geom='line', col=res) +  facet_grid(kp~type)+
-  geom_errorbar(aes(x=t, ymin=hmin, ymax=hmax,color=res),width=0.1) +  facet_grid(kp~type)+
+## Merge
+all_data_1$spec='Parametric'
+all_data_2$spec='Nonparametric'
+all_data = rbind(all_data_1,all_data_2)
+
+
+qplot(data=all_data %>% filter(type=='LTP'), x=t,y=h,geom='line', col=res) +  facet_grid(spec~kp)+
+  geom_errorbar(aes(x=t, ymin=hmin, ymax=hmax,color=res),width=0.1) +  facet_grid(spec~kp)+
   geom_line(aes(x=t,y=hd,col=res),linetype='dashed')+
-  theme(legend.position="top")
+  theme(legend.position="top") + ylab('Hazard Rate') + xlab('Number of Practice')
 

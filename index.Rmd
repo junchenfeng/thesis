@@ -1,31 +1,31 @@
 --- 
-title: "Essays on Learning Through Practices"
+title: "Essays on Learning Through Practice"
 author: "Junchen Feng"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
+fontsize: 12pt
+geometry: margin=2.54cm
 bibliography: [ref01.bib,ref02.bib,ref03.bib,ref04.bib]
 biblio-style: apalike
 link-citations: yes
 description: "Junchen Feng's dissertation."
 ---
 
+\listoffigures
+\listoftables
+
+
 # Abstract{-}
 
-The age of digital education is dawning. With ubiquitous high-speed internet access and smart devices comes the blossom of digital learning service and learning data. Not only do we collect more quantity of data, but also higher quality data. Yet our understanding of the learning data lags the progress in the collection of data. This dissertation aims to provide a framework that takes advantage of the user engagement data to help identify the latent knowledge mastery of the learner and the pedagogical efficacy of the learning material.
+Intelligent Tutoring System is a key component of the future education with human expertise and artificial intelligence working in conjunction. It will prove to be a revolution that changes the education as we know it. A quantitative measurement of efficacies of practice to heterogeneous learners is the cornerstone of building an effective intelligent tutoring system that is able to generate practice recommendations adaptive to individual learner’s progress. This thesis proposes a framework for defining and estimating the practice efficacy, which can be applied to a wide variety of learning processes. 
 
-Chapter one establishes the general model of learning through practices. Extending the Bayesian Knowledge Tracing model beyond binary latent state and binary response, the general model articulates the assumptions that justify the simplification of the learning process to a first order Markov process. In addition, the general model also characterizes the exit decision and the effort choice.
+The Learning Through Practice (LTP) model is an extension of the Bayesian Knowledge Tracing (BKT) model. The BKT model formalizes the "practice makes perfect" learning process as a probabilistic transition between binary latent mastery in a homogeneous learner population. The latent mastery is inferred from the sequence of observed responses as a noisy signal of the latent mastery. The LTP model relaxes the assumption of latent mastery as a binary variable to a multinomial variable. The LTP model also relaxes the assumption of homogenous learner population to allow for restricted learner heterogeneity, thus empowering the model to generate adaptive recommendations. 
 
-Chapter two deals with the identification and the estimation of the general model. In addition to user homogeneity and rank order conditions to prevent label switching, the thesis derives a necessary condition for the local identification of the general learning model, which limits the complexity of the learning model given the data structure. The general model is estimated with MCMC algorithm. The general strategy is to first augment the latents then update the parameter by Gibbs Sampler. When the posterior distribution is hard to sample from, the adaptive rejection sampling algorithm is used to reduce the computational cost. 
-
-Chapter three and chapter four are two applications of the general learning model, with focus on the exit decision and the effort choice.
-
-Chapter three characterizes the dynamci selection bias in the estimated pedagogical efficacy by the Bayesian Knowledge Tracing model due to the exit decision. If the hazard rate depends on and differs between the latent knowledge mastery states, the BKT model is biased. In particular, if the mastered learner is less likely to quit than the unmastered, the estimated pedagogical efficacy is biased upwards. 
-
-Chapter four explains why the difference in difference estimator does not lead to correct inference in a randomized control trial when the effort induced measurement error is present. If the effort choice depends on and differs between the latent knowledge mastery states, the DID estimator is not a monotonic function of the true difference of the pedagogical efficacy. In addition, the direction of the bias is not determined in general. 
+This thesis derives the necessary conditions for parameter identification of the LTP model. As a special case, this thesis derives the sufficient conditions for parameter identification of the BKT model, which corrects a long-standing mistake in the literature to base parameter inference on the observed learning curve. This thesis also outlines a Monte Carlo Markov Chain(MCMC) algorithm to estimate parameters of the LTP model. The MCMC algorithm first augments the observed data with latent mastery by Forward Recursion Backward Sampling algorithm given the parameters, then uses Gibbs sampler to update the parameters given the augmented data. In the second step, if the conditional likelihood does not have a conjugate prior distribution, Gibbs sampler draws new parameters with Adaptive Rejection Sampling algorithm.
 
 
+A more important improvement over the classical BKT model is the inclusion of learner engagement. As digital education flourishes, learner behavior data are now widely available. The LTP model capitalizes on these new data to account for learner engagement in the learning process. The two features analyzed in this thesis are stop decision and effort decision. The former refers to the learner's decision to exit the practice sequence before it ends; the latter refers to the learner's decision to choose a level of effort in solving the problem. The LTP model uses the hazard model to describe the early exit from the practice so as to mitigate the dynamic selection bias caused by selective sample attrition. The LTP model uses the hidden Markov model to describe the frivolous error caused by a lack of effort so as to better estimate the true efficacy parameter. The LTP model augmented with learner engagement can be used to describe a variety of learning processes, such as reinforcement learning and zone of proximal development.
 
-
-
+This thesis then provides two applications of the LTP model featureing different aspects of learner engagement. In the first application, the LTP model is applied to a quiz dataset of two-digit multiplication and long division to correct for the dynamic selection bias. The average learning gain from repeated practice decreases by at least 50% for the two-digit multiplication and at least 75% for the long division. In the second application, the LTP model is applied to account for effort choice in a randomized control trial to rank efficacies of a practice question with or without a video instruction set. While the two question forms cannot be ranked by the Difference in Difference regression, the practice question with the video instruction is estimated to have a stronger efficacy by the LTP model after controlling for the differential effort choices.
