@@ -35,7 +35,7 @@ This chapter attempts to study the identification of the LTP model from a new pe
 
 ## Sufficient Statistics of the LTP Model
 
-This section reparametrizes the LTP model as a multinomial distribution. The sample frequencies of the joint variable are sufficient statistics for the multinomial distribution. By drawing the analogy, it is can be proven that the sample frequencies of the joint distribution of item assignments, observed responses, stop decisions, and effort decisions are the sufficient statistics of the LTP model.
+This section reparametrizes data generating proces assumed by the LTP model as a multinomial distribution. The sample frequencies of the joint variable are sufficient statistics for the multinomial distribution. By drawing the analogy, it is can be proven that the sample frequencies of the joint distribution of item assignments, observed responses, stop decisions, and effort decisions are the sufficient statistics of the LTP model.
 
 To review, $\mathbf{A}$, is the joint item assignments of the sequence. $\mathbf{Y}$ is the joint responses. $\mathbf{H}$ is the joint stop decisions. $\mathbf{E}$ is the joint effort decisions. $\mathbf{a},\mathbf{y},\mathbf{h},\mathbf{e}$ are the realized value. Because $\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}$ are all discrete variables, the sample space of their joint distribution is countable. Define a mapping function $G(\mathbf{y},\mathbf{a},\mathbf{e},\mathbf{h})=\omega$ that projects each distinct combinations of $\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}$ to a distinct $\omega$. Define a new random variable $\Omega$ that follows a multinomial distribution whose probability mass function is 
 
@@ -201,7 +201,7 @@ The Bayesian Knowledge Tracing model is identified if at least three periods of 
 
 The equivalent representation of Theorem 3.4 is that the BKT model is identified if the three-response sequence BKT model is identified.
 
-Assume the BKT model based on sequences of length three is identified, but the model on sequences of length $T$ is not identified. Let m ($m\geq2$) be the size of the parameter sets that are observation equivalent. The observational equivalent parameters sets are denoted as $\Theta_1, \dots, \Theta_m$. Because that the parameter space is the same for the BKT model on sequences with length three and that with length $T$, $\Theta_1, \dots, \Theta_m$ also generates the observation for the BKT model on sequences with length three. However, it is uniquely identified, therefore $\Theta_1=\dots=\Theta_m=\Theta$, and the BKT model on sequences with length $T$ is identified. 
+Assume the BKT model based on sequences of length three is identified, but the model on sequences of length $T$ is not identified. Let m ($m\geq2$) be the size of the observation equivalent parameter sets. The parameters sets are denoted as $\Theta_1, \dots, \Theta_m$. Because that the parameter space is the same for the BKT model on sequences with length three and that with length $T$, $\Theta_1, \dots, \Theta_m$ also generates the observation for the BKT model on sequences with length three. However, it is uniquely identified, therefore $\Theta_1=\dots=\Theta_m=\Theta$, and the BKT model on sequences with length $T$ is identified. 
 
 ```
 
@@ -213,7 +213,7 @@ A revisit of the example in Beck and Chang [-@beck2007identifiability] illustrat
 
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 
-bc_param = data.frame(model=c('Knowledge','Guess','Reading Tutor'), pi=c(0.56,0.36,0.01),l=c(0.1,0.1,0.1),s=c(0.0,0.3,0.53),g=c(0.05,0.05,0.05) )
+bc_param = data.frame(model=c('Knowledge','Guess','Reading Tutor'), pi=c(0.56,0.36,0.01),l=c(0.1,0.1,0.1),g=c(0.0,0.3,0.53),s=c(0.05,0.05,0.05) )
 
 kable(bc_param,
   booktabs = TRUE,
@@ -288,7 +288,7 @@ ss1$model='Knowledge'
 ss2 = generate_sufficient_statistics(0.3, 0.95, 0.36, 0.1)
 ss2$model='Guess'
 
-ss3 = generate_sufficient_statistics(0.63, 0.95, 0.01, 0.1)
+ss3 = generate_sufficient_statistics(0.53, 0.95, 0.01, 0.1)
 ss3$model='Reading Tutor'
 
 ss = rbind(ss1,ss2,ss3)
