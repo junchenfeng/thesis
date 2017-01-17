@@ -1,4 +1,3 @@
-
 Learning Through Practices
 ========================================================
 author: Junhen Feng
@@ -6,95 +5,104 @@ autosize: true
 
 
 
+Main Result
+========================================================
+type: section
+
+- A model of Learning Through Practice (LTP)
+    - define the efficacy of practice in relation to a dynamic learning process
+    - incorporate learner engagement, including stop decision and effort decision
+
+- Identification and Estimation of the LTP model
+
+- Empirical Application
+    - Stop Decision:  A majority of the observed learning gain is dynamic selection bias due to sample attrition
+    - Effort Decision:  Identify statistical significant effect in a RCT where DID failed to do
+
+
 Motivation
 ========================================================
 type: section
 
-Practice Makes Perfect
-========================================================
-- Merriam Webster: To do repeated exercises for proficiency
 
-- Effective practice requires more than simple repetition
-
-- How to recommend?
-
-
-
-A Motivating Example (1)
+For a Better Intelligent Tutoring System (ITS)
 ========================================================
 
-- The Learner tries to learn two-digit multiplication
-- What content?
-  + 14*20
-  + 14*21
-  + 14*23
+- Human teacher collaborates with an ITS is the future of education
 
-- What format?
-  + 14*23 = ___
+- Dual roles of Practice
+    - assessment 
+    - instruction
+    
+- When the question bank is given
+    - selection
+    - sequencing
+    
 
-  + Vertical format
-
-  $$
-  \begin{aligned}
-  &\quad 14\\
-  &\times 23\\
-  &---\\
-  \end{aligned}
-  $$
-
-***
-
-- When to stop?
-  + Winning streak
-  + Losing streak
-  + Mixture
-
-
-A Motivating Example (2)
+Computerized Adaptive Testing (CAT) is not Sufficient
 ========================================================
-id: intro_mot
-- Practice as Assessment -> Optimal Stopping
 
-  + The user's latent ability has to be inferred from the observed response
+- CAT aims to measure the latent ability with certain precision by as few questions as possible
 
-- Practice as Instruction -> **Optiomal Recommendation**
+- A good exam question can be a bad practice question
+    - A good exam question: 
+    
+    A learner above the threshold will succeed while a learner below the threshold will fail
+    
+    - A good practice question: 
+    
+    A learner below the threshold has a shot at solving the problem with hints and helps
+    
+- Item Response Theory (IRT) implicitly assumes no learning
 
-  + What matters is how the item instruction elevates the learner's mastery
-  + What observed is how item difficulty reveals the learner's mastery
-  + The folk wisdom is inverse U
-  + Break the conditional independence [IRT Comparison](#\irt)
 
-
-
-
-Pedagogical Efficacy
+Understanding Learner Heterogeneity is Essential
 ========================================================
-type: prompt
 
-- Practice: Any learning task that produces a measurable outcome
-  + Listening to lecture per se is not a practice [not measurable]
-  + Batting exercise is a practice
+- User heterogeneity is the essential reason for individualization
 
-- Pedagogical efficacy = What makes practices effective = learning
+- Learner heterogeneity:
+    - Different level of current mastery (Assessment)
+    - Different gain to the same pedagogy (Instruction)
 
-    + A hard question without a clear answer
+- Efficacy of practice = Learning Gain
 
-- To measure, not to explain, the pedagogical efficacy
+
+Mastery, Learning, Practice and Efficacy
+========================================================
+
+- Mastery:
+
+The capability to solve a  problem or perform a task in a particular domain
+
+- Learning:
+
+A process in which a learner becomes capable of solving a problem that she is unable to previously
+
+- Practice:
+
+Solving a sequence of problems
+
+- Efficacy:
+
+The probability of moving a learner from a lower mastery state to a higher one
 
 
 
 Navigation
 ========================================================
 
-- [Chapter 1](#/chp1): A General Model
-- [Chapter 2](#/chp2): Identification and Estimation
-- [Chapter 3](#/chp3): Selection Bias of the Exit Decision
-- [Chapter 4](#/chp4)：Effort Induced Measurement Error
+- [Chapter 2](#/chp2): The Learning Through Practice Model
+- [Chapter 3](#/chp3): Identification
+- [Chapter 4](#/chp4): Estimation
+- [Chapter 5](#/chp5): Dynamic Selection Bias
+- [Chapter 6](#/chp6):Effectiveness V.S.Efficacy
 
 
-Chapter I: A General Model of Learning Through Practices
+
+Chapter 2: A Model of Learning Through Practice
 ========================================================
-id: chp1
+id: chp2
 type: section
 
 - [The Learning Process](#/lp)
@@ -107,420 +115,409 @@ type: section
 
 Event Sequence
 ========================================================
-
-+ The learner is presented with a practice item
-
-+ The learner decides the effort level
-
-    * With effort, (probabilistic) learning happens depending on the item efficacy
-    * Without effort, no learning
-
-+ The learner produces a response and is graded
-
-    * Assume no learning from the feedback after the response
-
-+ The learner choose to stop
-
-    * No: start from the first step
-
-
-Why Modelling Effort and Stop
-========================================================
-- Theorectically
-  + Prevalent in low stake learning environment
-  + bias the pedagogical efficacy if ignored
-
-- Practically
-  + Engagement is usually managed by the product manager
-
-
-
-Notation
-========================================================
-- $j$: The item id
-- $t$: The sequence id. [*Not calendar time*]
-- $X_t$: The latent state of knowledge mastery
-- $Y_t$: The observed response grade
-- $E_t$: The observed effort
-- $H_t$: If the learner stops at sequence $t$
-- $A()$: The assignment function.
-    + $A(t)=j$: The item $j$ is at $t^{th}$ practice sequence
-
-
-
-
-The Learning Process (1)
-========================================================
 id: lp
-- **Assumption 1**: $X_t$ is unidimensional
 
-    + Avoid mapping the knowledge space to item
+1. A learner is presented with a practice item
 
-- **Assumption 2**: $X_t$ is discrete with $M_x$ number of states
-    + *Learning is moving from a lower state to a higher state*.
-    + More intuitive representation of probabilitic learning than continuous mastery
+2. The learner produces a response based on her state of latent mastery
+
+3. The learner receives feedback on the observed response.
+
+4. The learner learns (elevates her latent mastery) probabilistically.
 
 
-The Learning Process (2)
+Assumptions on Latent Mastery 
 ========================================================
 
-- General pedagogical efficacy
+**Assumption 1**:  Latent mastery ($X_t$) is a unidimenstional ordered discrete variable with $M_x$ number of states.
 
-$$P(X_t=m|X_{t-1}=n,A(1),\dots,A(t-1),j)$$
++ Avoid factorial state representation (mapping of knowledge points to items)
 
-- **Assumption 3**: Pedagogical efficacy is independent of the sequence order
-  + Rule out training fatigue
-
-- **Assumption 4**: No substitution or complementarity in sequence composition
-  + Rule out scaffolding items
++ As flexible as a continuous latent mastery if the number of states is allowed to vary
 
 
-The Learning Process (3)
+Assumptions on Efficacy (1)
 ========================================================
 
-- **Assumption 5**: Learning is gradual. Transit one state at a time.
+- A general definition of efficacy: 
 
-$$p(X_t=m|X_{t-1}=n, j) =0 \quad \forall t,j \quad\text{where} \quad m-n>1$$
+The probability of practice item $j$ moving the state of mastery of a learner of type $z$ from $m$ to $n$ ($m\leq n$) at sequence position $t$, after exposing to feedback ($Y_t$) on the current item $j$ and feedback ($\mathbf{Y}_{1,t-1}$) on the preceding items ($\mathbf{A}_{1,t-1}$) 
 
-- **Assumption 6**: No forgetting.
+**Assumption 2**: Pedagogical efficacy does not dependent on responses conditional on the previous latent mastery.
 
-$$p(X_t=m|X_{t-1}=n, j) = 0 \quad \forall t,j \quad\text{where} \quad m < n$$
+**Assumption 3**: There is no complementarity or substitution effect in the item composition.
 
-- This is called left-to-right transition
+**Assumption 4**: The pedagogical efficacy is independent of the sequence position.
 
-The Learning Process (4)
-========================================================
-Define the **pedagogical efficacy**  as
-$$\ell^k_j =P(X_t=k+1|X_{t-1}=k,j)$$
+- The working definition of efficacy:
 
-Define the **initial mastery distribution** as
-$$\pi^k = P(X_1=k)$$
+The probability of practice item $j$ moving the state of mastery of a learner of type $z$ from $m$ to $n$
+
+$\ell^{z;m,n}_{j} \equiv P(X_t=n|X_{t-1}=m;Z=z;A_t=j)$
 
 
-The Observed Response (Without Effort Decision)
+Efficacy and Heterogeneity
 ========================================================
 
-- **Assumption 7**: The response is only a function of the latent knowledge mastery
-- **Assumption 8**: The response is discrete with $M_y$ number of state
 
-Define the **correct rate** as
+- Heterogeneity Based on State: $\ell^{z;m,n}_j\neq\ell^{z;k,n}_j$
+
+A first grade and a college freshman learn calculus. 
+
+Same destination different starting point.
+
+
+- Heterogeneity Based on Type: $\ell^{z;m,n}_j\neq\ell^{k;m,n}_j$
+
+An art major and an econ major learn calculus. 
+
+Same starting point and destination but different speed.
+
+
+Assumptions on Efficacy (2)
+========================================================
+
+**Assumption 5**: The latent mastery never regresses.
+
 $$
-c^{k,m}_j = P(Y_{j,t}=m|X_t=k)
+\ell^{z;m,n}_{j} = 0 \quad \forall t,z,j \quad\text{where} \quad m < n
 $$
 
 
-
-Learning Process as A Hidden Markov Process
+Assumptions on Observed Response
 ========================================================
-id: hmm1
+id:lp2
+
+**Assumption 6**: The distribution of observed response ($Y_t$) conditional the latent mastery is the same for all learner types.
+
+$P(Y_{t}=r|X_t=k,A_t=j)  \equiv c^{r,k}_j$
+
+[Example 1: Bayesian Knowledge Tracing Model](#/bkt)
 
 
-![plot of chunk unnamed-chunk-1](fig/hmm_1.png)
-
-Examples
+Learning Through Practice With Learner Engagement
 ========================================================
-id: hmm_example
-- [Bayesian Knowledge Tracing Model](#/bkt)
-- [Zone of Proximal Development](#/zpd)
+
+- The duration and the intensity of learner engagement are imperfect in a low stake learning environment
+    + Duration: the stop decision
+    + Intensity: the effort decision
+    
+- New Event Sequence
+
+1. A learner is presented with a practice question.
+
+2. The learner exerts a level of effort based on her state of latent mastery
+
+3. The learner produces a response based on the effort level and her state of latent mastery. 
+
+4. The learner receives feedback on the observed response.
+
+5. If the learner has exerted effort, she learns probabilistically. Otherwise, she does not learn.
+
+6. The learner can choose or be forced to exit. If the learner continues, repeat from (1); else data collection stops.
 
 
-The Effort Decision(1)
+The Effort Decision (1)
 ========================================================
 id: ed
-**Assumption 9**: Effort is a binary choice.
+**Assumption 6**: Effort is a binary choice with value 0 and 1.
 
-**Assumption 10**: Effort choice is independent, conditioning on the latent mastery and the item
-
-
+**Assumption 7**: Conditioning on the latent mastery and the item, the effort choice is independent
 
 $$
-P(E_t=1|X_t=k,A(t)=j) = \gamma_j^k
+P(E_t=1|Z=z,X_t=k,A_t=j) = \gamma_j^{z;k}
 $$
 
-- The learner does not learn about the cost of effort
+
+- Grit is a characteristic of the state of mastery, not the learner
 
 
-The Effort Decision(2)
+
+The Effort Decision (2)
 ========================================================
-**Assumption 11**: No pain no gain.
+**Assumption 8** (No pain no gain): If a learner does not exert effort, she does not learn
 
-$P(X_t=k+1|X_{t-1}=k, A(t)=j, E_t=0) = 0$
+$P(X_t=n|X_{t-1}=m, Z=z, A_t=j, E_t=0) = 0 \quad \forall z,t,j, \text{and }m > n$
 
+**Assumption 9** (No Educated Guess): If a learner does not exert effort, she makes a wrong response for sure
 
-**Assumption 12**: No educated guess
+$P(Y_t=0|E_t=0,A_t=j) = 1  \quad \forall j,t$
 
-$P(Y_t=0|E_t=0,A(t)=j) = 1$
-
-[to Chapter 4](#/chp4)
+[to Chapter 5](#/chp5)
 
 
 The Stop Decision
 ========================================================
 id: sd
-- Stop: $H_t=1$
 
-- The hazard rate
-$$
-h_t^k=P(H_t=1|H_{t-1}=0,X_t=k)
-$$
+- Depdence Structure
+    + Stop-by-rule: Learners are forced to exit based on responses
+        - X-strike rule: Three mistakes and out (Old Duolingo)
 
-- The hazard rate is duration dependent
-- The hazard rate varies with the latent state
-  + Not depend on response [Error due to ignorance and error due to carelessness differs]
-  + A plausible story: boredom V.s. Frustration
+    + Stop-by-choice: Learners are forced to exit based on latent mastery
+        - Boredom V.S. Frustration 
 
-
+- Functional Form ($h_t^k \equiv P(H_t=1|H_{t-1}=0,S_t=k)$):
+    + Proportional Hazard: $h_t^k= \lambda_k e^{\beta_k t}$
+    + Non-parametric: $h_{t}^k$
 
 
-The General Model
+**Assumption 10**: Stop decision is independent of item characteristics
+
+[to Chapter 6](#/chp6)
+
+
+
+Express Learning Theories with the LTP model
 ========================================================
-id: hmm2
+id: ltp_example
+- [Zone of Proximal Development](#/zpd)
 
-![plot of chunk unnamed-chunk-2](fig/hmm_2.png)
+- [Reinforcement Learning](#/rl)
 
-Chapter II: Identification and Estimation
+
+Chapter 3: Model Identification
 ========================================================
-id: chp2
+id: chp3
 type: section
+
+
+
+Identification of the BKT Model (1)
+========================================================
+
+- The BKT is considered as the BKT model by the learning analytics literature
+
+    + The following model specification has the same learning curve
+
+
+
+|     model     |  pi  |  l  |  g   |  s   |
+|:-------------:|:----:|:---:|:----:|:----:|
+|   Knowledge   | 0.56 | 0.1 | 0.00 | 0.05 |
+|     Guess     | 0.36 | 0.1 | 0.30 | 0.05 |
+| Reading Tutor | 0.01 | 0.1 | 0.53 | 0.05 |
+
+***
+
+![plot of chunk unnamed-chunk-2](thesis-figure/unnamed-chunk-2-1.png)
+
+Identification of the BKT Model (2)
+========================================================
+
+- These models have different distribution of joint responses
+    + They are sufficient statistics
+    + It implies different likelihood and model identification
+
+
+***
+
+![plot of chunk unnamed-chunk-3](thesis-figure/unnamed-chunk-3-1.png)
+
+
+Identification of the BKT Model (3)
+========================================================
+id: bkt_id
+- In Bayesian analysis, identification (in the frequestist sense) implies:
+    + The posterior distribution of parameters with a non-informative prior is single modality
+    + The mean of such posterior distributions converges to the "true" parameter in large sample
+
+[formal proof](#/bkt_proof)
+
+![plot of chunk unnamed-chunk-4](thesis-figure/unnamed-chunk-4-1.png)
+
+
+Necessary Identification Conditions
+=======================================================
+id: ltp_id
+
+- The data generating system described by the LTP model has sufficient statistics
+
+- The sufficient statistics are moment conditions for identification
+
+- Identification Conditions:
+    + More moment conditions than parameters
+    + Jacobian matrix at the local optimal solution has full column matrix
+
+[formal proof](#/ltp_proof)
+
+
+Label Switching and Rank Order Condition
+=======================================================
+
+- Label Switching
+    + In latent state model, the label of states is arbitrary.
+    + Arbitrary labels in MCMC algorithm results in poor mixture
+
+- Rank Order Condition:
+    + States: A learner with higher state of mastery has higher probability of correct response
+
+    $$P(Y_t=1|X_t=m) < P(Y_t=1|X_t=n) \forall m < n$$
+
+    + Type: A learner with higher type has higher probability of  initial mastery
+
+    $$P(X_1=1|Z=w) < P(X_1=1|Z=v) \forall w < v$$
+
+Chapter 4: Model Estimation
+========================================================
+id: chp4
+type: section
+
+
+An Overview of Monte Carlo Markov Chain Algorithm
+========================================================
+
+- General Strategy:
+    + First augment the observed data with latent states given parameters
+    + Update parameters with Gibbs sampler given the augmented data
+
+
+Priors
+========================================================
+
+- Parameters that follow a multinomial distribution is the non-informative Dirichelet distribution $Dir(1,\dots,1)$
+    + Initial mastery probability ($\pi_0,\dots,\pi_{M_X-1}$)
+    + Type Density ($\alpha_1,\dots,\alpha_{M_Z}$)
+    + Pedagogical efficacy conditional on latent mastery $k$ ($\ell^{z;k,k+1}_j,\dots,\ell^{z;k,M_X-1}_j$)
+    + Response Probability conditional on latent mastery $k$ ($c_j^{0,k},\dots,c_j^{M_Y-1,k}$)
+    + Nonparametric hazard rate condition on state $k$ and position $t$ ($h^t_k$)
+
+- Proportional hazard model ($\gamma_j^{z,k},\beta_j^{z,k}$) follows uniform distrubtion
+
+
+Notation
+========================================================
+- $j$: The item id
+- $t$: The sequence id. [*Not clock time*]
+- $X_t$: The latent state of knowledge mastery
+- $Y_t$: The observed response grade
+- $E_t$: The observed effort
+- $H_t$: If the learner stops at sequence $t$
+- $A_t$: The item $j$ is at $t^{th}$ practice sequence
+
 
 Notation
 ========================================================
 + $i$: the the learner id
-+ $N$： the number of learners
++ $N$: the number of learners
 + $T_i$:the sequence length of learner $i$.
 + $\mathbf{X}_{1,T_i}^i$: The latent state sequence. $(X^i_1,\dots,X^i_{T_i})$
 + $\mathbf{Y}_{1,T_i}^i$: The answer sequence. $(Y^i_1,\dots,Y^i_{T_i})$
-+ $\mathbf{A}_{1,T_i}^i$: The item sequence.   $(A^i(1),\dots,A^i(T_i))$
++ $\mathbf{A}_{1,T_i}^i$: The item sequence.   $(A^i_1,\dots,A^i_{T_i})$
 + $\mathbf{E}_{1,T_i}^i$: The effort sequence. $(E^i_1,\dots,E^i_{T_i})$
 + $\mathbf{H}_{1,T_i}^i$: The stop sequence.   $(H^i_1,\dots,H^i_{T_i})$
 
-Notation(2)
+Likelihood (1)
 ========================================================
 
-- Let $\mathbf{y}_{1,T_i}^i$ denote a realized sequence $(Y_1=y_1,\dots,Y_{T_i}=y_{T_i})$
-  + Same for $\mathbf{a}_{1,T_i}^i$,$\mathbf{e}_{1,T_i}^i$,$\mathbf{h}_{1,T_i}^i$
-
-- For simplicity, omit the lower index when refering to the full sequence
-  + e.g. $\mathbf{Y}^i = \mathbf{Y}_{1,T_i}^i$
-
-- Let assignment function $A(t)$ to be exogeneously determined, thus independent of all other parameters
-
-
-The Augmented Likelihood(1)
-========================================================
-
-- Consider observing the data $\mathbf{y}, \mathbf{a}, \mathbf{e}, \mathbf{h}$ of length $T$ for an individual
-  + suppress $i$
-
-- Augment the data by $\mathbf{X}$ and then marginalize over it.
+- Likelihood of observed data
 
 $$
-P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{a}) \propto \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}|\mathbf{a})
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}|\mathbf{A},\Theta) \propto \sum_{Z=1}^{M_Z}(P(Z) \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|Z,\mathbf{A},\Theta))
 $$
 
-- For a particular state augmentation $\mathbf{x}$, factor the likelihood according to the model
+- Conditional on Learner Type $z$
+
+$$
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}, \mathbf{X}|Z,\mathbf{A},\Theta)
+= P(\mathbf{H}|Z,\mathbf{X},\mathbf{Y},\Theta)P(\mathbf{Y}|Z,\mathbf{X},\mathbf{A},\mathbf{E},\Theta)P(\mathbf{E},\mathbf{X}|Z,\mathbf{A},\Theta)
+$$
+
+- Conditional likelihood of Observed Response
+
+$$
+P(\mathbf{Y}|Z,\mathbf{X},\mathbf{E},\mathbf{A},\Theta) = \prod_{t=1}^{T} \prod_{k=0}^{M_X-1}\prod_{j=1}^J[ \prod_{r=0}^{M_Y-1} (c_j^{r,k})^{I(A_t=j,Y_t=r,X_t=k,E_t=1)}\prod_{r=1}^{M_Y-1}0^{I(A_t=j,Y_t=r,X_t=k,E_t=0)}]
+$$
+
+- Conditional likelihood of Hazard Rate
 
 $$
 \begin{aligned}
-P(\mathbf{Y}=\mathbf{y},  \mathbf{E}=\mathbf{e}, \mathbf{H}=\mathbf{h}, \mathbf{X}=\mathbf{x}|\mathbf{a})
-&= P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{a},\mathbf{E}=\mathbf{e})P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x})P(\mathbf{E}=\mathbf{e},\mathbf{X}=\mathbf{x}|\mathbf{a})
+P(\mathbf{H}|Z,\mathbf{X},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_X-1}(\lambda_{z;k}e^{\beta_{z;k}t})^{I(H_t=1,X_t=k,Z=z)}(1-\lambda_{z;k}e^{\beta_{z;k}t})^{I(H_t=0,X_t=k,Z=z)}\\
+P(\mathbf{H}|Z,\mathbf{S},\Theta) &=  \prod_{t=1}^{T}\prod_{k=0}^{M_S-1}(h_t^{z;k})^{I(H_t=1,S_t=k,Z=z)}(1-h_t^{z;k})^{I(H_t=0,Z=z,S_t=k)}
 \end{aligned}
 $$
 
-The Augmented Likelihood(2)
-========================================================
-$$
-\begin{aligned}
-P(\mathbf{Y}=\mathbf{y}|\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e},\mathbf{a}) &= \prod_{t=1}^{T} \prod_{k=1}^{M_x}\prod_{j=1}^J[ (c_j^{0,k})^{1(A(t)=j,y_t=0,x_t=k,e_t=1)}1^{1(A(t)=j,y_t=0,x_t=k,e_t=0}\\
-&\prod_{m=1}^{M_y-1} (c_j^{m,k})^{1(A(t)=j,y_t=m,x_t=k,e_t=1)}0^{1(A(t)=j,y_t=m,x_t=k,e_t=0}]
-\end{aligned}
-$$
-
-The Augmented Likelihood(3)
-========================================================
-$$
-\begin{aligned}
-P(\mathbf{H}=\mathbf{h}|\mathbf{X}=\mathbf{x}) &= \prod_{t=1}^{T}\prod_{k=1}^{M_x}h(t,k)^{1(h_t=1,x_t=k)}(1-h(t,k))^{1(h_t=0,x_t=k)}\\
-&= \prod_{t=1}^{T}\prod_{k=1}^{M_x}[\lambda_ke^{\beta_kt}]^{1(h_t=1,x_t=k)}(1-\lambda_ke^{\beta_kt})^{1(h_t=0,x_t=k)}
-\end{aligned}
-$$
-
-The Augmented Likelihood(4)
-========================================================
-$$
-\begin{aligned}
-&P(\mathbf{X}=\mathbf{x},\mathbf{E}=\mathbf{e}|\mathbf{a})\\
-&= P(X_1=x_1)P(E_1=e_1|X_1=x_1)\prod_{t=2}^{T}P(E_t|X_{t-1}=x_{t-1})P(X_t=x_t|X_{t-1}=x_{t-1},E_t=e_t)\\
-&= \prod_{k=1}^{M_x}(\pi^k)^{1(x_1=k)}\prod_{j=1}^J(\gamma_j^k)^{1(A(t)=j,x_1=k,E_1=1)}(1-\gamma_j^k)^{1(A(t)=j,X_1=k,E_1=0)}\\
-& \prod_{t=2}^{T}\prod_{j=1}^J\{[(\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=1)}(1-\gamma_j^k)^{1(A(t)=j,x_{t-1}=k,e_t=0)}]\\
-&[1^{1(x_{t-1}=M_x,x_t=M_x)}\prod_{k=1}^{M_x-1}(\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)}(1-\ell^k_j)^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)}\\
-&1^{1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}\\
-&0^{1-1(A(t)=j,x_{t-1}=k,x_t=k+1,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=1)-1(A(t)=j,x_{t-1}=k,x_t=k,e_t=0)}]\}
-\end{aligned}
-$$
-
-Identification (1)
-========================================================
-- Are all parameters identified?
-
-- MLE: Unique point mass in the measure of the parameter space
-  + **What I mean identification here**
-
-- MCMC: As long as the posterior parameter distribution is proper
-  + Multimodality makes it difficult to traverse the whole parameter space
-  + Multimodality makes MAP estimator meaningless
-
-General Identification Assumption
+Likelihood (2)
 ========================================================
 
-- Learner homogeneity:
-  + **Identifcation Assumption 1**: Learner's initial mastery is generated i.i.d. from the multinomial distribution $\{\pi^k\}$
-
-- Need to prevent label switching
-  + E.g.: Flip mastery status from 1 to 0; Flip unmastery status from 0 to 1.
-  + **Identifcation Assumption 2(a)**: $X_t,Y_t$ binary, $c_j^{0,1} < c_j^{1,1}$
-  + **Identifcation Assumption 2(b)**: $X_t,Y_t$ tetiary, $c^{0,1}_j < (c^{1,1}_j+c^{1,2}_j)$, $c^{1,2}_j < c^{2,2}_j$
-
-Identification (2)
-========================================================
-
-- Similar to method of moments:
-  + The number of parameters is smaller than the number of moment conditions
-
-- Sufficient statistics are the optimal moment conditions
-
-
-Case Study : Identification of BKT model(1)
-========================================================
-id: bkt_identify
-- $T=2$, not uniquely identified
-  + Four equalities but they add up to 1. Thus only three moment conditions
-
+- Conditional likelihood of the Effort and the Latent State
 
 $$
 \begin{aligned}
-P(Y_1=1,Y_2=1) &= (1-\pi)(1-\ell)c_0c_0+(1-\pi)\ell c_0c_1+\pi c_1c_1\\
-P(Y_1=0,Y_2=1) &= (1-\pi)(1-\ell)(1-c_0)c_0+(1-\pi)\ell (1-c_0)c_1+\pi (1-c_1)c_1 \\
-P(Y_1=1,Y_2=0) &= (1-\pi)(1-\ell)c_0(1-c_0)+(1-\pi)\ell c_0(1-c_1)+\pi c_1(1-c_1)\\
-P(Y_1=0,Y_2=0) &= (1-\pi)(1-\ell)(1-c_0)(1-c_0)+(1-\pi)\ell (1-c_0)(1-c_1)+\pi (1-c_1)(1-c_1)\\
+P(\mathbf{X},\mathbf{E}|\mathbf{A},\Theta,Z) &= P(X_1|Z)P(E_1|X_1,Z)\prod_{t=2}^{T}P(X_t|X_{t-1},Z,E_{t-1})P(E_t|X_t,Z)\\
+P(X_1|Z) &= \prod_{k=0}^{M_X-1}(\pi^{z;k})^{I(X_1=k,Z=z)}\\
+P(E_t|X_t,Z,\mathbf{A}) &=\prod_{j=1}^J(\gamma_j^{z;k})^{I(A_t=j,Z=z,X_t=k,E_t=1)}(1-\gamma_j^{z;k})^{I(A_t=j,Z=z,X_t=k,E_t=0)}\\
+P(X_t|X_{t-1},E_{t-1},Z,\mathbf{A})&=\prod_{j=1}^J\{[\prod_{k=1}^{M_X-2} (1-\sum_{n=k+1}^{M_X-1} \ell^{z;k,n}_j)1^{I(A_{t-1}=j,X_{t-1}=k,X_t=n,Z=z,E_t=1)}]\\
+&[\prod_{m=1}^{M_X-2}\prod_{n=k+1}^{M_X-1}(\ell^{z;m,n}_j)^{I(A_{t-1}=j,X_{t-1}=m,X_t=n,Z=z,E_t=1)}]\}
 \end{aligned}
 $$
-Case Study : Identification of BKT model(2)
+
+
+
+Augment State (Brute Force)
 ========================================================
 
-- $T=3$, uniquely identified
-  + Nine equalities with eight moments
+- The latent states can be generated by rule. Given the latent states, calculate the likelihood marginalizing out nuisance states.
 
 $$
 \begin{aligned}
-P(Y_1=1,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0^2(1-c_1) + (1-\pi)\ell c_0c_1(1-c_1)+\pi c_1^2(1-c_1) \\
-P(Y_1=1,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0(1-c_0)c_1 + (1-\pi)\ell c_0(1-c_1)c_1+\pi c_1^2(1-c_1) \\
-P(Y_1=0,Y_2=1,Y_3=1) &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell (1-c_0)c_0c_1 + (1-\pi)\ell (1-c_0)c_1^2+\pi c_1^2(1-c_1) \\
-P(Y_1=0,Y_2=0,Y_3=1) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)^2c_1 + (1-\pi)\ell (1-c_0)^2c_1+\pi c_1(1-c_1)^2 \\
-P(Y_1=0,Y_2=1,Y_3=0) &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)c_0(1-c_1) + (1-\pi)\ell c0(1-c_0)(1-c_1)+\pi c_1(1-c_1)^2\\
+P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-1}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)\\
+P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-2}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) \quad \text{(4.1)}
 \end{aligned}
 $$
-[proof](#\bkt_proof)
 
-The Sufficient Statistics
-========================================================
-
-Let $G(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$ maps the observed variable to a set $\Omega$ with size $Z$.
-
-Let $G^{-1}(z)$ denote the $z^{th}$ element of mapping set.
+- The backward sampling scheme is
+    + Sample the latest latent state $X_T$ by  $P(X_T=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)$
+    + Given the sampled $X_{t+1}$, sample the last latent state $X_t$ by $P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)$
 
 $$
-L = \prod_{i=1}^N P(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i) = \prod_{z=1}^ZP(G^{-1}(z))^{\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)}
+\begin{aligned}
+P(X_T=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=  \frac{P(X_T=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}{\sum_{k=0}^{M_X-1}P(X_T=k,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}\\
+P(X_{t-1}=m|,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) &= \frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)}
+\end{aligned}
 $$
 
-- Let $n_z=\sum_{i=1}^N1(G(\mathbf{Y}^i,\mathbf{A}^i,\mathbf{E}^i,\mathbf{H}^i)=z)$
-
-
-The Sufficient Statistics (Cont)
-========================================================
-- Example:
-  + Response only, binary $Y_t$, $t$=2, $j=1$
-  + $\Omega=\{(1,1),(0,1),(1,0),(0,0)\}$
-  + $G((1,0))=3$, $G^{-1}(3) = (1,0)$
-
-Identification
-========================================================
-- By law of large numbers $\lim_{N\rightarrow \infty}\frac{\sum_i^N1(G(\mathbf{y},\mathbf{a},\mathbf{h},\mathbf{e})=z)}{N} \rightarrow p_z$
-- Sufficient statistics $\{p_1,\dots,p_Z\}$. It implies Z-1 moment conditions.
-- Let the size of the parameter set $\Theta$ to be W.
-
-- Necessary condition: $Z\geq W$
-- Sufficient condition: Only possible to prove local unique identification result
-
-
-Estimation
-========================================================
-id: mcmc
-- Why not EM:
-  + Lack of Unique Identification
-  + Hard to incorporate the hazard model
-  + [Future] Hard to incorporate user heterogeneity
-
-- General Stategy of MCMC
-  + Given parameters, augment the latent states
-  + Given latent states, update the parameters with Gibbs Sampling
-
-- [Future] Hamiltonian Markov Chain Monte Carlo for better mixture in high dimensional parameter space
-
-
-Data Augmentation(1): Brute Force
-========================================================
-- Calculate the initial density and conditional probability explicitly
-  + $P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{(X_t=n\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
-  + $P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\sum_{((X_{t-1}=m,X_t=n)\in\mathbf{X})}P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
-  + $P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=  \frac{P(X_t=n|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{\sum_{k=1}^{M_x}P(X_t=k|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}$
-  + $P(X_{t-1}=m|X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})=\frac{P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}{P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})}$
-
-- Sampling Scheme
-  + Draw the last state by $P(X_{T}|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A})$
-  + Draw backward by $P(X_{t-1}|X_t=k)$ conditional on the last draw $X_t=k$
-
-Data Augmentation(2): FRBS
+Augment State (Forward Recusion and Backward Sampling)
 ========================================================
 
-- Forward recursion, backward sampling[Scott, 2002]
-  + $\tilde{\pi}^k_t=P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,H_t, \Theta)$
-  + $P_{t}(m,n) = P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1},H_{t+1},\Theta)$
+- The FRBS algorithm is essentially the brute force algorithm
 
-- Recursion
+- The computation cost is reduced by leveraging the conditional independence of the First Order Markov Chain
 
-  1. Initialize the marginal state density by
+[details](#/frbs)
 
-  $$
-  \tilde{\pi}^k_1 = \frac{P(X_1=k)P(E_1|X_1=k)P(H_1|X_1=k)P(Y_1|X_1=k,E_1)}{\sum_{n=1}^K P(X_1=n)P(E_1|X_1=n)P(H_1|X_1=n)P(Y_1|X_1=n,E_1)}
-  $$
-
-  2. Calculate $P_t(n,k)=\tilde{\pi}_{t-1}^n P(X_t=k|X_{t-1}=n,E_{t-1})P(Y_t|X_t,E_t)P(E_t|X_t)\prod_{k=1}^T(1-h_k^{X_k})$
-
-  3. Calculate $\tilde{\pi}_t^k=\sum_{n}P_t(n,k)$
-
-Data Augmentation: FRBS sampling
+Augment Learner Type
 ========================================================
-- Why backward sampling legit
 
-  + By the assumption of first-order Markov chain $X_t\perp\!\!\!\perp \mathbf{Y}_{t+2,T},\mathbf{E}_{t+2,T},\mathbf{H}_{t+2,T}|X_{t+1}$
-  + $P(X_t|X_{t+1}=j,\mathbf{Y},\mathbf{E},H_T,\Theta) = P(X_t|X_{t+1},\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{H}_{1,t+1},\Theta)$, which is $\frac{P(i,j)}{\sum_i P(i,j)}$
-
-- Scheme
- + Sample by $\tilde{\pi}^k_T$
- + Backward sample by $\frac{P(k,j)}{\sum_i P(i,j)}$ given $X_{t+1}=j$
-
+$$
+P(Z=z|\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},\Theta) = \frac{\alpha_zP(\mathbf{Y},\mathbf{E},\mathbf{H}|\mathbf{A}Z=z,\Theta)}{\sum_{w=1}^{M_Z}(\alpha_wP(\mathbf{Y},\mathbf{E},\mathbf{H}|\mathbf{A},Z=w,\Theta))}
+$$
 
 Gibbs Sampling: Conjugate Posterior
 ========================================================
 
-- Except for the hazard model, all parameters are either binomial or multinomial
-  + The conjugate prior is either Beta(1,1) or Dirchelet(1,$\dots$,1)
-  + The posterior is Beta(1+$n_0$,1+$n_1$)  or Dirchelet(1+$n_1$, $\dots$, 1+$n_N$)
+- The mixture density
 
-- Prior effectively assigns zero probability mass to parameter being 0 or 1, which satisfied **identification assumption 3**
+$Dir(a_{Z_1},\dots,a_{Z_{M_Z}})$ where $a_{Z_k} = 1+\sum_{i=1}^N I(Z^i_1=k)$.
 
-- To satisfy  **identification assumption 2**, draw new set of parameters until the inequality is met
+- The initial state density of learner type $z$
+
+$Dir(a_{X_0;z},\dots,a_{X_{M_X-1};z})$ where $a_{X_k;z} = 1+\sum_{i=1}^N I(X^i_1=k,Z^i=z)$.
+
+- The effort rates conditional on the latent state mastery ($X=k$) of learner type $z$
+
+$Beta(a_{E_0;z},a_{E_1;z})$ where $a_{E_e;z} = 1+\sum_{t=1}^T\sum_{i=1}^N I(E_t=e, X^i_t=k,Z^i=z)$.
+
+- The response rates conditional on the latent state mastery ($X=k$)
+
+$Dir(a_{Y_0},\dots,a_{Y_{M_Y-1}})$ where $a_{Y_r} = 1+\sum_{t=1}^T\sum_{i=1}^N I(Y^i_t=r,X^i_t=k,E_t=1)$.
+
+- (Nonparametric) The hazard rate conditional on the latent mastery $k$ of learner type $z$
+
+$Beta(a_{H^{z;k}_{t,0}},a_{H^{z;k}_{t,1}})$ where $a_{H^{z;k}_{t,h}} = 1+\sum_{i=1}^N I(X^i_t=k,Z^i=z,H_t=h)$
+
+
 
 Gibbs Sampling: Non-conjugate Posterior
 ========================================================
@@ -533,424 +530,292 @@ Gibbs Sampling: Non-conjugate Posterior
 - The conditional distribution of $\lambda$ and $\beta$ are log concave
   + $\lambda e^{\beta T}<1$ contrains the initial sampling point
 
+[details](#/ars)
 
-Chapter III: Selection Bias of the Exit Decision
+
+Chapter 5: Dynamic Selection Bias of Sample Attrition
 ========================================================
-id: chp3
-type: section
-
-- [Motivation](#/chp3mot)
-
-- [Characterize the Bias](#/chp3theory)
-
-- [Case Study](#/chp3case)
-
-Motivation
-=======================================================
-id: chp3mot
-
-- Dynamic Selection Bias
-  + If the learner is allowed to drop out
-  + Low mastery students drop out first
-  + Higher success rate reflect both learning and survival bias
-
-
-Characterize the Bias
-=======================================================
-id: chp3theory
-
-$$
-E(\hat{\ell^k}) = \ell\times \frac{\sum_{t=1}^TP(H_t=0|X_t=k+1,X_{t-1}=k|\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}{\sum_{t=1}^TP(H_t=0|X_{t-1}=k,\mathbf{Y},\mathbf{E})P(X_{t-1}=k|\mathbf{Y},\mathbf{E})}
-$$
-- Unbiased if and only if $P(H_t|X_t=k+1,X_{t-1}=k)=P(H_t|X_{t-1}=k)$, which means the stop decision is independent of latent state
-
-- If $h_t^1 < h_t^0$, Then $P(H_t=0|X_t=1,X_{t-1}=0) > P(H_t=0|X_{t-1}=0)$, and the pedagogical efficacy is **biased upwards**
-
-- Notice that if the hazard rate only depends on response but not state, the pedagogical efficacy is unbiased
-
-Case Study
-=======================================================
-id: chp3case
-
-- [The Learning Environment] (#/chp3env)
-
-- [The Learning Task] (#/chp3task)
-
-- [Result] (#/chp3res)
-
-
-The Learning Environment(1)
-=======================================================
-id: chp3env
-
-<img src="fig/app.png" title="Level Initiation" alt="Level Initiation" style="display: block; margin: auto;" />
-
-
-The Learning Environment(2)
-=======================================================
-- Mechanically built in selection bias
-  + Correct, damage the enenmy
-  + Incorrect, damaged by the enemy
-  + Maximum take 3 hits
-  + Longest streak is 10. Data collected at the first 5.
-- Basic algorithmatic training
-  + identical unidimensional latent skill
-  + Quasi-homogeneous items
-
-
-
-The Learning Task
-=======================================================
-id: chp3task
-
-- Sequential Order: Grade 1
-  + 1,4,2. What is the 2nd largest number?
-
-- Vertical Division: Grade 2
-
-![plot of chunk unnamed-chunk-4](fig/vertical_division.png)
-
-
-Observed Learning Curve
-=======================================================
-id: chp3res
-
-![plot of chunk unnamed-chunk-5](fig/chp3_obs_res_rate.png)
-
-Differential Attrition
-=======================================================
-id: chp3res
-
-![plot of chunk unnamed-chunk-6](fig/hazardrate.png)
-
-Estimated Pedagogical Efficacy
-=======================================================
-- Baseline(BKT):
-
-  + $E_t=1$
-  + $X_t$,$Y_t$ binary
-  + $j=1$
-  + $H_t=0$
-
-- General model:
-  + Allow $H_t$
-
-***
-
-|Knowledge Point | BKT | BKT+Hazard|
-|----------------|-----|-------|
-|Sequential Order| 0.213|0.097 |
-|Vertical Division|0.077 |0.004 |
-
-Estimated Pedagogical Efficacy
-=======================================================
-
-![plot of chunk unnamed-chunk-7](fig/chp3_lc_fit.png)
-
-
-Chapter IV: Effort Induced Measurement Error
-========================================================
-id: chp4
-type: section
-
-- [Motivation](#/chp4mot)
-
-- [Characterize the Bias](#/chp4theory)
-
-- [Case Study](#/chp4case)
-
-
+type:section
+id:chp5
 
 
 Motivation
 =======================================================
-id: chp4mot
 
-- Consider an RCT that compares pedagogical efficacies of two items
-    + Random assignment of the items
-    + Balanced random attrition
-    + standard DID design
+- Which practice has better efficacy?
+    + Conventional wisdom says long division because the learning curve rises more sharply
+    
+***
 
-$$
-Y_{i,T} = \beta_d D_i + \beta_t T + \gamma D_i T + \epsilon_{i,T}
-$$
+![plot of chunk unnamed-chunk-5](thesis-figure/unnamed-chunk-5-1.png)
 
-- If items induce differential efforts and the effort influences the performance
-    + The observed performance has non-zero mean measurement error
-    + The DID estimator may not even have the right sign
 
-Task Engagement (or Lack Thereof)
+Dynamic Selection Bias
 =======================================================
-- The lack of effort is a salient feature in the low stake learning environment
-    + Baker et al(2004) and Wixon et al(2012) report the lack of student engagement in digital learning
-    + Pardos et al(2013) documents the lack of student engagement in classroom learning
 
-- Effort is largely absent from other literature because it is hard to monitor
+- Assume the composition of latent types are static when it is chaning
 
+- Assume the change in composition of latent types are from efficacy while it is partly from differential attrition
+    + Let the true efficacy be zero. The true learning curve is flat
+    + Let learners without mastery be more likely to dropout
+    + The proportion of learners without mastery descreases overtime, which results in an upward sloping learning curve
 
-Characterize the Bias(1)
+- Differential attrition is a Necessary, but not Sufficient, condition for bias in the estimated parameters
+    + The dependence structure of the stop decision matters
+    
+Stop-by-rule or Stop-by-choice 
 =======================================================
-id: chp4theory
 
-- To show the intuition, assume a very simple structure
-    + $M_x=M_y=2$, $j=1$
-    + $c^{11}=1$, $c^{01}=0$. No slip and no guess
-    + $e^1=1$. Mastered student always exerts effort
-    + $0< e^0 <1$. Unmastered student slacks some of the time
+- Stop-by-rule:
 
-- It can be proved that the estimated pedagogical efficacy is biased downwards
+    + The exit from practice due to a system rule, which is usually based on the observed response.
 
-$$
-E(\hat{\ell}- \ell)  =  \ell(e^0-1) <0
-$$
+    + E.g. In old Duolingo, a learner can make three errors before being forced to stop
 
+![plot of chunk unnamed-chunk-6](fig/duolingo_screenshot.png)
 
+***
 
+- Stop-by-choice:
+    + The exit from practice due to learner's own initiative when she could have continued to practice, which is usually the consequence of learner's non-cognitive skill
+    + Link (different) non-cognitive skills to states of latent mastery
+        - Without mastery: resiliance against frustration
+        - With mastery: resiliance against boredom
 
-Characterize the Bias(2)
+Dependence Structure and Dynamic Selection Bias
 =======================================================
-- In the motivating RCT example, the ATE is
+
+- If the stop decision is stop-by-rule
+    + Both BKT and LTP consistently estimate parameters of the learning process
+
+- If the stop decision is stop-by-choice
+    + Only LTP consistently estiamte parameters of the learning process
+
+- Key Intuition: 
+    + The parameter learning in BKT is already conditioning on responses. 
+    + In stop-by-rule, conditioning on stop decision, as a function of responses, has no information value
+
+- [Formal proof](#stop_proof):       
+
+A Revisit of the Motivation Example
+=======================================================
+
+- [The learning environment] (#/babel)
+
+- The system stop decision is stop-by-rule:
+    + The practice ends if learners accumulate 2-3 errors or 3-4 successes
+
+- The empirical hazard rate shows that there are stop-by-choice
+    + Hazard rate is not zero in the first period
+
+- Long division has bigger selective sample attrition
+    
+***
+![plot of chunk unnamed-chunk-7](thesis-figure/unnamed-chunk-7-1.png)
+
+Hazard Rates are Reasonably Estimated 
+=======================================================
+![plot of chunk unnamed-chunk-8](fig/hr-fit.png)
+
+Majority of the Observed Learning Gain is Spurious
+=======================================================
+
+- The counterfactual learning curve without selection
+
+![plot of chunk unnamed-chunk-9](fig/lc_fit_efficacy.png)
+
+***
+
+- The predicted learning curve with selection
+
+![plot of chunk unnamed-chunk-10](fig/lc_fit_attrition.png)
+
+
+Chapter 6: Effort Choice and Efficacy Ranking
+========================================================
+id: chp6
+type: section
+
+
+Motivation: Learner Engagement in a Low Stake Learning Environment
+========================================================
+
+- An emerging literature on students not giving their best at learning
+    + The problem has been recognized for a decade in the learning analytics
+    + The problem starts to get attraction in economics due to Levitt's work on incentive
+    
+- If a program does not have effectiveness:
+    + No pedagogical efficacy
+    + Has pedagogical efficacy but also low effort appeal
+    
+- Randomized Control Trial design does not preclude the problem of effort
+
+Difference in Difference as a Measure of Effectiveness
+========================================================
+
+- RCT allows the estimation of ATE
 
 $$
-E(\hat{\gamma}) = \ell_1e^0_1-\ell_0e^0_0
+ATE = [E(Y|D=T,t=1)-E(Y|D=C,t=1)]-[E(Y|D=T,t=0)-E(Y|D=C,t=0)]  \quad \text{(6.1)}
 $$
-- For the sign to be correct: $(\ell_1-\ell_0)(\frac{l_1}{l_0}-\frac{e_0}{e_1})>0$
 
-    + It implies more pedagogical effective item also induces more effort
-    + Not true in general
+- DID estimates the ATE by
 
+$$
+Y_{i,t} = \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+$$
+
+- But DID is really estimating
+
+$$
+\begin{aligned}
+O_{i,t} &= Y_{i,t}E_{i,t}\\
+O_{i,t} &= \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+\end{aligned}
+$$
+
+Does DID Estimate the Same Efficacy Rank Order
+========================================================
+
+- Yes: When the control group has a null efficacy
+    + Essentially a power problem
+    
+- No: Otherwise
+    + E.g. Same Efficacy but can generate different sign of relative effectiveness with different effort specification
+    + The problem does not go away in large sample
+
+[formal proof](#/did_proof)
 
 
 Case Study
-=======================================================
-id: chp4case
+========================================================
 
-- [The Learning Environment] (#/chp4env)
-
-- [The Experiment Design] (#/chp4design)
-
-- [The Identification of Effort] (#/effortident)
-
-- [Result] (#/chp4res)
-
-
-"Gamified" Learning
-=======================================================
-id: chp4env
-
-<img src="fig/initial.png" title="Level Initiation" alt="Level Initiation" style="display: block; margin: auto;" />
-Practice Interface
-=======================================================
-<img src="fig/practice.png" title="Practice Interface" alt="Practice Interface" style="display: block; margin: auto;" />
-
-Low Stake Incentive
-=======================================================
-<img src="fig/completion.png" title="Level Completion" alt="Level Completion" style="display: block; margin: auto;" />
-
-
-The Experiment Design (1)
-=======================================================
-id: chp4design
-
-- The learning task / pre-test
-- Calculate the circumference and area of the large rectangle
-- Student fills in the blanks
+- [The learning environment](#/afenti)
+    + a low stake learning environment
+    + learners are known to exert low effort sometimes
+![plot of chunk unnamed-chunk-11](fig/practice_screenshot.png)
 
 ***
 
-<img src="fig/f1.png" title="Pre-test" alt="Pre-test" style="display: block; margin: auto;" />
+- The experiment 
+    + Goal: compare the efficacy of practice question with or without video instruction
+![plot of chunk unnamed-chunk-12](fig/item.png)
+- Instruction:
+    + Calculate the circumference and the area of the small rectangle
+    
+    + To get the circumference of the large rectangle, multiply the circumference of the small rectangle by two and subtract two times of the length of the joined side
+    
+    + To get the area of the large rectangle,  multiply the area of the small rectangle by two
+
+
+Effort Identification
+========================================================
+
+- No Effort
+    + Blank Answer
+    + Nonsensical answer (E.g. Emoji)
+
+- Valid Effort:
+    + An honest error
+        - Mis-identified the length or width of the large rectangle
+        - Either circumference or the area is correctly calculated
+    + Correct answer
 
 
 
-The Experiment Design (2)
-=======================================================
 
+|   Group   | Task  | No-Effort(%) | No-Effort(SE) | Honest Error (%) | Honest Error (SE) | Correct(%) | Correct(SE) |
+|:---------:|:-----:|:------------:|:-------------:|:----------------:|:-----------------:|:----------:|:-----------:|
+|  Control  |  pre  |      25      |     0.87      |        28        |       0.91        |     47     |     1.0     |
+| Treatment |  pre  |      27      |     0.95      |        27        |       0.95        |     46     |     1.1     |
+|  Control  | train |      30      |     0.93      |        23        |       0.84        |     47     |     1.0     |
+| Treatment | train |      34      |     1.01      |        21        |       0.87        |     45     |     1.1     |
+|  Control  | post  |      35      |     0.96      |        16        |       0.74        |     49     |     1.0     |
+| Treatment | post  |      36      |     1.03      |        16        |       0.79        |     48     |     1.1     |
 
-- Post-test
-<img src="fig/f3.png" title="Post-test" alt="Post-test" style="display: block; margin: auto;" />
+Robustness of the Effort Identification
+========================================================
 
-The Experiment Design (3)
-=======================================================
+- Distribution of Time Spent on Item without Effort 
 
-- Same Training Question
-
-![plot of chunk unnamed-chunk-13](fig/f2.png)
-
-***
-
-
-- Different Delivery Methods
-    + No Scaffolding
-    + Vocabulary Scaffolding
-        * What is the new length and width
-        * What is the circumference
-        * What is the area
-    + Video Scaffolding [not compulsory] that reveals the post-test question
-    [(link)](http://my.polyv.net/front/video/preview?vid=36488cc9164c53d6616869d83fbfd1b3_3)
-
-The Experiment Design (4)
-=======================================================
-- Group Status
-    + Group 1: pre-test + no-scaffolding + post-test
-    + Group 2: no-scaffolding + post-test
-    + Group 3: pre-test + vocabulary-scaffolding + post-test
-    + Group 4: vocabulary-scaffolding + post-test
-    + Group 5: pre-test + video-scaffolding + post-test
-
-- Group Assignment
-    + Assign learners to the group based on the remainder of their user id divided by 5
-
-
-Summary Statistics(1)
-=======================================================
-- Total learners recruited: 13939
-- Average retention rate is 84%. Pre-test hurts retention.
+![plot of chunk unnamed-chunk-14](thesis-figure/unnamed-chunk-14-1.png)
 
 ***
 
-![plot of chunk unnamed-chunk-14](fig/exp_attrition.png)
 
-Summary Statistics(2)
-=======================================================
-- The no scaffolding and video scaffolding group has almost no difference
-- The vocabulary scaffolding has worse efficacy than the no scaffolding
+Distribution of Time Spent on Item With Effort 
 
-***
-
-![plot of chunk unnamed-chunk-15](fig/exp_stat.png)
-
-The Identification of Effort: Identification
-=======================================================
-id: effortident
-
-- [effort classification](#/ans_class)
-  + Slack/Give up: blank answer, non-blank wrong answer
-  + Valid Effort: Slip, partial right and all right
+![plot of chunk unnamed-chunk-15](thesis-figure/unnamed-chunk-15-1.png)
 
 
-Validity(1)
-=======================================================
-- The learner spent significantly less time to submit a blank answer in repeated exercises
-  + Compare no scaffolding with and without pre-test
-- [Not Shown] Submitting a blank answer is highly serial correlated
+Differential Effort Level Choice
+========================================================
+- Fill-in-the-blanks has close to zero guess rate
 
-***
+- Learners who answer the pre-test item correctly must have mastery
+    + The effort gap rate is 2% in the training question
+    
+- Learners who answer the pre-test item incorrectly either has no mastery or exert no effort
+    + The effort gap rate for learners without mastery is at least 4% in the training question
 
-![plot of chunk unnamed-chunk-16](fig/blank_ans_time_dist.png)
-
-Validity(2)
-=======================================================
-- Non-blank answer is also likely to be slacking:
-  + In repeated exercises, skewed toward left, similar to the blank answer
-  + Has lower mean compare to the other two
-
-- Valid Error and Correct has no position shift and similar distribution
-
-***
-
-![plot of chunk unnamed-chunk-17](fig/non_blank_ans_time_dist.png)
+- A non-zero effort gap at the pre-test
+    + The RCT is not perfectly executed
 
 
+| Period |   Group   | Mean Effort Rate(Y=0) | S.E(Y=0) | Mean Effort Rate(Y=1) | S.E(Y=1) |
+|:------:|:---------:|:---------------------:|:--------:|:---------------------:|:--------:|
+|  pre   |  Control  |         0.54          |   0.01   |         1.00          |    0     |
+|  pre   | Treatment |         0.51          |   0.01   |         1.00          |    0     |
+| train  |  Control  |         0.48          |   0.01   |         0.94          |    0     |
+| train  | Treatment |         0.44          |   0.01   |         0.92          |    0     |
+|  post  |  Control  |         0.43          |   0.01   |         0.90          |    0     |
+|  post  | Treatment |         0.43          |   0.01   |         0.90          |    0     |
 
-Pattern(1)
-=======================================================
-- Increase by sequence
-- Higher for the vocabulary scaffolding
-
-***
-
-![plot of chunk unnamed-chunk-18](fig/exp_giveup.png)
-
-Pattern(2)
-=======================================================
-- Highly serial correlated
-- [Left panel] All-giveup has higher probability mass than a binomal model would predict.
-
-***
-
-![plot of chunk unnamed-chunk-19](fig/exp_giveup_seq.png)
-
-The Result
-=======================================================
-id: chp4res
-
-- The model is estimated with MCMC algorithm
-  + The learning parameter has a beta prior B(1,1)
-  + Chain length 1000. First 30% is burn-in sample.
-  + Sample every 10 iterations
-- Only groups with both pre-test and post-test are included in the sample
-- Two-state model, binary grade; Three-state model, partial grade
-
-The Result (Two-state model)
-=======================================================
-- Position shifts (correct for downward bias)
-- Weakly separate out video scaffolding
-
-***
-
-![plot of chunk unnamed-chunk-20](fig/mcmc_2_param.png)
-
-The Result (Three-state model: 0->1)
-=======================================================
-- The pedagogical efficacy with effort is not well estimated
-  + Because low effort rate and low initial density, too few observations
-
-***
-
-![plot of chunk unnamed-chunk-21](fig/mcmc_3_param_01.png)
+Result for Aggregate Score
+========================================================
 
 
+| Model | Est. Rel  Effectivness | Est. Rel  Efficacy | 95% CI(L) | 95% CI(H) | Treatment Better? |
+|:-----:|:----------------------:|:------------------:|:---------:|:---------:|:-----------------:|
+|  DID  |          0.01          |         NA         |   -0.03   |   0.05    |         N         |
+|  LTP  |           NA           |        0.12        |   0.01    |   0.23    |         Y         |
 
-The Result (Three-state model: 1->2)
-=======================================================
+Result for Component Score
+========================================================
 
-- More robust to effort decision
-- Clear separation of item characteristic
 
-***
+| Knowledge Component | Model | Est. Rel  Effectiveness | Est. Rel  Efficacy | 95% CI(L) | 95% CI(H) |
+|:-------------------:|:-----:|:-----------------------:|:------------------:|:---------:|:---------:|
+|        Area         |  LTP  |           NA            |        0.03        |   -0.12   |   0.19    |
+|        Area         |  DID  |          0.02           |         NA         |   -0.02   |   0.06    |
+|    Circumference    |  LTP  |           NA            |        0.23        |   0.09    |   0.40    |
+|    Circumference    |  DID  |          0.01           |         NA         |   -0.03   |   0.05    |
+|        Shape        |  LTP  |           NA            |        0.02        |   -0.11   |   0.15    |
+|        Shape        |  DID  |          0.01           |         NA         |   -0.02   |   0.05    |
 
-![plot of chunk unnamed-chunk-22](fig/mcmc_3_param_12.png)
-
-Q&A
+Thank You
 =======================================================
 type: section
 
-Not IRT model
-=======================================================
-id: irt
+<font size="80"> Q&A </font> 
 
-- Learning from doing is bad for assessment
-  + Local indepdence: Conditional on user score, items are independent of each other
-  + user score is assumed to be invariant
 
-- Cannot model pedagogical efficacy
-
-[return](#/intro_mot)
-
-Proof of Unique Identification
-=======================================================
-id:bkt_proof
-- $c_1=\frac{p_{101}-p_{011}}{p_{10}-p_{01}}$
-- $\frac{p_{110}-p_{101}}{p_{001}-p_{010}} =\frac{c_0}{1-c_0} \rightarrow c_0=\frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}}$
-- $\pi$ and $\ell$ can be expressed as a function of $c_0$ and $c_1$
-  + $p_{1}=\pi c_1+(1-\pi)c_0$
-  + $p_{01}-p_{10} = (1-\pi)\ell(c_1-c_0)$
-
-[return](#\bkt_identify)
-
-Special Case 1: Bayesian Knowledge Tracing Model
+Example 1: Bayesian Knowledge Tracing Model
 =======================================================
 id: bkt
 
 - Developed by Corbert and Anderson(1996)
-- The equivalent of Rasch model in the literature of the learning analytics
-- $M_x=2$, $M_y=2$, $j=1$
-- The guess rate is $c^{0,1}$, The slip rate is $c^{1,0}$.
+- The model is defined by four parameters:
+    + Initial probability of mastery $\pi = P(X_1=1)$
+    + Learning rate $\ell = P(X_t=1|X_{t-1}=0) \equiv \ell^{1;0,1}_1$
+    + Guess rate: $g = P(Y_t=1|X_t=0) \equiv c^{1,0}_1$
+    + Slip rate: $s = P(Y_t=0|X_t=1) \equiv 1-c^{1,1}_1$
 
-[return](#/hmm_example)
+
+[return](#/lp2)
 
 
-Special Case 2: Zone of Proximal Development
+Example 2: Zone of Proximal Development
 =======================================================
 id: zpd
 
@@ -959,78 +824,137 @@ id: zpd
     + Development lags task requirement but may succeed in the task with guidance or collaboration [**The zone**]
     + Development leads task requirement and succeed on their own
 
-Special Case 2: Zone of Proximal Development (Cont)
+- LTP representation: $M_X=3, M_Y=2,M_Z=1$ with effort decision.
+
+$$
+\begin{aligned}
+P(Y_t=0|X_t=0) &\approx 1\\
+P(E_t=0|X_t=0) &\approx 1\\
+P(X_t=2|X_{t-1}=0) &\approx 0\\
+P(Y_t=0|X_t=2) &\approx 0
+\end{aligned}
+$$
+[return](#/ltp_example)
+
+
+Example 3: Reinforcement Learning
 =======================================================
-- $M_x=3$, $M_y=3$, $j=1$
-    + $X=0$ is the unprepared. $X=1$ is the zone. $X=2$ is the mastered
-    + $Y=0$ is failure. $Y=1$ is partial success. $Y=2$ is complete success
+id: rl
 
-- Allow for **learning reinforcement** where positive performance leads to better performance
+- Reinforcement learning
+    + People repeat actions that reward them with pleasure and avoid actions that punish them with pain
+    + The more successes a learner get, the more engaged she is; the more failures a learner gets, the less engaged she is
 
-[return](#/hmm_example)
+- LTP representation:
+    + The stop decision depends on the latent mastery and the hazard rate is negatively correlated with the latent mastery
+    + The effort rate is positively correlated with the latent mastery
+
+[return](#/ltp_example)
 
 
-Answer Classification (1)
+BKT Identification :
 =======================================================
-id: ans_class
-The answers are initially classified into six categories:
+id: bkt_proof
 
-(1) Blank answer: The learner submits nothing on the circumference and the area
+- Theorem 1:
+The Bayesian Knowledge Tracing model is identified on practice sequences with length three if $\pi\neq 1$, $0 \leq \ell<1$ and $c^{1,0} \neq c^{1,1}$.
 
-(2) Non-blank wrong answer: Neither circumference nor area is correctly calculated and not includes in the slip or the wrong shape category
+- Proof:
 
-(3) Slip: The answer is correctly calculated but the learner inputs in a wrong way
+Let $p_{ijk} = P(Y_1=i,Y_2=j,Y_3=k)$, $p_{i,j}=P(Y_1=i,Y_2=j)$, and $p_i=P(Y_1=i)$. Let $c_1=c^{1,1}$, $c_0=c^{1,0}$. Excluding $p_{0,0,0}$, the rest seven moment conditions are:
 
-Answer Classification (2)
-=======================================================
+$$
+\begin{aligned}
+p_{111} &=(1-\pi)(1-\ell)c_0^3+(1-\pi)(1-\ell)\ell c_0^2c_1 + (1-\pi)\ell c_0c_1^2+\pi c_1^3 \\
+p_{110} &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0^2(1-c_1) + (1-\pi)\ell c_0c_1(1-c_1)+\pi c_1^2(1-c_1)\\
+p_{101} &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell c_0(1-c_0)c_1 + (1-\pi)\ell c_0(1-c_1)c_1+\pi c_1^2(1-c_1)\\
+p_{011} &=(1-\pi)(1-\ell)c_0^2(1-c_0)+(1-\pi)(1-\ell)\ell (1-c_0)c_0c_1 + (1-\pi)\ell (1-c_0)c_1^2+\pi c_1^2(1-c_1)\\
+p_{100} &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell c_0(1-c_0)(1-c_1) + (1-\pi)\ell c_0(1-c_1)^2+\pi c_1(1-c_1)^2\\
+p_{010} &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)c_0(1-c_1) + (1-\pi)\ell (1-c_0)(1-c_1)c_1+\pi c_1(1-c_1)^2\\
+p_{001} &=(1-\pi)(1-\ell)c_0(1-c_0)^2+(1-\pi)(1-\ell)\ell (1-c_0)^2c_1 + (1-\pi)\ell (1-c_0)(1-c_1)c_1+\pi c_1(1-c_1)^2
+\end{aligned}
+$$
 
-(4) Wrong Shape: The learner calculates correctly either the circumference or the area of the small rectangle
-
-(5) right circumference: The learner correctly calculates the circumference of the large rectangle
-
-(6) right area: The learner correctly calculates the area of the large rectangle
-
-(7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
-
-Answer Classification (3)
-=======================================================
-
-
-|    Group     | Task  | Blank Ans(%) | Non Blank Wrong Ans (%) | Slip(%) |
-|:------------:|:-----:|:------------:|:-----------------------:|:-------:|
-|     No-3     |  pre  |     10.8     |           14            |  1.09   |
-| Vocabulary-3 |  pre  |     10.4     |           15            |  0.82   |
-|    Video     |  pre  |     11.4     |           15            |  0.73   |
-|     No-3     | train |     14.6     |           16            |  0.32   |
-|     No-2     | train |     9.8      |           13            |  0.48   |
-| Vocabulary-3 | train |     18.2     |           15            |  0.27   |
-| Vocabulary-2 | train |     13.1     |           24            |  0.32   |
-|    Video     | train |     16.3     |           18            |  0.37   |
-|     No-3     | post  |     18.4     |           17            |  0.81   |
-|     No-2     | post  |     16.7     |           18            |  0.52   |
-| Vocabulary-3 | post  |     21.4     |           16            |  0.73   |
-| Vocabulary-2 | post  |     24.2     |           18            |  0.61   |
-|    Video     | post  |     18.2     |           17            |  0.69   |
-
-Answer Classification (4)
+BKT Identification (1) :
 =======================================================
 
+From these base moments, derive the following moments by marginalizing over nuisance periods. For example $p_{11} = p_{111}+p_{110}$.
 
-|    Group     | Task  | Wrong Shape(%) | Right Circ(%) | Right Area(%) | Correct(%) |
-|:------------:|:-----:|:--------------:|:-------------:|:-------------:|:----------:|
-|     No-3     |  pre  |      8.8       |      8.8      |     11.2      |     46     |
-| Vocabulary-3 |  pre  |      7.4       |      8.0      |     11.9      |     47     |
-|    Video     |  pre  |      7.7       |      8.9      |     11.0      |     45     |
-|     No-3     | train |      5.1       |      5.3      |     12.2      |     47     |
-|     No-2     | train |      10.2      |      8.3      |     14.8      |     44     |
-| Vocabulary-3 | train |      10.6      |      9.7      |     17.7      |     28     |
-| Vocabulary-2 | train |      20.7      |      6.3      |     18.4      |     17     |
-|    Video     | train |      3.5       |      4.9      |     12.5      |     45     |
-|     No-3     | post  |      1.9       |     10.0      |      7.6      |     44     |
-|     No-2     | post  |      3.5       |     11.8      |      8.0      |     42     |
-| Vocabulary-3 | post  |      2.5       |     10.5      |      7.0      |     41     |
-| Vocabulary-2 | post  |      5.3       |     11.7      |      6.1      |     34     |
-|    Video     | post  |      1.6       |     10.1      |      8.6      |     43     |
+$$
+\begin{aligned}
+p_{11} &= (1-\pi)(1-\ell)c_0^2+(1-\pi)\ell c_0c_1+\pi c_1^2\\
+p_{01} &= (1-\pi)(1-\ell)(1-c_0)c_0+(1-\pi)\ell (1-c_0)c_1+\pi (1-c_1)c_1\\
+p_{10} &= (1-\pi)(1-\ell)c_0(1-c_0)+(1-\pi)\ell c_0(1-c_1)+\pi c_1(1-c_1)\\
+p_1 &= (1-\pi)c_0+\pi c_1
+\end{aligned}
+$$
+
+With some algebra, it is easy to show that if $\pi \neq 1$, $0 \leq \ell<1$ and $c_1 \neq c_0$,
+$$
+\begin{aligned}
+c_1 = \frac{p_{101}-p_{011}}{p_{01} - p_{10}}\\
+c_0=\frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}}
+\end{aligned}
+$$
+
+Plug $c_1$ and $c_0$ into $p_1$ to solve for $\pi$
+
+$$
+\pi = \frac{p_{10}+p_{01}-\frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}}}{\frac{p_{101}-p_{011}}{p_{01} - p_{10}} - \frac{p_{110}-p_{101}}{p_{110}-p_{101}+p_{001}-p_{010}}}
+$$
+
+Plug $c_1$, $c_0$ and $\pi$ into any of the equations above to solve for $\ell$. This proof chooses $p_{01}-p_{10}$.
+$$
+\ell = \frac{p_{01}-p_{10}}{(1-\pi)(c_1-c_0)} = \frac{p_{01}-p_{10}}{\frac{p_{101}-p_{011}}{p_{01} - p_{10}}-(p_{11}+p_{10})}
+$$
 
 
-[Back](#\effortident)
+
+BKT Identification (2) :
+=======================================================
+
+
+Now that one solution to the system is found, it is necessary to prove that it is the only solution. $c_1$ and $c_0$ are both solutions to a linear equation with one unknown, therefore they are unique. $\pi$ is also the unique solution to a linear equation with one unknown when $c_1$ and $c_0$ are plugged in. When $c_1$, $c_0$ and $\pi$ are solved, $\ell$ is the unique solution to a linear equation in any equations. In sum, the solution is unique although the representation of the solution is not.
+
+BKT Identification (3) :
+=======================================================
+
+Now consider the special cases wheen the model is not identified.
+
+If $\pi=1$ but $0<\ell<1$, $\ell$ and $c_0$ are not identified because they are never observed.
+
+If $\ell=1$ but $0<\pi<1$, $\pi$ and $c_0$ are not identified because $p_1$ is a linear equation with two unknowns.
+
+If $c_1=c_0$, $\pi$ and $\ell$ are not uniquely identified because the latent variable collapses to one state.
+
+
+BKT Identification (4) :
+=======================================================
+
+- Theorem 2:
+
+The Bayesian Knowledge Tracing model is identified if at least three periods of response are observed, $\pi\neq 1$, $0 \leq \ell<1$ and $c^{1,0} \neq c^{1,1}$.
+
+- Proof:
+
+The equivalent representation of Theorem 3.4 is that the BKT model is identified if the three-response sequence BKT model is identified.
+
+Assume the BKT model based on sequences of length three is identified, but the model on sequences of length $T$ is not identified. Let m ($m\geq2$) be the size of the observation equivalent parameter sets. The parameters sets are denoted as $\Theta_1, \dots, \Theta_m$. Because that the parameter space is the same for the BKT model on sequences with length three and that with length $T$, $\Theta_1, \dots, \Theta_m$ also generates the observation for the BKT model on sequences with length three. However, it is uniquely identified, therefore $\Theta_1=\dots=\Theta_m=\Theta$, and the BKT model on sequences with length $T$ is identified.
+
+
+BKT Identification (5) :
+=======================================================
+
+- The practice identification is influence by the magnitude of $\pi$.
+
+- The read tutor has $\pi$ close to 0 and requires longer practice sequence to identify
+
+[return](#/bkt_id)
+
+
+
+
+```
+Error in `$<-.data.frame`(`*tmp*`, "seq", value = integer(0)) : 
+  replacement has 0 rows, data has 6
+```
