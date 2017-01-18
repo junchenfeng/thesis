@@ -96,7 +96,7 @@ Navigation
 - [Chapter 3](#/chp3): Identification
 - [Chapter 4](#/chp4): Estimation
 - [Chapter 5](#/chp5): Dynamic Selection Bias
-- [Chapter 6](#/chp6):Effectiveness V.S.Efficacy
+- [Chapter 6](#/chp6)：Effectiveness V.S.Efficacy
 
 
 
@@ -324,6 +324,8 @@ id: bkt_id
 
 [formal proof](#/bkt_proof)
 
+***
+
 ![plot of chunk unnamed-chunk-4](thesis-figure/unnamed-chunk-4-1.png)
 
 
@@ -395,11 +397,10 @@ Notation
 - $H_t$: If the learner stops at sequence $t$
 - $A_t$: The item $j$ is at $t^{th}$ practice sequence
 
+***
 
-Notation
-========================================================
 + $i$: the the learner id
-+ $N$: the number of learners
++ $N$： the number of learners
 + $T_i$:the sequence length of learner $i$.
 + $\mathbf{X}_{1,T_i}^i$: The latent state sequence. $(X^i_1,\dots,X^i_{T_i})$
 + $\mathbf{Y}_{1,T_i}^i$: The answer sequence. $(Y^i_1,\dots,Y^i_{T_i})$
@@ -413,7 +414,7 @@ Likelihood (1)
 - Likelihood of observed data
 
 $$
-P(\mathbf{Y},  \mathbf{E}, \mathbf{H}|\mathbf{A},\Theta) \propto \sum_{Z=1}^{M_Z}(P(Z) \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|Z,\mathbf{A},\Theta))
+P(\mathbf{Y},  \mathbf{E}, \mathbf{H}|\mathbf{A},\Theta) \propto \sum_{Z=1}^{M_Z}(P(Z) \sum_{X_1}\dots\sum_{X_{T}}P(\mathbf{Y}, \mathbf{E}, \mathbf{H}, \mathbf{X}|Z，\mathbf{A},\Theta))
 $$
 
 - Conditional on Learner Type $z$
@@ -463,7 +464,7 @@ Augment State (Brute Force)
 $$
 \begin{aligned}
 P(X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-1}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)\\
-P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-2}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) \quad \text{(4.1)}
+P(X_{t-1}=m,X_t=n,\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta)&=\sum_{X_1}\dots\sum_{X_{t-2}}\sum_{X_{t+1}}\dots\sum_{X_T} P(\mathbf{X},\mathbf{Y},\mathbf{E},\mathbf{H},\mathbf{A},Z,\Theta) 
 \end{aligned}
 $$
 
@@ -480,6 +481,7 @@ $$
 
 Augment State (Forward Recusion and Backward Sampling)
 ========================================================
+id: augdata_frbs
 
 - The FRBS algorithm is essentially the brute force algorithm
 
@@ -521,6 +523,7 @@ $Beta(a_{H^{z;k}_{t,0}},a_{H^{z;k}_{t,1}})$ where $a_{H^{z;k}_{t,h}} = 1+\sum_{i
 
 Gibbs Sampling: Non-conjugate Posterior
 ========================================================
+id: gibs_ars
 - The parameters of the hazard model can still be drew by full conditional distribution
 - No conjugate prior -> draw new parameter is expensive
 - Adaptive Rejection Sampler uses the log concavity to speed up
@@ -544,7 +547,7 @@ Motivation
 
 - Which practice has better efficacy?
     + Conventional wisdom says long division because the learning curve rises more sharply
-    
+
 ***
 
 ![plot of chunk unnamed-chunk-5](thesis-figure/unnamed-chunk-5-1.png)
@@ -562,8 +565,8 @@ Dynamic Selection Bias
 
 - Differential attrition is a Necessary, but not Sufficient, condition for bias in the estimated parameters
     + The dependence structure of the stop decision matters
-    
-Stop-by-rule or Stop-by-choice 
+
+Stop-by-rule or Stop-by-choice
 =======================================================
 
 - Stop-by-rule:
@@ -584,6 +587,7 @@ Stop-by-rule or Stop-by-choice
 
 Dependence Structure and Dynamic Selection Bias
 =======================================================
+id: stop
 
 - If the stop decision is stop-by-rule
     + Both BKT and LTP consistently estimate parameters of the learning process
@@ -591,16 +595,17 @@ Dependence Structure and Dynamic Selection Bias
 - If the stop decision is stop-by-choice
     + Only LTP consistently estiamte parameters of the learning process
 
-- Key Intuition: 
-    + The parameter learning in BKT is already conditioning on responses. 
+- Key Intuition:
+    + The parameter learning in BKT is already conditioning on responses.
     + In stop-by-rule, conditioning on stop decision, as a function of responses, has no information value
 
-- [Formal proof](#stop_proof):       
+- [Formal proof](#stop_proof):
 
 A Revisit of the Motivation Example
 =======================================================
+id:stop_case
 
-- [The learning environment] (#/babel)
+- [The learning environment](#/babel)
 
 - The system stop decision is stop-by-rule:
     + The practice ends if learners accumulate 2-3 errors or 3-4 successes
@@ -609,11 +614,11 @@ A Revisit of the Motivation Example
     + Hazard rate is not zero in the first period
 
 - Long division has bigger selective sample attrition
-    
+
 ***
 ![plot of chunk unnamed-chunk-7](thesis-figure/unnamed-chunk-7-1.png)
 
-Hazard Rates are Reasonably Estimated 
+Hazard Rates are Reasonably Estimated
 =======================================================
 ![plot of chunk unnamed-chunk-8](fig/hr-fit.png)
 
@@ -643,11 +648,11 @@ Motivation: Learner Engagement in a Low Stake Learning Environment
 - An emerging literature on students not giving their best at learning
     + The problem has been recognized for a decade in the learning analytics
     + The problem starts to get attraction in economics due to Levitt's work on incentive
-    
+
 - If a program does not have effectiveness:
     + No pedagogical efficacy
     + Has pedagogical efficacy but also low effort appeal
-    
+
 - Randomized Control Trial design does not preclude the problem of effort
 
 Difference in Difference as a Measure of Effectiveness
@@ -656,7 +661,7 @@ Difference in Difference as a Measure of Effectiveness
 - RCT allows the estimation of ATE
 
 $$
-ATE = [E(Y|D=T,t=1)-E(Y|D=C,t=1)]-[E(Y|D=T,t=0)-E(Y|D=C,t=0)]  \quad \text{(6.1)}
+ATE = [E(Y|D=T,t=1)-E(Y|D=C,t=1)]-[E(Y|D=T,t=0)-E(Y|D=C,t=0)]
 $$
 
 - DID estimates the ATE by
@@ -676,10 +681,10 @@ $$
 
 Does DID Estimate the Same Efficacy Rank Order
 ========================================================
-
+id: did
 - Yes: When the control group has a null efficacy
     + Essentially a power problem
-    
+
 - No: Otherwise
     + E.g. Same Efficacy but can generate different sign of relative effectiveness with different effort specification
     + The problem does not go away in large sample
@@ -697,14 +702,14 @@ Case Study
 
 ***
 
-- The experiment 
+- The experiment
     + Goal: compare the efficacy of practice question with or without video instruction
 ![plot of chunk unnamed-chunk-12](fig/item.png)
 - Instruction:
     + Calculate the circumference and the area of the small rectangle
-    
+
     + To get the circumference of the large rectangle, multiply the circumference of the small rectangle by two and subtract two times of the length of the joined side
-    
+
     + To get the area of the large rectangle,  multiply the area of the small rectangle by two
 
 
@@ -736,14 +741,14 @@ Effort Identification
 Robustness of the Effort Identification
 ========================================================
 
-- Distribution of Time Spent on Item without Effort 
+- Distribution of Time Spent on Item without Effort
 
 ![plot of chunk unnamed-chunk-14](thesis-figure/unnamed-chunk-14-1.png)
 
 ***
 
 
-Distribution of Time Spent on Item With Effort 
+Distribution of Time Spent on Item With Effort
 
 ![plot of chunk unnamed-chunk-15](thesis-figure/unnamed-chunk-15-1.png)
 
@@ -754,7 +759,7 @@ Differential Effort Level Choice
 
 - Learners who answer the pre-test item correctly must have mastery
     + The effort gap rate is 2% in the training question
-    
+
 - Learners who answer the pre-test item incorrectly either has no mastery or exert no effort
     + The effort gap rate for learners without mastery is at least 4% in the training question
 
@@ -804,7 +809,7 @@ Example 1: Bayesian Knowledge Tracing Model
 =======================================================
 id: bkt
 
-- Developed by Corbert and Anderson(1996)
+- Developed by Corbert and Anderson (1996)
 - The model is defined by four parameters:
     + Initial probability of mastery $\pi = P(X_1=1)$
     + Learning rate $\ell = P(X_t=1|X_{t-1}=0) \equiv \ell^{1;0,1}_1$
@@ -935,6 +940,9 @@ BKT Identification (4) :
 
 The Bayesian Knowledge Tracing model is identified if at least three periods of response are observed, $\pi\neq 1$, $0 \leq \ell<1$ and $c^{1,0} \neq c^{1,1}$.
 
+BKT Identification (5) :
+=======================================================
+
 - Proof:
 
 The equivalent representation of Theorem 3.4 is that the BKT model is identified if the three-response sequence BKT model is identified.
@@ -942,7 +950,7 @@ The equivalent representation of Theorem 3.4 is that the BKT model is identified
 Assume the BKT model based on sequences of length three is identified, but the model on sequences of length $T$ is not identified. Let m ($m\geq2$) be the size of the observation equivalent parameter sets. The parameters sets are denoted as $\Theta_1, \dots, \Theta_m$. Because that the parameter space is the same for the BKT model on sequences with length three and that with length $T$, $\Theta_1, \dots, \Theta_m$ also generates the observation for the BKT model on sequences with length three. However, it is uniquely identified, therefore $\Theta_1=\dots=\Theta_m=\Theta$, and the BKT model on sequences with length $T$ is identified.
 
 
-BKT Identification (5) :
+BKT Identification (6) :
 =======================================================
 
 - The practice identification is influence by the magnitude of $\pi$.
@@ -951,10 +959,316 @@ BKT Identification (5) :
 
 [return](#/bkt_id)
 
+***
+
+<img src="thesis-figure/unnamed-chunk-19-1.png" title="Posterior Distribution of Parameters: Read Tutor Model" alt="Posterior Distribution of Parameters: Read Tutor Model" style="display: block; margin: auto;" />
+
+
+LTP Identification
+=======================================================
+id: ltp_proof
+
+- $\mathbf{Y}$ is the joint responses. $\mathbf{H}$ is the joint stop decisions. $\mathbf{E}$ is the joint effort decisions. $\mathbf{a},\mathbf{y},\mathbf{h},\mathbf{e}$ are the realized value.
+- Define a mapping function $G(\mathbf{y},\mathbf{a},\mathbf{e},\mathbf{h})=\omega$ that projects each distinct combinations of $\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H}$ to a distinct $\omega$. Define a new random variable $\Omega$ that follows a multinomial distribution whose probability mass function is
+
+$$
+P(\Omega=\omega) = P(\mathbf{Y}=\mathbf{y},\mathbf{A}=\mathbf{a}, \mathbf{E}=\mathbf{e},\mathbf{H}=\mathbf{h})
+$$
+
+
+- Let $N_{\Omega}$ be the cardinality of the sample space of $\Omega$. Define $n_\omega=\sum_{i=1}^N I(G(\mathbf{y}^i,\mathbf{a}^i,\mathbf{e}^i,\mathbf{h}^i)=\omega)$ where $i$ is the learner id and $N$ is the number of learners.
+
+LTP Identification (1)
+=======================================================
+
+- Theorem :$\{ n_1,\dots\,n_{N_{\Omega}}\}$ are sufficient statistics of the joint distribution $(\mathbf{Y},\mathbf{A}, \mathbf{E},\mathbf{H})$
+
+
+- proof:The total likelihood function is
+
+$$
+\begin{aligned}
+L &= \prod_{i=1}^NP(\mathbf{Y}=\mathbf{y}^i,\mathbf{A}=\mathbf{a}^i, \mathbf{E}=\mathbf{e}^i,\mathbf{H}=\mathbf{h}^i)\\
+&= \prod_{i=1}^NP(\Omega=G(\mathbf{y}^i,\mathbf{a}^i,\mathbf{e}^i,\mathbf{h}^i))= \prod_{\omega=1}^{N_{\Omega}} P(\Omega=\omega)^{\sum_{i=1}^N I(G(\mathbf{y}^i,\mathbf{a}^i,\mathbf{e}^i,\mathbf{h}^i)=\omega)} \\
+&= \prod_{\omega=1}^{N_{\Omega}} P(\Omega=\omega)^{N_{\omega}}
+\end{aligned}
+$$
+
+
+LTP Identification (2)
+=======================================================
+
+- Theorem
+The parameters are locally identified only if the number of parameters is smaller than or equal to $N_{\Omega}-1$ and the Jacobian matrix of the moment conditions evaluated at the local optimal solution has full column rank.
+
+- Proof
+    + If the number of parameters is larger than $N_{\Omega}-1$, there are more variables than equations. The system has no unique solution.
+    + If Jacobian matrix evaluated at the optimal solution does not full column rank, it means that for at least one such $\theta^*_j$ that $\frac{\partial P(\Omega=\omega,\theta^*)}{\partial \theta_j^*} =0 \quad \forall \omega$. Therefore, $\theta_j$ has multiple roots and the solution is not unique.
+
+[return](#/ltp_id)
+
+
+Forward Recursion Back Sampling Algorithm
+=======================================================
+id:frbs
+
+[return](#/augdata_frbs)
+
+- Start with the conditional marginal density($\tilde{\pi}^{z;k}_t$) and the conditional joint density of two adjacent latent states ($\tilde{p}^{z;m,n}_{t+1}$)
+
+$$
+\begin{aligned}
+\tilde{\pi}^{z;k}_t & =P(X_t=k|\mathbf{Y}_{1,t},\mathbf{E}_{1,t},\mathbf{A}_{1,t} ,\mathbf{H}_{1,t}, Z,\Theta)\\
+\tilde{p}^{z;m,n}_{t+1}&=P(X_t=m,X_{t+1}=n|\mathbf{Y}_{1,t+1},\mathbf{E}_{1,t+1},\mathbf{A}_{1,t+1} ,\mathbf{H}_{1,t+1}, Z,\Theta)
+\end{aligned}
+$$
+
+- The recursive algorithm is:
+    + Given $\tilde{\pi}^m_t$, calculate the conditional joint density ($\tilde{p}^{z;m,n}_{t+1}$)
+    + Given $\tilde{p}^{z;m,n}_{t+1,Z}$, calculate partial conditional marginal density ($\tilde{\pi}_{t+1}^{z;n}$)
+
+$$
+\begin{aligned}
+\tilde{p}^{z;m,n}_{t+1} &= \tilde{\pi}_t^{z;m} P(X_{t+1}=n|X_t=m,E_{t-1},Z)\quad P(Y_{t+1}|X_{t+1},E_{t+1})P(E_{t+1}|X_{t+1}=m,Z)P(H_{t+1}|X_{t+1}=m,Z,H_t=0)\\
+
+\tilde{\pi}_{t+1}^{z;n}&=\sum_{m=0}^{M_X-1}\tilde{p}^{z;m,n}_{t+1}
+\end{aligned}
+$$
+
+- Once the conditional marginal density and conditional joint density are all calculated, sample backward
+    + Sample $X_T$ by $\tilde{\pi}_{T}^{z;n}$
+    + Given $X_{t+1}=n$, Sample $X_{t}$ by $\tilde{p}^{z;m,n}_{t}$
+
+Adaptive Rejection Sampling Algorithm
+=======================================================
+id:ars
+
+[return](#/gibs_ars)
+
+(1) Choose a few values $x_j$ from the domain. Construct the upper hull and the lower hull of the target distribution function $f(x)$ by piecewise linear functions of 
+
+$$
+\begin{aligned}
+u(x) &= f(x_j)+f'(x_j)(x-x_j)\\
+l(x) &= \frac{(x_{j+1}-x)f(x_j)+(x-x_j)f(x_{j+1})}{x_{j+1}-x_j}
+\end{aligned}
+$$
+
+defined over intervals $x\in(z_{j-1},z_j)$ where 
+
+$$
+z_j = \frac{f(x_j)-f(x_{j+1})-x_{j+1}f'(x_{j+1})+x_jf'(x_j)}{f'(x_j)-f'(x_{j+1})}
+$$
+
+(2) Sample new value of $x^*$ by the probability of $s(x)$ where
+
+$$
+s(x) =\frac{exp(u(x))}{\int_{D_x} exp(u(x)) dx} 
+$$
+
+(3) Sample $w$ independently from uniform(0,1). Accept the new value$x^*$ if
+
+$$
+w \leq e^{l(x^*)-u(x^*)}
+$$
+Otherwise, accept the new value$x^*$ if 
+$$
+w \leq e^{f(x^*)-u(x^*)}
+$$
+Otherwise reject $x^*$ and draw again.
+
+(4) If $x^*$ is accepted, add to the list of $x_j$ for the next draw.
 
 
 
-```
-Error in `$<-.data.frame`(`*tmp*`, "seq", value = integer(0)) : 
-  replacement has 0 rows, data has 6
-```
+Parameter Consistency Under Stop Decision (1)
+=======================================================
+id:stop_proof
+
+**Theorem:**
+
+The pedagogical efficacy is consistently estimated by the Bayesian Knowledge Tracing Model only if 
+
+$$
+P(\mathbf{X_{t_1,t_2}}|\mathbf{Y},H_{t-1}=0) = P(\mathbf{X_{t_1,t_2}}|\mathbf{Y}) \quad \forall \quad 1 < t_1 < t_2 \leq T 
+$$
+
+*proof:*
+
+If the true parameter set $\Theta$ is stationary in the iterative estimation procedure of the BKT model, the BKT model converges to the true parameter. For pedagogical efficacy in iteration $s+1$:
+
+
+$$
+\begin{aligned}
+\hat{\ell}_{BKT}^{mn} &= \frac{\sum_{t=2}^T\sum_{i=1}^NI(X^i_t=n,X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}{\sum_{t=2}^T\sum_{i=1}^NI(X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}\\
+&= \frac{\sum_{t=2}^{T}\frac{\sum_{i=1}^NI(X^i_t=n,X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}{N}}{\sum_{t=2}^{T}\frac{\sum_{i=1}^NI(X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}{N}}
+\end{aligned}
+$$
+
+
+By law of large number, 
+
+$$
+\begin{aligned}
+\lim_{N\rightarrow \infty}\frac{\sum_{i=1}^NI(X^i_t=n,X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}{N}&\rightarrow P(X_t=n,X_{t-1}=m|\mathbf{Y})\\
+\lim_{N\rightarrow \infty} \frac{\sum_{i=1}^NI(X^i_{t-1}=m|\Theta_s,\mathbf{Y}^i)}{N} &\rightarrow P(X_{t-1}=m|\Theta_s,\mathbf{Y})\\
+\lim_{N\rightarrow\infty}\hat{\ell}_{s+1}^{mn} &\rightarrow \frac{\sum_{t=2}^TP(X_t=n,X_{t-1}=m|\mathbf{Y})}{\sum_{t=2}^TP(X_{t-1}=m|\Theta_s,\mathbf{Y})}\\
+&=\frac{\sum_{t=2}^T \ell^{mn} P(X_{t-1}=m|\Theta_s,\mathbf{Y})}{ \sum_{t=2}^TP(X_{t-1}=m|\Theta_s,\mathbf{Y})}\\
+&=\ell^{mn} 
+\end{aligned}
+$$
+
+
+Parameter Consistency Under Stop Decision (2)
+=======================================================
+
+**Lemma 1**:
+
+If the stop decision depends only on the observed response, $P(H_t=1)=f(Y_1,\dots,Y_t)$, the Bayesian Knowledge Tracing model consistently estimates the pedagogical efficacy.
+
+*proof:*
+
+$$
+\begin{aligned}
+P(\mathbf{X_{t_1,t_2}}|\mathbf{Y},H_{t-1}=0) &=\frac{P(\mathbf{X_{t_1,t_2}},\mathbf{Y},H_{t-1}=0)}{P(\mathbf{Y},H_{t-1}=0)} \\
+&= \frac{P(H_{t-1}=0|\mathbf{Y})P(\mathbf{Y}|\mathbf{X_{t_1,t_2}})P(\mathbf{X_{t_1,t_2}})}{\sum_{X_{t1}}\dots \sum_{X_{t_2}}P(H_{t-1}=0|\mathbf{Y})P(\mathbf{Y}|\mathbf{X_{t_1,t_2}})P(\mathbf{X_{t_1,t_2}})} \\
+&= \frac{P(\mathbf{Y}|\mathbf{X_{t_1,t_2}})P(\mathbf{X_{t_1,t_2}})}{\sum_{X_{t1}}\dots \sum_{X_{t_2}}P(\mathbf{Y}|\mathbf{X_{t_1,t_2}})P(\mathbf{X_{t_1,t_2}})} \\
+&= P(\mathbf{X_{t_1,t_2}}|\mathbf{Y})
+\end{aligned}
+$$
+
+The results follow by theorem 5.1.
+
+Parameter Consistency Under Stop Decision (3)
+=======================================================
+
+[return](#/stop)
+
+**Lemma 2:**
+
+If the stop decision depends on the latent mastery, $P(H_t=1)=f(Y_1,\dots,Y_t,X_1,\dots,X_t)$, the Bayesian Knowledge Tracing model consistently estimates the pedagogical efficacy only if $f(Y_1,\dots,Y_t,X_1=x_1^1,\dots,X_t=x_t^1)=f(Y_1,\dots,Y_t,X_1=x_1^2,\dots,X_t=x_t^2) \quad \forall x_1^1,x_1^2,\dots,x_t^1,x_t^2$.
+
+*proof:*
+
+Start with the posterior distribution of the marginal distribution 
+
+$$
+\begin{aligned}
+P(X_t=m|\mathbf{Y},H_{t-1}=0) &= \frac{\sum_{k=1}^{m}P(X_t=m|X_{t-1}=k)P(H_{t-1}=0|X_{t-1}=k)P(X_{t-1}=k|\mathbf{Y})}{\sum_{n=1}^{M_x}[\sum_{l=1}^{n}P(X_t=n|X_{t-1}=l)P(H_{t-1}=0|X_{t-1}=l)P(X_{t-1}=k|\mathbf{Y})]}\\
+P(X_t=m|\mathbf{Y}) &= \frac{\sum_{k=1}^{m}P(X_t=m|X_{t-1}=k)P(X_{t-1}=k|\mathbf{Y})}{\sum_{n=1}^{M_x}[\sum_{l=1}^{n}P(X_t=n|X_{t-1}=l)P(X_{t-1}=l|\mathbf{Y})]}\\
+\end{aligned}
+$$
+Let $P(X_t=m|X_{t-1}=n)$ be $\ell^{nm}$,$P(X_{t-1}=k|\mathbf{Y})=\pi_k$, $P(H_{t-1}=0|X_{t-1}=k)=h^k$. 
+
+$$
+P(X_t=m|\mathbf{Y},H_{t-1}=0) = P(X_t=m|\mathbf{Y}) \rightarrow \sum_{n=1}^{M_x}\sum_{l=1}^{n}\sum_{k=1}^{m} \ell^{km}\ell^{ln}\pi_k\pi_l(h_l-h_k) = 0
+$$
+
+If $h_l=h_k \quad \forall{\ell,k}$, it is obvious that the equality stands. If the equality stands, but $h_l\neq h_k\quad \text{for some }l,k$, then it must be true that $\ell^{km}\ell^{ln} = \ell^{lm}\ell^{kn}$. Since no conditions are imposed on the pedagogical efficacy, it must not be the case. Therefore, the sufficient and necessary condition is that the conditional hazard rates are equal across states.
+
+
+Description of Babel
+=======================================================
+id: babel
+
+-  Formal Stop Rule
+    + Each turn, the learner is challenged with a practice problem. 
+        - If she answers correctly, the health point of the AI avatar is randomly reduced. 
+        - If she answers incorrectly, the health point of the learner avatar is randomly reduced. 
+    + If the health point of either avatar drops to zero, the practice session stops. In expectation:
+        - The learner fails the level if he accumulates two or three errors
+        - The learner clears the level if he scores three or four hits.
+
+- Questions are almost perfect substitute
+    + "5:8=x:32" or "3:7=9:x"
+
+[return](#stop_case)
+
+
+Rank Order Consistency of the DID Estimator (1)
+=======================================================
+id:did_proof
+
+- Rank Order Conditions
+
+Let $\delta$ be the estimated relative effectiveness and $\Delta \ell$ be relative efficacy. 
+
+For the estimated effectiveness to have the same rank order as the efficacy, $\delta$ and $\Delta \ell$ need to satisfy the following properties.
+
+(1) If $\Delta \ell=0$, $\delta=0$.
+
+(2) If $\Delta \ell\neq0$, $\delta\Delta \ell>0$.
+
+
+Rank Order Consistency of the DID Estimator (2)
+=======================================================
+
+- Without Effort Choice
+
+**Theorem 1**
+
+The DID estimator correctly ranks pedagogical efficacies if there are learners without mastery before the experiment ($\pi<1$), the pre-test item does not convert all learners without mastery to having mastery ($\ell_0<1$), and the post-test item discriminates between two latent states($c_1^1 > c_1^0$).
+
+Rank Order Consistency of the DID Estimator (2)
+=======================================================
+
+*proof:*
+
+When there is no effort choice, the first difference within each group is 
+$$
+\begin{aligned}
+\delta_D&=P(Y_1=1,Y_0=1|D)-P(Y_1=1,Y_0=1|D) \\
+&= (1-\pi)(1-\ell_0)(1-\ell_D)(c_1^0-c_0^{1,0})+((1-\pi)[(1-\ell_0)\ell_D+\ell_0])(c_1^1-c_0^{1,0})+(1-\pi)(c_1^1-c_0^{1,1})
+\end{aligned}
+$$
+
+The second difference is
+$$
+\delta =\delta_T-\delta_C = \Delta \ell(1-\pi)(1-\ell_0)(c_1^1-c_1^0)
+$$
+
+If $\ell_0<1$, $\pi<1$, and $c_1^1>c_1^0$, it is easy to verify that rank order properties are satisfied. 
+
+
+Rank Order Consistency of the DID Estimator (3)
+=======================================================
+
+- With Effort Choice
+
+**Theorem 2**
+
+the DID estimator correctly ranks pedagogical efficacies if $\pi<1$ and $\ell_0<1$, $c_1^1e_1^1-c_1^0e_1^0$ and $e_T^0=e_C^0$
+
+Rank Order Consistency of the DID Estimator (4)
+=======================================================
+
+*proof:*
+
+The first difference is
+$$
+\begin{aligned}
+\tilde{\delta}_D&=P(O_0=0,O_1=1|D)-P(O_0=1,O_1=0|D) \\
+&=P(E_0=0,E_1=1,Y_1=1|D)+P(E_0=1,E_1=1,Y_0=0,Y_1=1|D)\\
+&\quad-P(E_0=1,E_1=0,Y_0=1|D)-P(E_0=1,E_1=1,Y_0=1,Y_1=0|D)\\
+&= (1-\pi)(1-\ell_0e^0_0)(1-\ell_De_D)(c_1^0e^0_1-c_0^{1,0}e^0_0)+((1-\pi)[(1-\ell_0e^0_0)\ell_De^0_D+\ell_0e^0_0])(c_1^1e^1_1-c_0^{1,0}e^0_0)+(1-\pi)(c_1^1e^1_1-c_0^{1,1}e^0_0)
+\end{aligned}
+$$
+
+The second difference is
+$$
+\tilde{\delta} = \tilde{\delta}_T-\tilde{\delta}_C = (\ell_Te^0_T-\ell_Ce^0_C)(1-\pi)(1-\ell_0e^0_0)(c_1^1e_1^1-c_1^0e_1^0)
+$$
+
+When $\Delta \ell=0$, $\tilde{\delta}=0$ only when $e^0_T=e^0_C$.
+
+If $e^0_T=e^0_C$, when $\Delta \ell\neq0$, $\tilde{\delta} \Delta \ell>0$ requires $c_1^1e_1^1-c_1^0e_1^0>0$.
+
+[return](#/did)
+
+Description of Afenti
+=======================================================
+id: afenti
+
+- A role-playing game where a learner clears a level to claim some reward by succeeding in practice questions
+- A small monetary incentive for good performance and no direct punishment for poor performance
+- Each correct answer is worth the same regardless of its difficulty
