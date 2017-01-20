@@ -1,21 +1,21 @@
-Learning Through Practices
+Learning Through Practice
 ========================================================
-author: Junhen Feng
+author: Junchen Feng
 autosize: true
 
 
 
-Main Result
+Main Results
 ========================================================
 type: section
 
 - A model of Learning Through Practice (LTP)
-    - define the efficacy of practice in relation to a dynamic learning process
+    - learning gain and learner heterogeneity
     - incorporate learner engagement, including stop decision and effort decision
     - Identification and Estimation of the LTP model
 
 - Empirical Application
-    - Stop Decision:  A majority of the observed learning gain is dynamic selection bias due to sample attrition
+    - Stop Decision:  spurious observed learning gain due to sample attrition
     - Effort Decision:  Correct Rank Order Inference in a RCT that DID gets it wrong
 
 
@@ -23,15 +23,11 @@ type: section
 Motivation
 ========================================================
 
-- Human teacher collaborates with an ITS is the future of education
+- Human teacher collaborates with an Intelligent Tutoring System (ITS) is the future of education
 
 - Dual roles of Practice
     - assessment 
     - instruction
-    
-- When the question bank is given
-    - selection
-    - sequencing
     
 
 Computerized Adaptive Testing (CAT) is not Sufficient
@@ -39,23 +35,12 @@ Computerized Adaptive Testing (CAT) is not Sufficient
 
 - CAT aims to measure the latent ability with certain precision by as few questions as possible
 
-- A good exam question can be a bad practice question
-    
-- Item Response Theory (IRT) implicitly assumes no learning
+- Item Response Theory (IRT) is the user model behind CAT
+
+- IRT implicitly assumes no learning
     - Understand growth/gain is the key
 
 
-Understanding Learner Heterogeneity is Essential
-========================================================
-id:hetero
-
-- Efficacy of practice = Learning Gain [(formal def)](#/def)
-
-- Heterogeneity of Efficacy:
-    - Different level of current mastery
-    - Different gain conditional on mastery level
-    
-![plot of chunk unnamed-chunk-1](fig/efficacy_heterogeneity.png)
 
 The Data Structure
 ========================================================
@@ -80,11 +65,13 @@ The Data Structure
 Bayesian Knowledge Tracing Model
 ========================================================
 
-- One type ($Z$)
+- One type ($Z$), One item $j=0$
 - Two state ($X_t$)
-- One item type
-- Observed response ($Y_t$) is a noisy signal of the latent mastery
-- Non-regressive state transition (Never forgets)
+- System dynamics 
+    + Observed response ($Y_t$) is a noisy signal of the latent mastery
+    + Latent mastery evolution
+        - If a learner has no mastery, she learns probabilistically
+        - If a learner has mastery, she never forgets/regresses
 
 - In terms of Hidden Markov Process
 
@@ -126,7 +113,7 @@ Bayesian Knowledge Tracing Model
 - Notation:
     + $\pi \equiv P(X_1=1)$
     + $\ell \equiv P(X_t=1|X_{t-1}=0)$
-    + $c^{r,k} \equiv P(Y_t=r|X_t=k)$
+    + $g \equiv P(Y_t=1|X_t=0); \quad s \equiv P(Y_t=0|X_t=1)$
 
 - The HMM process
 
@@ -138,8 +125,8 @@ P(Y_T=1)
 \end{bmatrix}
 &=
 \begin{bmatrix}
-c^{0,0} & c^{0,1}\\
-c^{0,1} & c^{1,1}
+1-g & s\\
+g & 1-s
 \end{bmatrix}
 \prod_{t=2}^T
 \begin{bmatrix}
@@ -153,51 +140,13 @@ c^{0,1} & c^{1,1}
 \end{aligned}
 $$
 
-Generalized Learning Through Practice
-========================================================
-id: ltp_efficacy
-- Extend the number of item types (j)
-- Extend the number of states
-
-$$
-\begin{aligned}
-\begin{bmatrix}
-\ell_j^{0,0} & 0 & 0\\
-\ell_j^{0,1} & \ell_j^{1,1} & 0\\
-\ell_j^{0,2} & \ell_j^{1,2} & 1
-\end{bmatrix}
-\end{aligned}
-$$
-
-- Extend the number of learner type
-
-$$
-\begin{aligned}
-\sum_{z=1}^Z
-\begin{bmatrix}
-\ell_j^{z;0,0} & 0 & 0\\
-\ell_j^{z;0,1} & \ell_j^{z;1,1} & 0\\
-\ell_j^{z;0,2} & \ell_j^{z;1,2} & 1
-\end{bmatrix}
-\end{aligned}
-$$
-
-
-
-***
-
-- Working definition of efficacy [(Assumption)](#efficacy_assumption)
-
-$\ell^{z;m,n}_j$
-
-![plot of chunk unnamed-chunk-2](fig/efficacy_heterogeneity_case.png)
 
 Learner Engagement 
 ========================================================
 id: ltp_le
 
 - Effort Decision [(Assumption)](#/ed)
-    + $e \equiv P(E_t=1|X_t=0)$
+    + $e^k \equiv P(E_t=1|X_t=k)$
 - No pain no gain: 
     + $P(X_t=1|X_{t-1}=0,E_t=0)=0$
 
@@ -205,11 +154,11 @@ $$
 (
 \begin{bmatrix}
 1-\ell & 0\\
-\ell e & 1
+\ell e^0 & 1
 \end{bmatrix}
 +
 \begin{bmatrix}
-\ell(1-e)  & 0\\
+\ell(1-e^0)  & 0\\
 0 & 0
 \end{bmatrix}
 )
@@ -219,18 +168,32 @@ $$
 \end{bmatrix}
 $$
 
+- Measurement Error
+    + $O_t=Y_t*E_t$
+
 Learner Engagement 
 ========================================================
 
 - Stop Decision [(Assumption)](#/sd)
-    + $h^k \equiv P(H_t=1|H_t=0,X_t=k)$
+    + $h^k \equiv P(H_t=1|H_{t-1}=0,X_t=k)$
 
 - Selective sample attrition
-    + $h^1 \neq h^0 \rightarrow P(X_t|H_t) \neq P(X_t)$
+    + $h^1 \neq h^0 \rightarrow P(X_t=1|H_t=0) \neq P(X_t=1)$
     
     
 
 $$
+\begin{bmatrix}
+1-\ell & 0\\
+\ell & 1
+\end{bmatrix}
+\begin{bmatrix}
+1-\pi\\
+\pi
+\end{bmatrix}
+
+\neq
+
 \begin{bmatrix}
 1-\ell & 0\\
 \ell  & 1
@@ -439,7 +402,7 @@ Identification of the BKT Model (1)
 
 ***
 
-![plot of chunk unnamed-chunk-4](thesis-figure/unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-2](thesis-figure/unnamed-chunk-2-1.png)
 
 Identification of the BKT Model (2)
 ========================================================
@@ -451,7 +414,7 @@ Identification of the BKT Model (2)
 
 ***
 
-![plot of chunk unnamed-chunk-5](thesis-figure/unnamed-chunk-5-1.png)
+![plot of chunk unnamed-chunk-3](thesis-figure/unnamed-chunk-3-1.png)
 
 
 Identification of the BKT Model (3)
@@ -465,7 +428,7 @@ id: bkt_id
 
 ***
 
-![plot of chunk unnamed-chunk-6](thesis-figure/unnamed-chunk-6-1.png)
+![plot of chunk unnamed-chunk-4](thesis-figure/unnamed-chunk-4-1.png)
 
 
 Necessary Identification Conditions
@@ -682,19 +645,19 @@ Motivation
 
 ***
 
-![plot of chunk unnamed-chunk-7](thesis-figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-5](thesis-figure/unnamed-chunk-5-1.png)
 
 
 Dynamic Selection Bias
 =======================================================
 id: dynamicbias
 - Assume the change in composition of latent types are from efficacy while it is partially from attrition
-    + Let the true efficacy be zero
-    + Let learners without mastery be more likely to dropout
-        - The proportion of learners without mastery descreases overtime
-    + The learning curve
-        - The true curve is flat
-        - The observed curve has positive slope
+    <!-- + Let the true efficacy be zero -->
+    <!-- + Let learners without mastery be more likely to dropout -->
+    <!--     - The proportion of learners without mastery descreases overtime -->
+    <!-- + The learning curve -->
+    <!--     - The true curve is flat -->
+    <!--     - The observed curve has positive slope -->
 
 - Differential attrition is a necessary, but not sufficient, condition for bias
     + The dependence structure of the stop decision matters [(details)](#/stop)
@@ -707,7 +670,7 @@ Stop-by-rule
 
 ***
 
-![plot of chunk unnamed-chunk-8](fig/duolingo_screenshot.png)
+![plot of chunk unnamed-chunk-6](fig/duolingo_screenshot.png)
 
 Stop-by-choice
 =======================================================
@@ -737,31 +700,31 @@ id:stop_case
 - [Hazard rate fit](#/hrfit)
 
 ***
-![plot of chunk unnamed-chunk-9](thesis-figure/unnamed-chunk-9-1.png)
+![plot of chunk unnamed-chunk-7](thesis-figure/unnamed-chunk-7-1.png)
 
 Bounds of Estimated Efficacy
 =======================================================
 
 
-|     Knowledge Point      | Dependence | Estimates | 95% CI(L) | 95% CI(H) |
-|:------------------------:|:----------:|:---------:|:---------:|:---------:|
-|      Long Division       |    BKT     |   0.06    |   0.02    |   0.11    |
-|      Long Division       |    LTP     |   0.01    |   0.00    |   0.03    |
-| Two-Digit Multiplication |    BKT     |   0.13    |   0.08    |   0.18    |
-| Two-Digit Multiplication |    LTP     |   0.03    |   0.00    |   0.06    |
+|     Knowledge Point      |      Dependence      | Estimates | 95% CI(L) | 95% CI(H) |
+|:------------------------:|:--------------------:|:---------:|:---------:|:---------:|
+|      Long Division       | stop-by-choice (LTP) |   0.01    |   0.00    |   0.03    |
+|      Long Division       |  stop-by-rule (BKT)  |   0.06    |   0.02    |   0.11    |
+| Two-Digit Multiplication | stop-by-choice (LTP) |   0.03    |   0.00    |   0.06    |
+| Two-Digit Multiplication |  stop-by-rule (BKT)  |   0.13    |   0.08    |   0.18    |
 
 Spurious Learning Gain 
 =======================================================
 
 - The counterfactual learning curve without attrition
 
-![plot of chunk unnamed-chunk-11](fig/lc_fit_efficacy.png)
+![plot of chunk unnamed-chunk-9](fig/lc_fit_efficacy.png)
 
 ***
 
 - The predicted learning curve with attrition
 
-![plot of chunk unnamed-chunk-12](fig/lc_fit_attrition.png)
+![plot of chunk unnamed-chunk-10](fig/lc_fit_attrition.png)
 
 
 Chapter 6: Effort Choice and Efficacy Ranking
@@ -786,26 +749,32 @@ Effectiveness V.S. Efficacy
 Difference in Difference in Low Stake RCT
 ========================================================
 
-- Randomized Control Trial design does not preclude the problem of effort
-
+- Let $D_i$ be the group assignment, $Y_{i,t}$ be the observed response, $t$ be the practice sequence
 
 - What DID should estimate
 
 $$
-Y_{i,t} = \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+\begin{aligned}
+Y_{i,t} &= f(\pi, \ell, s, g, t)\\
+Y_{i,t} &= \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+\end{aligned}
 $$
 
 - What DID actually estimates
 
 $$
 \begin{aligned}
+Y_{i,t} &= f(\pi, \ell e^0, s, g, t)\\
 O_{i,t} &= Y_{i,t}E_{i,t}\\
 O_{i,t} &= \tilde{\beta}_0 + \tilde{\beta}_d D_i + \tilde{\beta}_t t + \tilde{\gamma} D_i t + \epsilon_{i,t}
 \end{aligned}
 $$
 
+***
+- Randomized Control Trial design does not preclude the problem of effort
+
+
 - Can DID correctly estimates the **rank order** in the presence of effort choice?
-    + Does $\gamma$ and $\tilde{\gamma}$ has the same sign
 
 
 Rank Order Inference Bias
@@ -827,13 +796,13 @@ id:rct
 - [The learning environment](#/afenti)
     + a low stake learning environment
     + learners are known to exert low effort
-![plot of chunk unnamed-chunk-13](fig/practice_screenshot.png)
+![plot of chunk unnamed-chunk-11](fig/practice_screenshot.png)
 
 ***
 
 - The experiment
     + Goal: compare the efficacy of practice question with or without video [instruction](#/instruction)
-![plot of chunk unnamed-chunk-14](fig/item.png)
+![plot of chunk unnamed-chunk-12](fig/item.png)
 
 
 
@@ -857,14 +826,14 @@ Robustness of the Effort Identification
 
 - Distribution of Time Spent on Item without Effort
 
-![plot of chunk unnamed-chunk-16](thesis-figure/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-14](thesis-figure/unnamed-chunk-14-1.png)
 
 ***
 
 
 Distribution of Time Spent on Item With Effort
 
-![plot of chunk unnamed-chunk-17](thesis-figure/unnamed-chunk-17-1.png)
+![plot of chunk unnamed-chunk-15](thesis-figure/unnamed-chunk-15-1.png)
 
 Summary Statistics
 ========================================================
@@ -872,13 +841,13 @@ id:rct_res
 
 - Positive growth but no treatment effect
 
-![plot of chunk unnamed-chunk-18](thesis-figure/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-16](thesis-figure/unnamed-chunk-16-1.png)
 
 ***
 
 - More [evidence](#/dif_effort) on differential effort choice
 
-![plot of chunk unnamed-chunk-19](thesis-figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-17](thesis-figure/unnamed-chunk-17-1.png)
 
 
 
@@ -904,6 +873,63 @@ Result for Component Score
 |    Circumference    |  DID  |          0.01           |         NA         |   -0.03   |   0.05    |         N         |
 |        Shape        |  LTP  |           NA            |        0.02        |   -0.11   |   0.15    |         N         |
 |        Shape        |  DID  |          0.01           |         NA         |   -0.02   |   0.05    |         N         |
+
+Heterogeneous Learning Gain
+========================================================
+id:hetero
+
+- Efficacy of practice = Learning Gain [(formal def)](#/def)
+
+- Heterogeneity of Efficacy:
+    - Different level of current mastery
+    - Different gain conditional on mastery level
+
+***
+
+![plot of chunk unnamed-chunk-20](fig/efficacy_heterogeneity.png)
+
+
+
+Generalized Learning Through Practice
+========================================================
+id: ltp_efficacy
+- Extend the number of item types (j)
+- Extend the number of states
+
+$$
+\begin{aligned}
+\begin{bmatrix}
+\ell_j^{0,0} & 0 & 0\\
+\ell_j^{0,1} & \ell_j^{1,1} & 0\\
+\ell_j^{0,2} & \ell_j^{1,2} & 1
+\end{bmatrix}
+\end{aligned}
+$$
+
+- Extend the number of learner type
+
+$$
+\begin{aligned}
+\sum_{z=1}^Z
+P(z)
+\begin{bmatrix}
+\ell_j^{z;0,0} & 0 & 0\\
+\ell_j^{z;0,1} & \ell_j^{z;1,1} & 0\\
+\ell_j^{z;0,2} & \ell_j^{z;1,2} & 1
+\end{bmatrix}
+\end{aligned}
+$$
+
+
+
+***
+
+- Working definition of efficacy [(Assumption)](#efficacy_assumption)
+
+$\ell^{z;m,n}_j$
+
+![plot of chunk unnamed-chunk-21](fig/efficacy_heterogeneity_case.png)
+
 
 Thank You
 =======================================================

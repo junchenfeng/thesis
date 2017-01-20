@@ -1,6 +1,6 @@
-Learning Through Practices
+Learning Through Practice
 ========================================================
-author: Junhen Feng
+author: Junchen Feng
 autosize: true
 
 ```{r env, echo=FALSE}
@@ -14,17 +14,17 @@ proj_dir = 'C:/Users/junchen/Documents/GitHub/thesis_presentation'
 options(digits=2)
 ```
 
-Main Result
+Main Results
 ========================================================
 type: section
 
 - A model of Learning Through Practice (LTP)
-    - define the efficacy of practice in relation to a dynamic learning process
+    - learning gain and learner heterogeneity
     - incorporate learner engagement, including stop decision and effort decision
     - Identification and Estimation of the LTP model
 
 - Empirical Application
-    - Stop Decision:  A majority of the observed learning gain is dynamic selection bias due to sample attrition
+    - Stop Decision:  spurious observed learning gain due to sample attrition
     - Effort Decision:  Correct Rank Order Inference in a RCT that DID gets it wrong
 
 
@@ -32,15 +32,11 @@ type: section
 Motivation
 ========================================================
 
-- Human teacher collaborates with an ITS is the future of education
+- Human teacher collaborates with an Intelligent Tutoring System (ITS) is the future of education
 
 - Dual roles of Practice
     - assessment 
     - instruction
-    
-- When the question bank is given
-    - selection
-    - sequencing
     
 
 Computerized Adaptive Testing (CAT) is not Sufficient
@@ -48,25 +44,12 @@ Computerized Adaptive Testing (CAT) is not Sufficient
 
 - CAT aims to measure the latent ability with certain precision by as few questions as possible
 
-- A good exam question can be a bad practice question
-    
-- Item Response Theory (IRT) implicitly assumes no learning
+- Item Response Theory (IRT) is the user model behind CAT
+
+- IRT implicitly assumes no learning
     - Understand growth/gain is the key
 
 
-Understanding Learner Heterogeneity is Essential
-========================================================
-id:hetero
-
-- Efficacy of practice = Learning Gain [(formal def)](#/def)
-
-- Heterogeneity of Efficacy:
-    - Different level of current mastery
-    - Different gain conditional on mastery level
-    
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-include_graphics('fig/efficacy_heterogeneity.png')
-```
 
 The Data Structure
 ========================================================
@@ -91,11 +74,13 @@ The Data Structure
 Bayesian Knowledge Tracing Model
 ========================================================
 
-- One type ($Z$)
+- One type ($Z$), One item $j=0$
 - Two state ($X_t$)
-- One item type
-- Observed response ($Y_t$) is a noisy signal of the latent mastery
-- Non-regressive state transition (Never forgets)
+- System dynamics 
+    + Observed response ($Y_t$) is a noisy signal of the latent mastery
+    + Latent mastery evolution
+        - If a learner has no mastery, she learns probabilistically
+        - If a learner has mastery, she never forgets/regresses
 
 - In terms of Hidden Markov Process
 
@@ -137,7 +122,7 @@ Bayesian Knowledge Tracing Model
 - Notation:
     + $\pi \equiv P(X_1=1)$
     + $\ell \equiv P(X_t=1|X_{t-1}=0)$
-    + $c^{r,k} \equiv P(Y_t=r|X_t=k)$
+    + $g \equiv P(Y_t=1|X_t=0); \quad s \equiv P(Y_t=0|X_t=1)$
 
 - The HMM process
 
@@ -149,8 +134,8 @@ P(Y_T=1)
 \end{bmatrix}
 &=
 \begin{bmatrix}
-c^{0,0} & c^{0,1}\\
-c^{0,1} & c^{1,1}
+1-g & s\\
+g & 1-s
 \end{bmatrix}
 \prod_{t=2}^T
 \begin{bmatrix}
@@ -164,53 +149,13 @@ c^{0,1} & c^{1,1}
 \end{aligned}
 $$
 
-Generalized Learning Through Practice
-========================================================
-id: ltp_efficacy
-- Extend the number of item types (j)
-- Extend the number of states
-
-$$
-\begin{aligned}
-\begin{bmatrix}
-\ell_j^{0,0} & 0 & 0\\
-\ell_j^{0,1} & \ell_j^{1,1} & 0\\
-\ell_j^{0,2} & \ell_j^{1,2} & 1
-\end{bmatrix}
-\end{aligned}
-$$
-
-- Extend the number of learner type
-
-$$
-\begin{aligned}
-\sum_{z=1}^Z
-\begin{bmatrix}
-\ell_j^{z;0,0} & 0 & 0\\
-\ell_j^{z;0,1} & \ell_j^{z;1,1} & 0\\
-\ell_j^{z;0,2} & \ell_j^{z;1,2} & 1
-\end{bmatrix}
-\end{aligned}
-$$
-
-
-
-***
-
-- Working definition of efficacy [(Assumption)](#efficacy_assumption)
-
-$\ell^{z;m,n}_j$
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-include_graphics('fig/efficacy_heterogeneity_case.png')
-```
 
 Learner Engagement 
 ========================================================
 id: ltp_le
 
 - Effort Decision [(Assumption)](#/ed)
-    + $e \equiv P(E_t=1|X_t=0)$
+    + $e^k \equiv P(E_t=1|X_t=k)$
 - No pain no gain: 
     + $P(X_t=1|X_{t-1}=0,E_t=0)=0$
 
@@ -218,11 +163,11 @@ $$
 (
 \begin{bmatrix}
 1-\ell & 0\\
-\ell e & 1
+\ell e^0 & 1
 \end{bmatrix}
 +
 \begin{bmatrix}
-\ell(1-e)  & 0\\
+\ell(1-e^0)  & 0\\
 0 & 0
 \end{bmatrix}
 )
@@ -232,18 +177,32 @@ $$
 \end{bmatrix}
 $$
 
+- Measurement Error
+    + $O_t=Y_t*E_t$
+
 Learner Engagement 
 ========================================================
 
 - Stop Decision [(Assumption)](#/sd)
-    + $h^k \equiv P(H_t=1|H_t=0,X_t=k)$
+    + $h^k \equiv P(H_t=1|H_{t-1}=0,X_t=k)$
 
 - Selective sample attrition
-    + $h^1 \neq h^0 \rightarrow P(X_t|H_t) \neq P(X_t)$
+    + $h^1 \neq h^0 \rightarrow P(X_t=1|H_t=0) \neq P(X_t=1)$
     
     
 
 $$
+\begin{bmatrix}
+1-\ell & 0\\
+\ell & 1
+\end{bmatrix}
+\begin{bmatrix}
+1-\pi\\
+\pi
+\end{bmatrix}
+
+\neq
+
 \begin{bmatrix}
 1-\ell & 0\\
 \ell  & 1
@@ -847,12 +806,12 @@ Dynamic Selection Bias
 =======================================================
 id: dynamicbias
 - Assume the change in composition of latent types are from efficacy while it is partially from attrition
-    + Let the true efficacy be zero
-    + Let learners without mastery be more likely to dropout
-        - The proportion of learners without mastery descreases overtime
-    + The learning curve
-        - The true curve is flat
-        - The observed curve has positive slope
+    <!-- + Let the true efficacy be zero -->
+    <!-- + Let learners without mastery be more likely to dropout -->
+    <!--     - The proportion of learners without mastery descreases overtime -->
+    <!-- + The learning curve -->
+    <!--     - The true curve is flat -->
+    <!--     - The observed curve has positive slope -->
 
 - Differential attrition is a necessary, but not sufficient, condition for bias
     + The dependence structure of the stop decision matters [(details)](#/stop)
@@ -958,19 +917,19 @@ Bounds of Estimated Efficacy
 for (i in seq(2)){
   file_path = paste0(proj_dir,'/_data/05/res/',kpids[i],'/yh.txt')
   y_param_data = read.table(file_path, col.names=c('l','pi','c0','c1','lambda0','beta0','lambda1','beta1'), header=F,sep=',')
-  y_param_data = y_param_data %>% select(l) %>% mutate(type='BKT', model='Proportional')
+  y_param_data = y_param_data %>% select(l) %>% mutate(type='stop-by-rule (BKT)', model='Proportional')
   
   file_path = paste0(proj_dir,'/_data/05/res/',kpids[i],'/xh.txt')
   x_param_data = read.table(file_path, col.names=c('l','pi','c0','c1','lambda0','beta0','lambda1','beta1'), header=F,sep=',') 
-  x_param_data = x_param_data %>% select(l) %>% mutate(type='LTP', model='Proportional')
+  x_param_data = x_param_data %>% select(l) %>% mutate(type='stop-by-choice (LTP)', model='Proportional')
   
   file_path = paste0(proj_dir,'/_data/05/res/',kpids[i],'/yh_np.txt')
   y_param_data_np = read.table(file_path, col.names=c('l','pi','c0','c1','h01','h02','h03','h04','h11','h12','h13','h14'), header=F,sep=',')
-  y_param_data_np = y_param_data_np %>% select(l) %>% mutate(type='BKT', model='Nonparametric')
+  y_param_data_np = y_param_data_np %>% select(l) %>% mutate(type='stop-by-rule (BKT)', model='Nonparametric')
   
   file_path = paste0(proj_dir,'/_data/05/res/',kpids[i],'/xh_np.txt')
   x_param_data_np = read.table(file_path, col.names=c('l','pi','c0','c1','h01','h02','h03','h04','h11','h12','h13','h14'), header=F,sep=',') 
-  x_param_data_np = x_param_data_np %>% select(l) %>% mutate(type='LTP', model='Nonparametric')
+  x_param_data_np = x_param_data_np %>% select(l) %>% mutate(type='stop-by-choice (LTP)', model='Nonparametric')
   
   tmp = rbind(y_param_data, x_param_data, y_param_data_np, x_param_data_np)
   tmp$kp = kp_names[i]
@@ -1029,26 +988,32 @@ Effectiveness V.S. Efficacy
 Difference in Difference in Low Stake RCT
 ========================================================
 
-- Randomized Control Trial design does not preclude the problem of effort
-
+- Let $D_i$ be the group assignment, $Y_{i,t}$ be the observed response, $t$ be the practice sequence
 
 - What DID should estimate
 
 $$
-Y_{i,t} = \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+\begin{aligned}
+Y_{i,t} &= f(\pi, \ell, s, g, t)\\
+Y_{i,t} &= \beta_0 + \beta_d D_i + \beta_t t + \gamma D_i t + \epsilon_{i,t}
+\end{aligned}
 $$
 
 - What DID actually estimates
 
 $$
 \begin{aligned}
+Y_{i,t} &= f(\pi, \ell e^0, s, g, t)\\
 O_{i,t} &= Y_{i,t}E_{i,t}\\
 O_{i,t} &= \tilde{\beta}_0 + \tilde{\beta}_d D_i + \tilde{\beta}_t t + \tilde{\gamma} D_i t + \epsilon_{i,t}
 \end{aligned}
 $$
 
+***
+- Randomized Control Trial design does not preclude the problem of effort
+
+
 - Can DID correctly estimates the **rank order** in the presence of effort choice?
-    + Does $\gamma$ and $\tilde{\gamma}$ has the same sign
 
 
 Rank Order Inference Bias
@@ -1302,6 +1267,67 @@ kable(
 
 
 ```
+
+Heterogeneous Learning Gain
+========================================================
+id:hetero
+
+- Efficacy of practice = Learning Gain [(formal def)](#/def)
+
+- Heterogeneity of Efficacy:
+    - Different level of current mastery
+    - Different gain conditional on mastery level
+
+***
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+include_graphics('fig/efficacy_heterogeneity.png')
+```
+
+
+
+Generalized Learning Through Practice
+========================================================
+id: ltp_efficacy
+- Extend the number of item types (j)
+- Extend the number of states
+
+$$
+\begin{aligned}
+\begin{bmatrix}
+\ell_j^{0,0} & 0 & 0\\
+\ell_j^{0,1} & \ell_j^{1,1} & 0\\
+\ell_j^{0,2} & \ell_j^{1,2} & 1
+\end{bmatrix}
+\end{aligned}
+$$
+
+- Extend the number of learner type
+
+$$
+\begin{aligned}
+\sum_{z=1}^Z
+P(z)
+\begin{bmatrix}
+\ell_j^{z;0,0} & 0 & 0\\
+\ell_j^{z;0,1} & \ell_j^{z;1,1} & 0\\
+\ell_j^{z;0,2} & \ell_j^{z;1,2} & 1
+\end{bmatrix}
+\end{aligned}
+$$
+
+
+
+***
+
+- Working definition of efficacy [(Assumption)](#efficacy_assumption)
+
+$\ell^{z;m,n}_j$
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+include_graphics('fig/efficacy_heterogeneity_case.png')
+```
+
 
 Thank You
 =======================================================
