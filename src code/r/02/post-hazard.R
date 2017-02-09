@@ -78,7 +78,7 @@ imputate_hazard_rate <- function(test_data, Tmax){
 
 proj_dir = getwd()
 kpids = c('87','138')
-kpnames = c('Two Digit Multiplication', 'Vertical Division')
+kpnames = c('Two Digit Multiplication', 'Long Division')
 maxT= 4
 
 ## Prop Model
@@ -198,7 +198,7 @@ for (i in seq(2)){
     tmp = data.frame(t=seq(4),yh=as.numeric(0),xh=as.numeric(0))
     for (t in seq(4)){
       if (t!=1){
-        pi = conditional_x_density_xh(pi, l, x_hrs$wh[t-1], x_hrs$yh[t-1])
+        pi = conditional_x_density_xh(pi, l, h0s[t-1], h1s[t-1])
       }
       tmp$yh[t]=trans_x2y_hazard(pi,c0,c1,h0s[t],h1s[t],1)
       tmp$wh[t]=trans_x2y_hazard(pi,c0,c1,h0s[t],h1s[t],0)
@@ -246,9 +246,12 @@ all_data_1$spec='Parametric'
 all_data_2$spec='Nonparametric'
 all_data = rbind(all_data_1,all_data_2)
 
+all_data$res = factor(all_data$res)
 
-qplot(data=all_data %>% filter(type=='LTP'), x=t,y=h,geom='line', col=res) +  facet_grid(spec~kp)+
+ggplot(data=all_data %>% filter(type=='LTP'), aes(x=t,y=h, col=res,linetype=res)) + geom_line() +
+  scale_linetype_manual(values = c("correct"='twodash',"incorrect"='solid')) +
+  facet_grid(spec~kp)+
   geom_errorbar(aes(x=t, ymin=hmin, ymax=hmax,color=res),width=0.1) +  facet_grid(spec~kp)+
-  geom_line(aes(x=t,y=hd,col=res),linetype='dashed')+
+  geom_line(aes(x=t,y=hd,col=res),linetype='dotted')+
   theme(legend.position="top") + ylab('Hazard Rate') + xlab('Number of Practice')
 

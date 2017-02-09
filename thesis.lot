@@ -1,0 +1,39 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{ An Example of the LTP Input Data}}{44}{table.1.1}
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{Estimated Pedagogical Efficacy of the LTP Models}}{64}{table.2.1}
+\contentsline {table}{\numberline {2.2}{Estimated Parameter of the Mixture Model (Global)}}{65}{table.2.2}
+\contentsline {table}{\numberline {2.3}{Estimated Parameter of the Mixture Model (Higher Mode )}}{66}{table.2.3}
+\contentsline {table}{\numberline {2.4}{Estimated Parameter of the Mixture Model (Lower Mode)}}{66}{table.2.4}
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{BKT Parameters in Beck\&Chang (2007)}}{79}{table.3.1}
+\contentsline {table}{\numberline {3.2}{Estimated Efficacy}}{81}{table.3.2}
+\contentsline {table}{\numberline {3.3}{Estimated Initial Mastery}}{81}{table.3.3}
+\contentsline {table}{\numberline {3.4}{Estimated Guess Rate}}{81}{table.3.4}
+\contentsline {table}{\numberline {3.5}{Estimated Slip Rate}}{82}{table.3.5}
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{Hazard Rates Conditional on Observed Response in Stop-by-Rule}}{94}{table.4.1}
+\contentsline {table}{\numberline {4.2}{Estimated Pedagogical Efficacy of Stop-by-Rule Sample Attrition}}{95}{table.4.2}
+\contentsline {table}{\numberline {4.3}{Conditional Hazard Rate of Stop-by-Choice Sample Attrition}}{95}{table.4.3}
+\contentsline {table}{\numberline {4.4}{Estimated Pedagogical Efficacy of Stop-by-Choice Sample Attrition}}{96}{table.4.4}
+\contentsline {table}{\numberline {4.5}{Estimated Pedagogical Efficacy of the Parametric Specification}}{102}{table.4.5}
+\contentsline {table}{\numberline {4.6}{Estimated Pedagogical Efficacy of the Non-parametric Specification}}{102}{table.4.6}
+\contentsline {table}{\numberline {4.7}{Percentage of Learning Gain Attributed to the Practice Efficacy}}{105}{table.4.7}
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{Simulation Result of the DID estimator}}{120}{table.5.1}
+\contentsline {table}{\numberline {5.2}{Simulation Result of the LTP estimator}}{120}{table.5.2}
+\contentsline {table}{\numberline {5.3}{Answer Composition - All Wrong}}{125}{table.5.3}
+\contentsline {table}{\numberline {5.4}{Effort Rate Choices - All}}{128}{table.5.4}
+\contentsline {table}{\numberline {5.5}{Effort Rate Choice - By Response in the Pre-test}}{129}{table.5.5}
+\contentsline {table}{\numberline {5.6}{Estimated Relative Effectiveness and Relative Efficacy in Aggregate Score}}{130}{table.5.6}
+\contentsline {table}{\numberline {5.7}{Estimated Relative Effectiveness and Relative Efficacy by Knowledge Components}}{131}{table.5.7}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {C.1}{Answer Composition (Percentage) - All Wrong}}{140}{table.C.1}
+\contentsline {table}{\numberline {C.2}{Answer Composition (Percentage) - Partial Correct}}{140}{table.C.2}
+\contentsline {table}{\numberline {C.3}{Answer Breakdown: Nonblank Answer}}{141}{table.C.3}
+\contentsline {table}{\numberline {C.4}{Answer Breakdown: Wrong Shape}}{142}{table.C.4}
+\contentsline {table}{\numberline {C.5}{Answer Breakdown: Wrong Circumference}}{143}{table.C.5}
+\contentsline {table}{\numberline {C.6}{Answer Breakdown: Wrong Area}}{144}{table.C.6}
+\contentsline {table}{\numberline {C.7}{Answer Breakdown: Slip}}{145}{table.C.7}

@@ -33,7 +33,7 @@ data$ec_status = factor(data$ec_status, labels=c('no-effort','Honest Error','Cor
 
 ## Introduction: Efficacy Vesus Effectiveness {-}
 
-Eric Talyor [-@taylor2015new] surveyed the evaluation of new education technology and concluded that education technologies are generally pedagogically ineffective in raising test scores. There are two competing hypotheses in explaining this observation: 
+Eric Taylor [-@taylor2015new] surveyed the evaluation of new education technology and concluded that education technologies are generally pedagogically ineffective in raising test scores. There are two competing hypotheses in explaining this observation: 
 
 1. New technology does not improve teaching/learning productivity even under ideal conditions.
 2. New technology improves productivity under ideal conditions but fails to do so in practical settings.
@@ -138,11 +138,13 @@ $$
 
 
 Econometricians use Difference in Difference (DID) regression to estimate the average treatment effect from an RCT. Let $Y$ be the response. $Y=1$ is a correct response. $Y=0$ is the incorrect response.  Let $t$ marks the experiment phase. $t=0$ is the pre-test phase and $t=1$ is the post-test phase. Under random assignment of an RCT, Average Treatment Effect (ATE) can be expressed as 
-$$
-ATE = [E(Y|D=T,t=1)-E(Y|D=C,t=1)]-[E(Y|D=T,t=0)-E(Y|D=C,t=0)]  \quad \text{(6.1)}
-$$
 
-The DID estimator accounts for common growth from pre-test to post-test period ($\beta_t$). It also controls for potential difference in the correct rate between the treatment and control groups in the pre-test period ($\beta_D$). Let $\beta_0$ be the average correct rate for the control group at the pre-test period. Let $\gamma$ denote the ATE. The four components in equation (6.1) can be expressed as:
+\begin{equation}
+ATE = [E(Y_{t=1}|D=T)-E(Y_{t=1}|D=C)]-[E(Y_{t=0}|D=T)-E(Y_{t=0}|D=C)] \label{ate}
+\end{equation}
+
+
+The DID estimator accounts for common growth from pre-test to post-test period ($\beta_t$). It also controls for potential difference in the correct rate between the treatment and control groups in the pre-test period ($\beta_D$). Let $\beta_0$ be the average correct rate for the control group at the pre-test period. Let $\gamma$ denote the ATE. The four components in equation \ref{eq:ate} can be expressed as:
 $$
 \begin{aligned}
 E(Y|D=C,t=0) &= \beta_0\\
@@ -210,7 +212,8 @@ When there is no effort choice, the first difference within each group is
 $$
 \begin{aligned}
 \delta_D&=P(Y_1=1,Y_0=1|D)-P(Y_1=1,Y_0=1|D) \\
-&= (1-\pi)(1-\ell_0)(1-\ell_D)(c_1^0-c_0^{1,0})+((1-\pi)[(1-\ell_0)\ell_D+\ell_0])(c_1^1-c_0^{1,0})+(1-\pi)(c_1^1-c_0^{1,1})
+&= (1-\pi)(1-\ell_0)(1-\ell_D)(c_1^0-c_0^{1,0})+((1-\pi)[(1-\ell_0)\ell_D+\ell_0])(c_1^1-c_0^{1,0})\\
+&+(1-\pi)(c_1^1-c_0^{1,1})
 \end{aligned}
 $$
 
@@ -240,7 +243,8 @@ $$
 \tilde{\delta}_D&=P(O_0=0,O_1=1|D)-P(O_0=1,O_1=0|D) \\
 &=P(E_0=0,E_1=1,Y_1=1|D)+P(E_0=1,E_1=1,Y_0=0,Y_1=1|D)\\
 &\quad-P(E_0=1,E_1=0,Y_0=1|D)-P(E_0=1,E_1=1,Y_0=1,Y_1=0|D)\\
-&= (1-\pi)(1-\ell_0e^0_0)(1-\ell_De_D)(c_1^0e^0_1-c_0^{1,0}e^0_0)+((1-\pi)[(1-\ell_0e^0_0)\ell_De^0_D+\ell_0e^0_0])(c_1^1e^1_1-c_0^{1,0}e^0_0)+(1-\pi)(c_1^1e^1_1-c_0^{1,1}e^0_0)
+&= (1-\pi)(1-\ell_0e^0_0)(1-\ell_De_D)(c_1^0e^0_1-c_0^{1,0}e^0_0)\\
+&\quad+((1-\pi)[(1-\ell_0e^0_0)\ell_De^0_D+\ell_0e^0_0])(c_1^1e^1_1-c_0^{1,0}e^0_0)+(1-\pi)(c_1^1e^1_1-c_0^{1,1}e^0_0)
 \end{aligned}
 $$
 
@@ -252,12 +256,10 @@ $$
 When $\Delta \ell=0$, $\tilde{\delta}=0$ only when $e^0_T=e^0_C$.
 
 If $e^0_T=e^0_C$, when $\Delta \ell\neq0$, $\tilde{\delta} \Delta \ell>0$ requires $c_1^1e_1^1-c_1^0e_1^0>0$.
-
-
 ```
 
 
-Theorem 6.3 essentially says the DID estimator correctly recovers the rank order only when the effort choices of learners without mastery are the same for the treatment pedagogy and the control pedagogy. It implies that the DID estimator does not preserve the rank order of efficacies when the effort choices differ by practice questions, which is more realistic in a low stake learning environment.
+Theorem 5.3 essentially says the DID estimator correctly recovers the rank order only when the effort choices of learners without mastery are the same for the treatment pedagogy and the control pedagogy. It implies that the DID estimator does not preserve the rank order of efficacies when the effort choices differ by practice questions, which is more realistic in a low stake learning environment.
 
 
 
@@ -290,18 +292,18 @@ $$
 In general, the inequality is not true.
 ```
 
-The key insight from Lemma 6.1 is that conditioning on the effort is a selection process. Such selection process breaks the valid counterfactual assumption granted by the random assignment of the RCT design. Therefore the estimated effectiveness of each group is biased.  Although it can be argued that a biased estimator of the effectiveness is not sufficient to conclude that the difference of two biased estimators does not preserve the rank order of pedagogical efficacies. The author wishes to point out that it is easy to construct a counterexample where such bias leads to a wrong rank order.
+The key insight from Lemma 5.1 is that conditioning on the effort is a selection process. Such selection process breaks the valid counterfactual assumption granted by the random assignment of the RCT design. Therefore the estimated effectiveness of each group is biased.  Although it can be argued that a biased estimator of the effectiveness is not sufficient to conclude that the difference of two biased estimators does not preserve the rank order of pedagogical efficacies. The author wishes to point out that it is easy to construct a counterexample where such bias leads to a wrong rank order.
 
 
 
 ## Simulation Study
 
-The simulation demonstrates Theorem 6.2 and Theorem 6.3 in the previous section. The true efficacy difference is set to be 0.4. Without effort choice, the true effectiveness difference for the DID estimator is 0.176. With effort choice, the true effectiveness difference for the DID estimator is 0, where the differential effort choices offset the efficacy difference entirely. The values of all simulation parameters are in Appendix B.4. 
+The simulation demonstrates Theorem 5.2 and Theorem 5.3 in the previous section. The true efficacy difference is set to be 0.4. Without effort choice, the true effectiveness difference for the DID estimator is 0.176. With effort choice, the true effectiveness difference for the DID estimator is 0, where the differential effort choices offset the efficacy difference entirely. The values of all simulation parameters are in Appendix B.4. 
 
 Use the 95% credible interval as the decision rule for ranking. If the interval is to the right of 0, the treatment ranks first. If the interval is to the left of the 0, the control ranks first. The simulation study is interested in whether the DID estimator and the LTP estimator make the right rank decision.
 
 
-Table 6.1 shows the result of the DID estimator. When the data generating process does not involve the effort choice, the DID estimator consistently estimates the relative effectiveness and thus correctly ranks the two groups. However, when the data generating process involves the effort choice, the 95% credible interval contains zero, thus the DID estimator fails to rank the treatment higher than the control.
+Table \ref{tab:s_did} shows the result of the DID estimator. When the data generating process does not involve the effort choice, the DID estimator consistently estimates the relative effectiveness and thus correctly ranks the two groups. However, when the data generating process involves the effort choice, the 95% credible interval contains zero, thus the DID estimator fails to rank the treatment higher than the control.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 data_dir = paste0(proj_dir, '/_data/03/sim/')
@@ -353,11 +355,11 @@ kable(
   sim_param %>% filter(model=='RCT') %>% select(-model,-true_efficacy,-est_efficacy), 
   col.names=c('D.G.P.', 'Effectiveness','Est.Effectiveness','95% CI(L)','95% CI(H)'),
   booktabs = TRUE, align='c',format='pandoc',
-  caption = 'Simulation Result of the DID estimator'
+  caption = '\\label{tab:s_did}Simulation Result of the DID estimator'
 )
 ```
 
-In contrast, Table 6.2 shows that the LTP estimator always recovers the correct rank order whether the data generating process has the effort choice or not. 
+In contrast, Table \ref{tab:s_ltp} shows that the LTP estimator always recovers the correct rank order whether the data generating process has the effort choice or not. 
 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
@@ -365,7 +367,7 @@ kable(
   sim_param %>% filter(model=='LTP') %>% select(-model,-true_effective,-est_effective), 
   col.names=c('D.G.P.', 'Efficacy','Est.Efficacy','95% CI(L)','95% CI(H)'),
   booktabs = TRUE, align='c',format='pandoc',
-  caption = 'Simulation Result of the LTP estimator'
+  caption = '\\label{tab:s_ltp}Simulation Result of the LTP estimator'
 )
 
 ```
@@ -377,9 +379,9 @@ This section applies the LTP model to a randomized control trial. The section fi
 
 ### The Learning Environment
 
-The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is used after school, rather than in the classroom. The product is framed as a role-playing game where a learner clears a level to claim some reward. The screen shots of the selection, the practice and the completion of a level are shown in Figure 6.1.
+The experiment is carried out in a paid self-learning product offered by a Chinese online learning service provider. The product is used after school, rather than in the classroom. The product is framed as a role-playing game where a learner clears a level to claim some reward by succeeding in practice questions. The screen shots of the selection, the practice and the completion of a level are shown in Figure \ref{fig:interface_afenti}.
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Stages of a Level in the Learning Game", fig.align='center'}
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "\\label{fig:interface_afenti}Stages of a Level in the Learning Game", fig.align='center'}
 include_graphics("fig/practice_screenshot.png")
 ```
 
@@ -400,26 +402,14 @@ The log data collected for the experiment include the following fields:
 
 The time spent on the item is defined as the time elapsed between the timestamp the server sends out the question to the learner's device and the timestamp the learner's answer received by the server. The transmission time in the network is negligible, usually in the magnitude of 10 milliseconds. However, the time spent does not distinguish how much time spent on each sub question. In addition, it is not a clean measure of student's active learning time. What student did between when the question is presented and when the answer is submitted is not observed. Although there are 4% of the observations logged response time longer than 2 minutes, the majority of the response time falls within a reasonable time range.
 
-Here is a sample of the original data log
-
-```{r, echo=FALSE,message=FALSE,warning=FALSE}
-log_example = head(data%>%select(uid, eid, cmt_time, cmt_timelen,atag_pct, answers), 1)
-log_example$uid = as.character(log_example$uid)
-kable(
-  log_example, 
-  col.names = c('User ID', 'Item ID', 'Submit Time', 'Time Spent on Item', 'Score', 'Answers'),
-  align='c',booktabs = TRUE,format='pandoc',
-  caption = 'Demo data from the Log'
-)
-```
 
 ### The Design and the Implementation of The Experiment 
 
 The experiment is administrated from June 9th to June 10th 2016 to third-grade students whose parents paid for the learning product. By then, all learners should have learned the pre-requisite knowledge in the school: calculating circumference and area of a rectangle. 
 
-Each group receives three items, the pre-test item, the training item and the post-test item, as shown in Figure 6.2. All items ask the learner to calculate the circumference and the area of two identical rectangles joined by one side given the length and width of the small rectangle. The pre-test item and the training item are rectangles joined by length but have different parameter values. The pre-test and post-test item share the same parameter value but whose small rectangles are joined by different sides. The highly similar yet not identical test items aim to increase the measurement validity while preventing students from memorizing the answer.
+Each group receives three items, the pre-test item, the training item and the post-test item, as shown in Figure \ref{fig:exp_desc}. All items ask the learner to calculate the circumference and the area of two identical rectangles joined by one side given the length and width of the small rectangle. The pre-test item and the training item are rectangles joined by length but have different parameter values. The pre-test and post-test item share the same parameter value but whose small rectangles are joined by different sides. The highly similar yet not identical test items aim to increase the measurement validity while preventing students from memorizing the answer.
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "Descriptions of Experiment Problems", fig.align='center'}
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap =  "\\label{fig:exp_desc}Descriptions of Experiment Problems", fig.align='center'}
 include_graphics("fig/item.png")
 ```
 
@@ -450,7 +440,7 @@ In the context of this experiment, there are only four honest mistakes:
 3. Wrong area: The learner calculates correctly the circumference but not the area
 4. Slip:  The answer is correctly calculated but the learner inputs in a wrong way (for example an extra zero at the end)
 
-Table 6.4 shows a breakdown of the answer classification. The classification is discussed in details in Appendix C.
+Table \ref{tab:ans_wrong} shows a breakdown of the answer classification. The classification is discussed in details in Appendix C.
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 # the four groups are noefforts, honest errors and correct response
@@ -474,40 +464,40 @@ ans_composition = data  %>%
 
 kable(
   ans_composition %>% arrange(qtype,group), 
-  col.names=c('Group','Task','No-Effort(%)','No-Effort(SE)','Honest Error (%)','Honest Error (SE)', 'Correct(%)','Correct(SE)'),
+  col.names=c('Group','Task','No-Effort(%)','S.E.','Honest Error (%)','S.E.', 'Correct(%)','S.E.'),
   booktabs = TRUE, align='c',format='pandoc',
-  caption = 'Answer Composition - All Wrong'
+  caption = '\\label{tab:ans_wrong}Answer Composition - All Wrong'
 )
 ```
 
 
 #### Robustness Check of the Effort Classification
 
-Time spent on the item is suggestive of the learner's level of effort. Figure 6.3 shows its distribution. While the response time distribution of the honest error is very similar to that of the correct answer, the response time distribution of the no-effort answer is very different to the other two. The median time spent on an honest error or a correct answer is about 47 seconds while that on a no-effort answer is about 10 seconds. The first quartile of the response time of an honest error or a correct answer is about 34 seconds, which is higher than the third quartile of the response time of a no-effort answer, 29 seconds. The similarity between the honest error and the correct answer and the difference of the two from the no-effort answer validates the effort classification. 
+Time spent on the item is suggestive of the learner's level of effort. Figure \ref{fig:box_time_ans} shows its distribution. While the response time distribution of the honest error is very similar to that of the correct answer, the response time distribution of the no-effort answer is very different to the other two. The median time spent on an honest error or a correct answer is about 47 seconds while that on a no-effort answer is about 10 seconds. The first quartile of the response time of an honest error or a correct answer is about 34 seconds, which is higher than the third quartile of the response time of a no-effort answer, 29 seconds. The similarity between the honest error and the correct answer and the difference of the two from the no-effort answer validates the effort classification. 
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE,, fig.cap = "Boxplot of Time Spent by Answer Type", fig.align='center',out.height='8cm',out.width='8cm'}
+```{r, echo=FALSE,message=FALSE,warning=FALSE,, fig.cap = "\\label{fig:box_time_ans}Boxplot of Time Spent by Answer Type", fig.align='center',out.height='8cm',out.width='8cm'}
 
 qplot(data=data,x=ec_status,y=cmt_timelen,geom='boxplot') + ylab('Time Spent on Item(Sec)') + xlab('Answer Type')
 ```
 
 
-It may be argued that the classification strategy underestimates the level of effort because it is possible that learners do think hard on these problems despite putting in a non-sensical answer or leaving it blank. Although it may be an issue for the pre-test item, such miscoding is less problematic for the training item and the post-test item. Figure 6.4 shows the distribution of response time when submitting a no-effort answer. Compared to the pre-test item, the response time distribution of the training item and the post-test item shifts to the left and skews toward 0. The learners are spending less time on the problem, so little that it may not them to read the question carefully. Therefore, the effort identification is likely to be more accurate in the next two items. 
+It may be argued that the classification strategy underestimates the level of effort because it is possible that learners do think hard on these problems despite putting in a non-sensical answer or leaving it blank. Although it may be an issue for the pre-test item, such miscoding is less problematic for the training item and the post-test item. Figure \ref{fig:dist_time_giveup} shows the distribution of response time when submitting a no-effort answer. Compared to the pre-test item, the response time distribution of the training item and the post-test item shifts to the left and skews toward 0. The learners are spending less time on the problem, so little that it may not them to read the question carefully. Therefore, the effort identification is likely to be more accurate in the next two items. 
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item without Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "\\label{fig:dist_time_giveup}Distribution of Time Spent on Item without Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
 qplot(data=data %>% filter(cmt_timelen<=120&giveup), x=cmt_timelen, geom='density', col=etype, linetype=etype, facets=group~qtype)+xlab('Time Spent on Task (Seconds)')
 ```
 
-In contrast, answers with actual effort input do not demonstrate the same shift. Figure 6.5 shows the response time distribution when submitting a valid answer. A honest error or a correct answer is taxing on one's mind and takes time, while a no-effort error made on the fly. The comparison of response time distribution between effort exertion and the lack of it further substantiates the classification.
+In contrast, answers with actual effort input do not demonstrate the same shift. Figure \ref{fig:dist_time_effort} shows the response time distribution when submitting a valid answer. A honest error or a correct answer is taxing on one's mind and takes time, while a no-effort error made on the fly. The comparison of response time distribution between effort exertion and the lack of it further substantiates the classification.
 
 
-```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "Distribution of Time Spent on Item With Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
+```{r,echo=FALSE,message=FALSE,warning=FALSE, fig.cap = "\\label{fig:dist_time_effort}Distribution of Time Spent on Item With Effort by Answer Classification", fig.align='center',out.height='8cm',out.width='8cm'}
 qplot(data=data %>% filter(cmt_timelen<=120&!giveup), x=cmt_timelen, geom='density', col=ec_status, linetype=ec_status,facets=group~qtype) + xlab('Time Spent on Task (Seconds)')
 ```
 
 
 #### Differential Effort Level Choice
 
-Table 6.5 lists the summary statistics of the effort rate group by the experiment sequence and the group assignment. The treatment group exerts less effort compared to the control group in the pre-test period and the training period, the difference of which is statistically significant. The effort gap narrows in the post-test period. Ideally, the two groups should have the same effort rate in the pre-test period but different effort rates in the training session. The different effort rates in the pre-test period suggest that the randomization is not perfect. However, the effort rate gap widens from 2.3% in the pre-test period to 3.4% in the training session. Although the widening of the effort gap is not statistically significant, it suggests that treatment pedagogy elicits less effort from the learners.
+Table \ref{tab:erc_all} lists the summary statistics of the effort rate group by the experiment sequence and the group assignment. The treatment group exerts less effort compared to the control group in the pre-test period and the training period, the difference of which is statistically significant. The effort gap narrows in the post-test period. Ideally, the two groups should have the same effort rate in the pre-test period but different effort rates in the training session. The different effort rates in the pre-test period suggest that the randomization is not perfect. However, the effort rate gap widens from 2.3% in the pre-test period to 3.4% in the training session. Although the widening of the effort gap is not statistically significant, it suggests that treatment pedagogy elicits less effort from the learners.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 effort_rate_stat = data %>% group_by(group,qtype) %>% summarize(pct=1-mean(giveup), se=(1-pct)*pct/sqrt(n())) %>% select(qtype,group,pct,se) %>% arrange(qtype,group)
@@ -516,7 +506,7 @@ kable(effort_rate_stat,
       
       col.names = c('Period','Group','Mean Effort Rate','Standard Error'),
       booktabs = TRUE, align='c', format='pandoc',
-      caption = 'Effort Rate Choices - All'
+      caption = '\\label{tab:erc_all}Effort Rate Choices - All'
       ) 
 ```
 
@@ -524,7 +514,7 @@ kable(effort_rate_stat,
 
 Further, this chapter wants to measure the effort gap of the learners with mastery and those without. From the data, one can only observe the effort rate conditional the response, but not on the state of latent mastery. That said, the state of latent mastery can be partially approximated by the response in the pre-test item. Because the pre-test item is a fill-in-the-blanks question, the probability of making a correct guess when the learner has no mastery is small enough to be negligible. Therefore, if a learner correctly answers the question, she must have mastered the knowledge point. If the learner incorrectly answers the question, it is unclear whether it is because she has no mastery or because she does not want to exert effort. Because the learners who fail the pre-test is a mixture of learners with and without mastery, if the effort gap of learners who correctly answers the pre-test is smaller than that of learners who incorrectly answers the pre-test, the latter becomes the lower bound of the effort gap of learners without mastery.
 
-Table 6.6 reports the effort rates for the learners partitioned by the response in the pre-test item. The effort rate gap is 1.6% for the learners who (presumably) have mastery because they correctly answer the pre-test question. It is lower than the effort gap of learners who incorrectly answer the pre-test question, which is around 4%. Therefore, the effort rate gap for the learners without mastery must be larger than 4%. Even at the lower bound, the effort rate gap of learners without mastery is about 2 times larger than those with mastery. 
+Table \ref{tab:erc_res} reports the effort rates for the learners partitioned by the response in the pre-test item. The effort rate gap is 1.6% for the learners who (presumably) have mastery because they correctly answer the pre-test question. It is lower than the effort gap of learners who incorrectly answer the pre-test question, which is around 4%. Therefore, the effort rate gap for the learners without mastery must be larger than 4%. Even at the lower bound, the effort rate gap of learners without mastery is about 2 times larger than those with mastery. 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 effort_rate_stat_1 = data %>% filter(is_placebo==1)%>% group_by(group,qtype) %>% summarize(pct_1=1-mean(giveup), se_1=(1-pct_1)*pct_1/sqrt(n()))
@@ -534,9 +524,9 @@ effort_rate_stat_placebo = merge(effort_rate_stat_1,effort_rate_stat_0) %>% sele
 
 kable(effort_rate_stat_placebo, 
       booktabs = TRUE,
-      col.names = c('Period','Group','Mean Effort Rate(Y=0)','S.E(Y=0)','Mean Effort Rate(Y=1)','S.E(Y=1)'),
+      col.names = c('Period','Group','Mean Effort Rate(Y=0)','S.E.','Mean Effort Rate(Y=1)','S.E.'),
       align='c',format='pandoc',
-      caption = 'Effort Rate Choice - By Response in the Pre-test'
+      caption = '\\label{tab:erc_res}Effort Rate Choice - By Response in the Pre-test'
       ) 
 ```
 
@@ -550,7 +540,7 @@ This section compares the DID estimator to the LTP estimator. It demonstrates ho
 
 #### Relative Effectiveness and Relative Efficacy in Aggregate
 
-Both the DID estimator and the LTP estimator are applied to the aggregate score. The point estimation of relative effectiveness given by the DID estimator is close to 0. Because its 95% confidence interval contains 0, the DID estimator suggests that the efficacy ranking of the two questions cannot be determined. In contrast, the point estimation of relative efficacy given by the LTP model is positive. Because its 95% credible interval excludes 0, the LTP estimator suggests that the training question with video instructions has better efficacy than the question without.
+Both the DID estimator and the LTP estimator are applied to the aggregate score. Table \ref{tab:el_aggr} shows the result. The point estimation of relative effectiveness given by the DID estimator is close to 0. Because its 95% confidence interval contains 0, the DID estimator suggests that the efficacy ranking of the two questions cannot be determined. In contrast, the point estimation of relative efficacy given by the LTP model is positive. Because its 95% credible interval excludes 0, the LTP estimator suggests that the training question with video instructions has better efficacy than the question without.
 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
@@ -589,9 +579,9 @@ param_data = param_data%>% arrange(model)
 
 kable(
   param_data, booktabs = TRUE,
-  col.names=c('Model','Est. Rel  Effectivness','Est. Rel  Efficacy','95% CI(L)','95% CI(H)','Treatment Better?'),
+  col.names=c('Model','Est. Rel Effective','Est. Rel Efficacy','95% CI(L)','95% CI(H)','Treatment Win'),
   align='c',format='pandoc',
-  caption = 'Estimated Relative Effectiveness and Relative Efficacy in Aggregate Score'
+  caption = '\\label{tab:el_aggr}Estimated Relative Effectiveness and Relative Efficacy in Aggregate Score'
 )
 
 ```
@@ -601,7 +591,7 @@ kable(
 To correctly solve the problem, a learner must be proficient in three knowledge components: shape identification, circumference calculation, and area calculation. Therefore, it is possible to score each knowledge components and analyze the respective pedagogical efficacy ranking. The effort choice is inherited from the aggregate score. For example, if the learner leaves a blank for circumference but fills in the area, the response is considered a valid effort for all three components, rather than treating it as a no-effort for the circumference due to the blank answer.
 
 
-According to the prior expectation of the pedagogical experts, the video scaffolding is likely to be more effective in teaching how to calculate the circumference, because it introduces a new method to calculate the circumference that is less likely to cause confusion. Table 6.8 reports the estimated relative effectiveness and relative efficacy by these components. The breakdown analysis indeed shows that the question with video instruction has higher pedagogical efficacy in teaching circumference, but not in teaching the other two components. This finding supports the plausibility of the claim that the LTP estimator is truly estimating the pedagogical efficacy.
+According to the prior expectation of the pedagogical experts, the video scaffolding is likely to be more effective in teaching how to calculate the circumference, because it introduces a new method to calculate the circumference that is less likely to cause confusion. Table \ref{tab:el_comp} reports the estimated relative effectiveness and relative efficacy by these components. The breakdown analysis indeed shows that the question with video instruction has higher pedagogical efficacy in teaching circumference, but not in teaching the other two components. This finding supports the plausibility of the claim that the LTP estimator is truly estimating the pedagogical efficacy.
 
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
@@ -672,9 +662,9 @@ param_data = rbind(bkt_param_data, did_param_data) %>% arrange(kp,model)
 
 kable(
   param_data, booktabs = TRUE,
-  col.names=c('Knowledge Component','Model','Est. Rel  Effectiveness','Est. Rel  Efficacy','95% CI(L)','95% CI(H)'),
+  col.names=c('Knowledge','Model','Est. Rel  Effect','Est. Rel  Efficacy','95% CI(L)','95% CI(H)'),
   align='c',format='pandoc',
-  caption = 'Estimated Relative Effectiveness and Relative Efficacy by Knowledge Components'
+  caption = '\\label{tab:el_comp}Estimated Relative Effectiveness and Relative Efficacy by Knowledge Components'
 )
 
 

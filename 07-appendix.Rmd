@@ -53,7 +53,7 @@ $\lambda_{z;k}$: The baseline hazard rate given latent mastery $k$ of learner ty
 
 # Simulation Parameters
 
-## The Monte Carlo Markov Chain Algorithm Convergence Demo: Single Type
+## MCMC Algorithm Convergence Demo: Single Type
 
 The initial state density is:
 
@@ -132,7 +132,7 @@ $$
 $$
 
 
-## The Monte Carlo Markov Chain Algorithm Convergence Demo: Multiple Types
+## MCMC Algorithm Convergence Demo: Multiple Types
 
 The first type is 60% of the sample ($\alpha_1=0.6$). The first item occurs with 50% probability ($P(A_t=1)=0.5$).
 
@@ -218,7 +218,7 @@ The answers are initially classified into six categories:
 
 (7) Correct Answer: Both circumference and area of the large rectangle are correctly calculated
 
-The Table  and Table  show the summary statistics of different groups' answer composition at a different stage of the experiment. There is a steady increase in the blank answer as the item sequence progresses. The nonblank answer increases most in the training session.
+Table \ref{tab:ans_giveup} and Table \ref{tab:ans_honestmis} show the summary statistics of different groups' answer composition at a different stage of the experiment. There is a steady increase in the blank answer as the item sequence progresses. The nonblank answer increases most in the training session.
 
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
@@ -232,9 +232,9 @@ ans_composition = data  %>%
             slip=mean(is_slip)*100)
 kable(
   ans_composition %>% arrange(qtype,group)%>% select(-rightcirc,-rightarea,-wrongshape,-slip), booktabs = TRUE,
-  col.names=c('Group','Task','Blank Ans(%)','Non Blank Wrong Ans (%)'),
-  align='c',
-  caption = 'Answer Composition - All Wrong'
+  col.names=c('Group','Task','Blank Ans','Non Blank Wrong Ans'),
+  align='c',format='pandoc',
+  caption = '\\label{tab:ans_giveup}Answer Composition (Percentage) - All Wrong'
 )
 ```
 
@@ -242,10 +242,10 @@ For learners who make a valid effort but still do not get all blanks correct, th
 
 ```{r, echo=FALSE,message=FALSE,warning=FALSE}
 kable(
-  ans_composition %>% arrange(qtype,group) %>% select(-blank,-nonblank), booktabs = TRUE,
-  col.names=c('Group','Task','Wrong Shape(%)', 'Wrong Area(%)', 'Wrong Circumference(%)','Slip(%)'),
-  align='c',
-  caption = 'Answer Composition - Partial Correct'
+  ans_composition %>% arrange(qtype,group) %>% select(-blank,-nonblank), 
+  col.names=c('Group','Task','Wrong Shape', 'Wrong Area', 'Wrong Circumference', 'Slip'),
+  align='c', booktabs = TRUE,format='pandoc',
+  caption = '\\label{tab:ans_honestmis}Answer Composition (Percentage) - Partial Correct'
 )
 ```
 
@@ -273,9 +273,8 @@ ans_stat = merge(type_ans_stat, type_stat) %>% mutate(pct=n/N) %>%
 For the non-blank answer, the most common error of the training item and the post-test item is (38,80), which is the correct answer to the pre-test item. The second common error for the post-test is (28,48), which is the correct answer to the training item.  The learners just memorized the answer key from the previous question, which signals that they are not making effort.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-
 kable(
-  ans_stat %>% filter(ans_type=='non-blank ans')%>% select(-ans_type) , booktabs = TRUE,
+  ans_stat %>% filter(ans_type=='non-blank ans')%>% select(-ans_type) , booktabs = TRUE,format='pandoc',
   caption = 'Answer Breakdown: Nonblank Answer'
 )
 ```
@@ -283,10 +282,8 @@ kable(
 The top category of the wrong shape is the right circumference and the right shape of the small rectangle, which is not surprising.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-
-
 kable(
-  ans_stat %>% filter(ans_type=='wrong shape') %>% select(-ans_type) , booktabs = TRUE,
+  ans_stat %>% filter(ans_type=='wrong shape') %>% select(-ans_type) , booktabs = TRUE,format='pandoc',
   caption = 'Answer Breakdown: Wrong Shape'
 )
 ```
@@ -294,9 +291,8 @@ kable(
 It is not surprising that either the circumference  or the double of the circumference of the small rectangle is in top 3 wrong answer category of the wrong circumference. In all three items, substitute the circumference with a (wrong) area is also a common mistake. For example, (160,80) in the pre-test and (24,48) in the training.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-
 kable(
-  ans_stat %>% filter(ans_type=='right area') %>% select(-ans_type) , booktabs = TRUE,
+  ans_stat %>% filter(ans_type=='right area') %>% select(-ans_type) , booktabs = TRUE,format='pandoc',
   caption = 'Answer Breakdown: Wrong Circumference'
 )
 ```
@@ -306,7 +302,7 @@ The most common mistake of the wrong area is using the area of the small rectang
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
 
 kable(
-  ans_stat %>% filter(ans_type=='right circumference') %>% select(-ans_type) , booktabs = TRUE,
+  ans_stat %>% filter(ans_type=='right circumference') %>% select(-ans_type) , booktabs = TRUE,format='pandoc',
   caption = 'Answer Breakdown: Wrong Area'
 )
 ```
@@ -315,9 +311,8 @@ kable(
 Slip mainly involves adding 1 before or 0 after the right answer.
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-
 kable(
-  ans_stat %>% filter(ans_type=='slip') %>% select(-ans_type) , booktabs = TRUE,
+  ans_stat %>% filter(ans_type=='slip') %>% select(-ans_type) , booktabs = TRUE,format='pandoc',
   caption = 'Answer Breakdown: Slip'
 )
 ```

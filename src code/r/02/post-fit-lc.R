@@ -1,6 +1,6 @@
- library(dplyr)
+library(dplyr)
 library(tidyr)
-
+library(ggplot2)
 # generate three fit
 update_mastery <- function(mastery, learn_rate){
   return (mastery + (1-mastery)*learn_rate)
@@ -94,7 +94,7 @@ conditional_x_density_yh<-function(pi,l,c0,c1,h0, h1){
 
 proj_dir = getwd()
 kpids = c('87','138')
-kpnames = c('Two Digit Multiplication', 'Vertical Division')
+kpnames = c('Two Digit Multiplication', 'Long Division')
 maxT= 4
 
 fit_log1 = read.table(paste0(proj_dir,'/_data/02/spell_data_87.csv'),sep=',',col.names=c('uid','t','y','h'))
@@ -204,7 +204,7 @@ qplot(data=all_data, x=t,y=pmean,geom='line') +  facet_grid(type~kp)+
 
 
 ########
-# Nonparametric
+# With Attrition
 ########
 
 for (i in seq(2)){

@@ -1,0 +1,101 @@
+\contentsline {chapter}{List of Figures}{5}{chapter*.1}
+\contentsline {chapter}{List of Tables}{7}{chapter*.2}
+\contentsline {chapter}{Abstract}{11}{chapter*.4}
+\contentsline {chapter}{Introduction}{15}{chapter*.5}
+\contentsline {section}{\numberline {0.1}The Instructor's Problem and the Dual Role of Practice}{16}{section.0.1}
+\contentsline {section}{\numberline {0.2}Mastery, Learning, and Practice Efficacy}{17}{section.0.2}
+\contentsline {section}{\numberline {0.3}The Bayesian Knowledge Tracing Model}{20}{section.0.3}
+\contentsline {section}{\numberline {0.4}Learner Engagement}{21}{section.0.4}
+\contentsline {section}{\numberline {0.5}Overview of the Thesis}{23}{section.0.5}
+\contentsline {chapter}{\numberline {1}Learning Through Practice}{27}{chapter.1}
+\contentsline {section}{\numberline {1.1}Practice Efficacy and Learning Process}{29}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}The General Definition of Efficacy}{30}{subsection.1.1.1}
+\contentsline {subsection}{\numberline {1.1.2}The Working Definition of Efficacy}{31}{subsection.1.1.2}
+\contentsline {subsection}{\numberline {1.1.3}The Learning Process}{33}{subsection.1.1.3}
+\contentsline {subsection}{\numberline {1.1.4}The Learning Process with Learner Engagement}{35}{subsection.1.1.4}
+\contentsline {section}{\numberline {1.2}The Statistical Inference Model}{35}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}An Overview of Hidden Markov Model}{36}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Hidden Markov Model As A Learning Model}{37}{subsection.1.2.2}
+\contentsline {subsection}{\numberline {1.2.3}The Bayesian Knowledge Tracing Model}{38}{subsection.1.2.3}
+\contentsline {subsection}{\numberline {1.2.4}Learner Heterogeneity}{39}{subsection.1.2.4}
+\contentsline {subsection}{\numberline {1.2.5}Learner Engagement}{40}{subsection.1.2.5}
+\contentsline {subsubsection}{\numberline {1.2.5.1}Event Sequence}{41}{subsubsection.1.2.5.1}
+\contentsline {subsubsection}{\numberline {1.2.5.2}The Effort Decision}{41}{subsubsection.1.2.5.2}
+\contentsline {subsubsection}{\numberline {1.2.5.3}The Stop Decision}{42}{subsubsection.1.2.5.3}
+\contentsline {subsection}{\numberline {1.2.6}LTP as HMM}{43}{subsection.1.2.6}
+\contentsline {subsection}{\numberline {1.2.7}An Example of Input Data}{44}{subsection.1.2.7}
+\contentsline {section}{\numberline {1.3}Express Learning Theories with the LTP model}{44}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Zone of Proximal Development}{45}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Reinforcement Learning}{46}{subsection.1.3.2}
+\contentsline {section}{\numberline {1.4}Adaptive Practice Recommendation}{46}{section.1.4}
+\contentsline {chapter}{\numberline {2}Model Estimation}{49}{chapter.2}
+\contentsline {section}{\numberline {2.1}Prior}{50}{section.2.1}
+\contentsline {section}{\numberline {2.2}Full Conditional Likelihood of Augmented Data}{51}{section.2.2}
+\contentsline {section}{\numberline {2.3}State Augmentation}{54}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Latent Mastery Augmentation}{54}{subsection.2.3.1}
+\contentsline {subsubsection}{\numberline {2.3.1.1}The Brute Force Algorithm}{54}{subsubsection.2.3.1.1}
+\contentsline {subsubsection}{\numberline {2.3.1.2}The Forward Recursion and Backward Sampling Algorithm}{55}{subsubsection.2.3.1.2}
+\contentsline {subsection}{\numberline {2.3.2}Learner Type Augmentation}{57}{subsection.2.3.2}
+\contentsline {section}{\numberline {2.4}Parameter Update}{57}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Conjugate Posterior}{58}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}Adaptive Rejection Sampling (ARS)}{58}{subsection.2.4.2}
+\contentsline {section}{\numberline {2.5}Label Switching}{61}{section.2.5}
+\contentsline {section}{\numberline {2.6}Posterior Inference}{62}{section.2.6}
+\contentsline {section}{\numberline {2.7}Simulation}{63}{section.2.7}
+\contentsline {subsection}{\numberline {2.7.1}Single Learner Type}{63}{subsection.2.7.1}
+\contentsline {subsection}{\numberline {2.7.2}Multiple Learner Types}{65}{subsection.2.7.2}
+\contentsline {chapter}{\numberline {3}Model Identification}{69}{chapter.3}
+\contentsline {section}{\numberline {3.1}The Literature Review}{70}{section.3.1}
+\contentsline {section}{\numberline {3.2}Sufficient Statistics of the LTP Model}{72}{section.3.2}
+\contentsline {section}{\numberline {3.3}Identification of the Learning Through Practice Model}{73}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}The Practical Implication}{74}{subsection.3.3.1}
+\contentsline {section}{\numberline {3.4}Identification of the Bayesian Knowledge Tracing Model}{76}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Revisit Beck\&Chang}{79}{subsection.3.4.1}
+\contentsline {chapter}{\numberline {4}Dynamic Selection Bias of Sample Attrition}{83}{chapter.4}
+\contentsline {section}{\numberline {4.1}Introduction}{83}{section.4.1}
+\contentsline {section}{\numberline {4.2}Sample Attrition and Dynamic Selection Bias}{84}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Dynamic Selection Bias}{84}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Dynamic Selection bias and Dependence Structure}{86}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Stop-by-Rule and Stop-by-Choice}{89}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Sign of Dynamic Selection Bias in Stop-by-Choice}{90}{subsection.4.2.4}
+\contentsline {section}{\numberline {4.3}Correct Dynamic Selection Bias}{92}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}The LTP Model}{92}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Simulation}{94}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.4}Case Study}{97}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}The Learning Environment}{97}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Data Cleaning Procedure}{99}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Empirical Hazard Rate Curve}{99}{subsection.4.4.3}
+\contentsline {subsection}{\numberline {4.4.4}Estimated Pedagogical Efficacy}{101}{subsection.4.4.4}
+\contentsline {subsection}{\numberline {4.4.5}The Fallacy of ``Learning Gain'' from Learning Curve}{103}{subsection.4.4.5}
+\contentsline {chapter}{\numberline {5}Effort Choice and Efficacy Ranking}{107}{chapter.5}
+\contentsline {section}{Introduction: Efficacy Vesus Effectiveness}{107}{section*.6}
+\contentsline {section}{\numberline {5.1}Effort Choice in Randomized Control Trials}{109}{section.5.1}
+\contentsline {section}{\numberline {5.2}The LTP model}{111}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}Key Assumptions}{111}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}Consistent Estimation of Relative Efficacy}{112}{subsection.5.2.2}
+\contentsline {section}{\numberline {5.3}The Difference in Difference Estimator}{113}{section.5.3}
+\contentsline {subsection}{\numberline {5.3.1}Inferring Relative Efficacy from Relative Effectiveness}{114}{subsection.5.3.1}
+\contentsline {subsection}{\numberline {5.3.2}Efficacy Ranking by the DID Estimator}{115}{subsection.5.3.2}
+\contentsline {subsubsection}{\numberline {5.3.2.1}Notation}{115}{subsubsection.5.3.2.1}
+\contentsline {subsubsection}{\numberline {5.3.2.2}Rank Ordering Without Effort Choice}{116}{subsubsection.5.3.2.2}
+\contentsline {subsubsection}{\numberline {5.3.2.3}Rank Order with Effort Choice}{117}{subsubsection.5.3.2.3}
+\contentsline {subsubsection}{\numberline {5.3.2.4}Rank Ordering Conditional on Effort}{118}{subsubsection.5.3.2.4}
+\contentsline {section}{\numberline {5.4}Simulation Study}{119}{section.5.4}
+\contentsline {section}{\numberline {5.5}Case Study}{120}{section.5.5}
+\contentsline {subsection}{\numberline {5.5.1}The Learning Environment}{121}{subsection.5.5.1}
+\contentsline {subsection}{\numberline {5.5.2}Raw data}{122}{subsection.5.5.2}
+\contentsline {subsection}{\numberline {5.5.3}The Design and the Implementation of The Experiment}{123}{subsection.5.5.3}
+\contentsline {subsection}{\numberline {5.5.4}Differential Effort Choice}{124}{subsection.5.5.4}
+\contentsline {subsubsection}{\numberline {5.5.4.1}Effort Classification}{124}{subsubsection.5.5.4.1}
+\contentsline {subsubsection}{\numberline {5.5.4.2}Robustness Check of the Effort Classification}{125}{subsubsection.5.5.4.2}
+\contentsline {subsubsection}{\numberline {5.5.4.3}Differential Effort Level Choice}{127}{subsubsection.5.5.4.3}
+\contentsline {subsection}{\numberline {5.5.5}The result}{129}{subsection.5.5.5}
+\contentsline {subsubsection}{\numberline {5.5.5.1}Relative Effectiveness and Relative Efficacy in Aggregate}{130}{subsubsection.5.5.5.1}
+\contentsline {subsubsection}{\numberline {5.5.5.2}Relative Effectiveness and Relative Efficacy by Knowledge Components}{130}{subsubsection.5.5.5.2}
+\contentsline {chapter}{\numberline {A}Notation}{133}{appendix.A}
+\contentsline {chapter}{\numberline {B}Simulation Parameters}{135}{appendix.B}
+\contentsline {section}{\numberline {B.1}MCMC Algorithm Convergence Demo: Single Type}{135}{section.B.1}
+\contentsline {section}{\numberline {B.2}MCMC Algorithm Convergence Demo: Multiple Types}{137}{section.B.2}
+\contentsline {section}{\numberline {B.3}The Dynamic Selection Bias Demo}{138}{section.B.3}
+\contentsline {section}{\numberline {B.4}The Effort-induced Measurement Error Demo}{138}{section.B.4}
+\contentsline {chapter}{\numberline {C}Answer Classification}{139}{appendix.C}
